@@ -6,7 +6,7 @@ services:
 startup: {type: form, module: ScanCheck}
 package_name: Scan_Compare
 allow_embedding: false
-name: Clone of Scan Compare
+name: ScanCompare
 runtime_options: {version: 2, client_version: '3', server_version: python3-sandbox,
   server_spec: null}
 startup_form: null
