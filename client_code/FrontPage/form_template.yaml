@@ -35,8 +35,16 @@ components:
       bold: false
       underline: false
       include_placeholder: true
-    name: drop_down_1
+    name: drop_down_frontpage
     layout_properties: {grid_position: 'NNDHYA,VWTOKS'}
+  - type: Button
+    properties: {role: filled-button, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Go, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: button_frontpage_1
+    layout_properties: {grid_position: 'CSKXPM,TYWJNG'}
+    event_bindings: {click: button_frontpage_click}
 - type: FlowPanel
   properties: {}
   name: navbar_links
