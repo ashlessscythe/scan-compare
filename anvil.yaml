@@ -1,0 +1,31 @@
+dependencies: []
+services:
+- source: /runtime/services/tables.yml
+  client_config: {}
+  server_config: {}
+startup: {type: form, module: ScanCheck}
+package_name: Scan_Compare
+allow_embedding: false
+name: Clone of Scan Compare
+runtime_options: {version: 2, client_version: '3', server_version: python3-sandbox,
+  server_spec: null}
+startup_form: null
+db_schema:
+  scans:
+    client: none
+    server: full
+    columns:
+    - name: scan_1
+      admin_ui: {order: 0, width: 200}
+      type: string
+    - name: scan_2
+      admin_ui: {order: 1, width: 200}
+      type: string
+    - name: created
+      admin_ui: {order: 2, width: 200}
+      type: datetime
+    - name: result
+      admin_ui: {order: 3, width: 200}
+      type: string
+    title: scans
+renamed: true
