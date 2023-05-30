@@ -7,7 +7,7 @@ services:
 - source: /runtime/services/anvil/files.yml
   client_config: {}
   server_config: {file_table: files}
-startup: {type: form, module: ScanCheck}
+startup: {type: form, module: FrontPage}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
