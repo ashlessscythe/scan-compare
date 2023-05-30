@@ -1,3 +1,4 @@
+scheduled_tasks: []
 dependencies: []
 services:
 - source: /runtime/services/tables.yml
@@ -10,8 +11,11 @@ startup: {type: form, module: ScanCheck}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
-runtime_options: {version: 2, client_version: '3', server_version: python3-sandbox,
-  server_spec: null}
+runtime_options:
+  version: 2
+  client_version: '3'
+  server_version: python3-sandbox
+  server_spec: {base: python310-minimal}
 startup_form: null
 db_schema:
   scans:
