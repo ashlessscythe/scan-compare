@@ -144,6 +144,12 @@ class ScanCheck(sc):
     match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
     return match.group()
 
+  def button_logout_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    anvil.users.logout()
+    open_form('Login')
+
+
 
 
 

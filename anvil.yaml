@@ -8,10 +8,10 @@ services:
   client_config: {}
   server_config: {file_table: files}
 - source: /runtime/services/anvil/users.yml
-  client_config: {allow_signup: false, enable_automatically: true, use_email: true,
-    confirm_email: true}
+  client_config: {allow_signup: true, enable_automatically: true, use_email: true,
+    confirm_email: true, allow_remember_me: false, remember_me_days: 30}
   server_config: {user_table: users}
-startup: {type: form, module: ScanCheck}
+startup: {type: form, module: Login}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
@@ -23,60 +23,72 @@ runtime_options:
 startup_form: null
 db_schema:
   scans:
+    title: scans
     client: none
     server: full
     columns:
     - name: scan_1
-      admin_ui: {order: 0, width: 200}
+      admin_ui: {width: 200}
       type: string
     - name: scan_2
-      admin_ui: {order: 1, width: 200}
-      type: string
-    - name: created
-      admin_ui: {order: 2, width: 200}
-      type: datetime
-    - name: result
-      admin_ui: {order: 3, width: 200}
+      admin_ui: {width: 200}
       type: string
     - name: scan_3
-      admin_ui: {order: 4, width: 200}
+      admin_ui: {width: 200}
       type: string
     - name: scan_4
-      admin_ui: {order: 5, width: 200}
+      admin_ui: {width: 200}
       type: string
-    title: scans
+    - name: result
+      admin_ui: {width: 200}
+      type: string
+    - name: created
+      admin_ui: {width: 200}
+      type: datetime
   files:
+    title: Files
     client: none
     server: full
     columns:
     - name: path
+      admin_ui: {width: 200}
       type: string
-      admin_ui: {order: 0, width: 200}
     - name: file
+      admin_ui: {width: 200}
       type: media
-      admin_ui: {order: 1, width: 200}
     - name: file_version
+      admin_ui: {width: 200}
       type: string
-      admin_ui: {order: 2, width: 200}
-    title: Files
   users:
+    title: Users
     client: none
     server: full
     columns:
     - name: email
+      admin_ui: {width: 200}
       type: string
-      admin_ui: {order: 0, width: 200}
     - name: enabled
+      admin_ui: {width: 200}
       type: bool
-      admin_ui: {order: 1, width: 200}
     - name: last_login
+      admin_ui: {width: 200}
       type: datetime
-      admin_ui: {order: 2, width: 200}
     - name: password_hash
+      admin_ui: {width: 200}
       type: string
-      admin_ui: {order: 3, width: 200}
     - name: n_password_failures
+      admin_ui: {width: 200}
       type: number
-      admin_ui: {order: 4, width: 200}
-    title: Users
+    - name: confirmed_email
+      admin_ui: {width: 200}
+      type: bool
+    - name: signed_up
+      admin_ui: {width: 200}
+      type: datetime
+    - name: remembered_logins
+      admin_ui: {width: 200}
+      type: simpleObject
+    - name: email_confirmation_key
+      admin_ui: {width: 200}
+      type: string
 renamed: true

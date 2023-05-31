@@ -15,5 +15,6 @@ class Login(LoginTemplate):
 
   def button_login_click(self, **event_args):
     user = anvil.users.login_with_form()
-    open_form('ScanCheck')
+    if user:
+      open_form('ScanCheck')
 
