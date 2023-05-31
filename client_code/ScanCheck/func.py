@@ -11,9 +11,6 @@ from anvil.tables import app_tables
 #    Module1.say_hello()
 #
 
-def say_hello():
-  print("Hello, world")
-
 def get_message(b_repeat, b_pn, b_barcode):
   if b_repeat:
     return 'Err: Same Barcode scanned 4 times'
