@@ -135,9 +135,12 @@ class ScanCheck(sc):
           result = 'same barcode scanned 4 times'
       else:
         result = f'pn match = {pn_match}, barcode match = {barcode_match}'
-        
-      message = func.get_message(b_repeat, pn_match, barcode_match)
-      alert(message)
+
+      func.flash_message(
+        func.get_message(
+          b_repeat, b_pn, b_barcode
+        )
+      )
       return result
 
   def add_to_database(self, result):

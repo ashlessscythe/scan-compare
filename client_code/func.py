@@ -36,3 +36,6 @@ def logout(self, **event_args):
 
 def is_valid(s):
   return s.__contains__(":P")
+
+def flash_message(m):
+  alert()
