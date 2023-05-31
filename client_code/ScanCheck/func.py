@@ -16,10 +16,10 @@ def say_hello():
 
 def get_message(b_repeat, b_pn, b_barcode):
   if b_repeat:
-    return 'Same Barcode scanned 4 times'
+    return 'Err: Same Barcode scanned 4 times'
   if b_pn and b_barcode:
-    return 'Part number matches, Barcodes are valid'
+    return 'Ok: Part number matches, Barcodes are valid'
   if b_pn and not b_barcode:
-    return 'Part number matches, Barcodes mismatch'
+    return 'Err: Part number matches, Barcodes mismatch'
   if not b_pn:
-    return 'Part number does not match'
+    return 'Err: Part number does not match'

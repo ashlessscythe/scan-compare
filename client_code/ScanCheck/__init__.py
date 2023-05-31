@@ -99,6 +99,8 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     if not self.check_fields_populated():
       pass
+    if not self.check_fields_valid():
+      pass
     else:
       with Notification("Checking Scans"):
         r = self.compare_scans()
@@ -123,7 +125,7 @@ class ScanCheck(sc):
 
       # compare pn
       b_repeat = len(set(scans)) == 1
-      pn_match = len(pn_list) == len(set(pn_list))
+      pn_match = len(set(pn_list)) == 1
       barcode_match = len(set(scans)) == 2
       
       # result to store in db
