@@ -37,5 +37,7 @@ def logout(self, **event_args):
 def is_valid(s):
   return s.__contains__(":P")
 
+# TODO
 def flash_message(m):
-  alert()
+  alert(m, large=True, role="anvil-role-warning")
+        
