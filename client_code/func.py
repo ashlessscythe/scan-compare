@@ -11,9 +11,6 @@ from anvil.tables import app_tables
 #    Module1.say_hello()
 #
 
-def say_hello():
-  print("Hello, world")
-
 def get_message(b_repeat, b_pn, b_barcode):
   if b_repeat:
     return 'Err: Same Barcode scanned 4 times'
@@ -23,3 +20,13 @@ def get_message(b_repeat, b_pn, b_barcode):
     return 'Err: Part number matches, Barcodes mismatch'
   if not b_pn:
     return 'Err: Part number does not match'
+
+def button_login_click(self, **event_args):
+  user = anvil.users.login_with_form()
+  if user:
+    open_form('ScanCheck')
+      
+def button_logout_click(self, **event_args):
+  """This method is called when the button is clicked"""
+  anvil.users.logout()
+  open_form('Logout')

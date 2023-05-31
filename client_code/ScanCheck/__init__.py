@@ -6,7 +6,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
 import re
-from . import func
+from ..import func
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -146,10 +146,6 @@ class ScanCheck(sc):
     match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
     return match.group()
 
-  def button_logout_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    anvil.users.logout()
-    open_form('Login')
 
 
 
