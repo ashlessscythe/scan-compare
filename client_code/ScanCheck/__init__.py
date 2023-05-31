@@ -123,7 +123,7 @@ class ScanCheck(sc):
 
       # compare pn
       b_repeat = len(set(scans)) == 1
-      pn_match = len(pn_list) == len(set(pn_list))
+      pn_match = len(set(pn_list)) == 1
       barcode_match = len(set(scans)) == 2
       
       # result to store in db
