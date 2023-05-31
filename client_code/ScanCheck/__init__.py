@@ -1,5 +1,6 @@
 from ._anvil_designer import ScanCheckTemplate as sc
 from anvil import *
+import anvil.users
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
@@ -114,16 +115,24 @@ class ScanCheck(sc):
       alert("Invalid Barcodes scanned, please verify")
       return 'invalid_info'
     else:
-      scans = self.get_scan_text()
+      payload = self.get_scan_text()
+      # extract scans
+      scans = [el for i, el in payload]
       # extract part numbers
-      pn_list = [(self.extract_pn(el)) for i, el in scans]
+      pn_list = [(self.extract_pn(el)) for i, el in payload]
 
       # compare pn
-      
+      b_repeat = len(set(scans)) == 1
       pn_match = len(pn_list) == len(set(pn_list))
-      barcode_match = len(set([j for i, j in scans])) == 2
-      result = f'pn match = {pn_match}, barcode match = {barcode_match}'
-      message = func.get_message(pn_match, barcode_match)
+      barcode_match = len(set(scans)) == 2
+      
+      # result to store in db
+      if b_repeat:
+          result = 'same barcode scanned 4 times'
+      else:
+        result = f'pn match = {pn_match}, barcode match = {barcode_match}'
+        
+      message = func.get_message(b_repeat, pn_match, barcode_match)
       alert(message)
       return result
 

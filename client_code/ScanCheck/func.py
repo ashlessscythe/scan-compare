@@ -1,3 +1,4 @@
+import anvil.users
 import anvil.server
 import anvil.tables as tables
 import anvil.tables.query as q
@@ -13,7 +14,9 @@ from anvil.tables import app_tables
 def say_hello():
   print("Hello, world")
 
-def get_message(b_pn, b_barcode):
+def get_message(b_repeat, b_pn, b_barcode):
+  if b_repeat:
+    return 'Same Barcode scanned 4 times'
   if b_pn and b_barcode:
     return 'Part number matches, Barcodes are valid'
   if b_pn and not b_barcode:
