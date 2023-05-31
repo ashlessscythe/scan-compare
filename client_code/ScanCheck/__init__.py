@@ -138,7 +138,7 @@ class ScanCheck(sc):
 
       func.flash_message(
         func.get_message(
-          b_repeat, b_pn, b_barcode
+          b_repeat, pn_match, barcode_match
         )
       )
       return result
