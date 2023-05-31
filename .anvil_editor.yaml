@@ -1,7 +1,8 @@
 unique_ids:
   forms:
     ScanCheck: S6IJYXJUTITDML3X6Z2UVP7TFJH4GNMX
-  modules: {}
+  modules:
+    ScanCheck.func: '1685545404111439834950971.20184'
   server_modules:
     ServerModule1: '1685470602114999328430680.62'
   assets:

@@ -5,6 +5,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
 import re
+from . import func
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -13,26 +14,63 @@ class ScanCheck(sc):
     
     # Any code you write here will run before the form opens.
     # globals?
+  
+  def text_box_1_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.text_box_2.focus()
 
-  def check_fields_valid(self):
+  def text_box_2_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.text_box_3.focus()
+
+  def text_box_3_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.text_box_4.focus()
+
+  def text_box_4_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.button_compare_click()
+
+  # return scans as dict
+  def get_scan_text(self):
     s1 = self.text_box_1.text
     s2 = self.text_box_2.text
-    if s1.__contains__(":P"):
-      if s2.__contains__(":P"):
+    s3 = self.text_box_3.text
+    s4 = self.text_box_4.text
+    s = [s1, s2, s3, s4]
+    scans = [ (i, el) for i, el in enumerate(s, start=1) ]
+    return scans
+  
+  def check_fields_valid(self):
+    scans = self.get_scan_text()
+    for i, s in scans:
+      if not s.__contains__(":P"):
+        alert(f'Scan {i} invalid')
+        return False
+      else:
         return True
       
   def check_fields_populated(self):
-    """This method is called when the TextBox loses focus"""
-    s1 = self.text_box_1.text
-    s2 = self.text_box_2.text
-    if not s1:
+    scans = self.get_scan_text()
+    s = [s for i, s in scans]    # denumerate
+    if not s[0]:
       alert("Error: Scan 1 empty")
       self.text_box_1.focus()
       return False
-    elif not s2:
+    elif not s[1]:
       alert("Error: Scan 2 empty")
       # focus 2
       self.text_box_2.focus()
+      return False
+    elif not s[2]:
+      alert("Error: Scan 3 empty")
+      # focus 3
+      self.text_box_3.focus()
+      return False
+    elif not s[3]:
+      alert("Error: Scan 4 empty")
+      # focus 4
+      self.text_box_4.focus()
       return False
     else:
       return True
@@ -41,9 +79,11 @@ class ScanCheck(sc):
   def clear_page(self):
     self.text_box_1.text = ""
     self.text_box_2.text = ""
+    self.text_box_3.text = ""
+    self.text_box_4.text = ""
     self.text_box_1.focus()
     
-  def scan_one_label_show(self, **event_args):
+  def startup_focus(self, **event_args):
     """This method is called when the Label is shown on the screen"""
     self.text_box_1.focus()
 
@@ -65,38 +105,39 @@ class ScanCheck(sc):
       self.clear_page()
     
   def compare_scans(self):
-    s1 = self.text_box_1.text
-    s2 = self.text_box_2.text
+    # check if populated
     if not self.check_fields_populated():
       alert("Missing Information")
       return 'missing_info'
+    # check if valid
     elif not self.check_fields_valid():
       alert("Invalid Barcodes scanned, please verify")
       return 'invalid_info'
     else:
-      s_extract_1 = self.extract_pn(s1)
-      s_extract_2 = self.extract_pn(s2)
-      if s_extract_1 == s_extract_2:
-        result = f'match {s_extract_1} and {s_extract_2}'
-      else:
-        result = f'no_match {s_extract_1} and {s_extract_2}'
-      alert(result)
+      scans = self.get_scan_text()
+      # extract part numbers
+      pn_list = [(self.extract_pn(el)) for i, el in scans]
+
+      # compare pn
+      
+      pn_match = len(pn_list) == len(set(pn_list))
+      barcode_match = len(set([j for i, j in scans])) == 2
+      result = f'pn match = {pn_match}, barcode match = {barcode_match}'
+      message = func.get_message(pn_match, barcode_match)
+      alert(message)
       return result
 
   def add_to_database(self, result):
-    s1 = self.text_box_1.text
-    s2 = self.text_box_2.text
-    anvil.server.call('add_scan', s1, s2, result)
+    scans = self.get_scan_text()
+    anvil.server.call('add_scan', scans, result)
 
   def extract_pn(self, barcode):
     match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
     return match.group()
 
-  def text_box_1_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    self.button_compare_click()
+
+
+
     
-  def text_box_2_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    self.button_compare_click()
+
 
