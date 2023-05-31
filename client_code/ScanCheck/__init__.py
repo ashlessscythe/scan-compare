@@ -12,10 +12,22 @@ class ScanCheck(sc):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
-    
     # Any code you write here will run before the form opens.
     # globals?
   
+# return scans as dict
+  def get_scan_text(self, **event_args):
+    s1 = self.text_box_1.text
+    s2 = self.text_box_2.text
+    s3 = self.text_box_3.text
+    s4 = self.text_box_4.text
+    s = [s1, s2, s3, s4]
+    scans = [ (i, el) for i, el in enumerate(s, start=1) ]
+    return scans
+
+def button_logout_click(self, **event_args):
+    func.logout(self)
+    
   def text_box_1_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.text_box_2.focus()
@@ -31,19 +43,9 @@ class ScanCheck(sc):
   def text_box_4_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.button_compare_click()
-
-  # return scans as dict
-  def get_scan_text(self):
-    s1 = self.text_box_1.text
-    s2 = self.text_box_2.text
-    s3 = self.text_box_3.text
-    s4 = self.text_box_4.text
-    s = [s1, s2, s3, s4]
-    scans = [ (i, el) for i, el in enumerate(s, start=1) ]
-    return scans
   
   def check_fields_valid(self):
-    scans = self.get_scan_text()
+    scans = func.get_scan_text()
     for i, s in scans:
       if not s.__contains__(":P"):
         alert(f'Scan {i} invalid')
@@ -52,7 +54,7 @@ class ScanCheck(sc):
         return True
       
   def check_fields_populated(self):
-    scans = self.get_scan_text()
+    scans = func.get_scan_text(self)
     s = [s for i, s in scans]    # denumerate
     if not s[0]:
       alert("Error: Scan 1 empty")
@@ -117,7 +119,7 @@ class ScanCheck(sc):
       alert("Invalid Barcodes scanned, please verify")
       return 'invalid_info'
     else:
-      payload = self.get_scan_text()
+      payload = func.get_scan_text(self)
       # extract scans
       scans = [el for i, el in payload]
       # extract part numbers
@@ -139,7 +141,7 @@ class ScanCheck(sc):
       return result
 
   def add_to_database(self, result):
-    scans = self.get_scan_text()
+    scans = func.get_scan_text(self)
     anvil.server.call('add_scan', scans, result)
 
   def extract_pn(self, barcode):

@@ -5,6 +5,7 @@ import anvil.users
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
+from .. import func
 
 class Logout(LogoutTemplate):
   def __init__(self, **properties):
@@ -13,6 +14,4 @@ class Logout(LogoutTemplate):
 
     # Any code you write here will run before the form opens.
   def button_login_click(self, **event_args):
-    user = anvil.users.login_with_form()
-    if user:
-      open_form('ScanCheck')
+    func.login(self)

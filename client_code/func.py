@@ -3,6 +3,9 @@ import anvil.server
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
+from .Login import *
+from .Logout import *
+
 # This is a module.
 # You can define variables and functions here, and use them from any form. For example, in a top-level form:
 #
@@ -21,12 +24,12 @@ def get_message(b_repeat, b_pn, b_barcode):
   if not b_pn:
     return 'Err: Part number does not match'
 
-def button_login_click(self, **event_args):
+def login(self, **event_args):
   user = anvil.users.login_with_form()
   if user:
     open_form('ScanCheck')
       
-def button_logout_click(self, **event_args):
+def logout(self, **event_args):
   """This method is called when the button is clicked"""
   anvil.users.logout()
   open_form('Logout')

@@ -5,6 +5,7 @@ import anvil.users
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
+from .. import func
 
 class Login(LoginTemplate):
   def __init__(self, **properties):
@@ -12,5 +13,6 @@ class Login(LoginTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run before the form opens.
-
-
+  def button_login_click(self, **event_args):
+    func.login(self)
+    
