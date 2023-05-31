@@ -33,3 +33,6 @@ def logout(self, **event_args):
   """This method is called when the button is clicked"""
   anvil.users.logout()
   open_form('Logout')
+
+def is_valid(s):
+  return s.__contains__(":P")

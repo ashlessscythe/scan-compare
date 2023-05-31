@@ -16,7 +16,7 @@ class ScanCheck(sc):
     # globals?
   
 # return scans as dict
-  def get_scan_text(self, **event_args):
+  def get_scan_text(self):
     s1 = self.text_box_1.text
     s2 = self.text_box_2.text
     s3 = self.text_box_3.text
@@ -25,7 +25,7 @@ class ScanCheck(sc):
     scans = [ (i, el) for i, el in enumerate(s, start=1) ]
     return scans
 
-def button_logout_click(self, **event_args):
+  def button_logout_click(self, **event_args):
     func.logout(self)
     
   def text_box_1_pressed_enter(self, **event_args):
@@ -45,16 +45,16 @@ def button_logout_click(self, **event_args):
     self.button_compare_click()
   
   def check_fields_valid(self):
-    scans = func.get_scan_text()
+    scans = self.get_scan_text()
     for i, s in scans:
-      if not s.__contains__(":P"):
+      if not func.is_valid(s):
         alert(f'Scan {i} invalid')
         return False
       else:
         return True
       
   def check_fields_populated(self):
-    scans = func.get_scan_text(self)
+    scans = self.get_scan_text()
     s = [s for i, s in scans]    # denumerate
     if not s[0]:
       alert("Error: Scan 1 empty")
@@ -119,16 +119,16 @@ def button_logout_click(self, **event_args):
       alert("Invalid Barcodes scanned, please verify")
       return 'invalid_info'
     else:
-      payload = func.get_scan_text(self)
+      payload = self.get_scan_text()
       # extract scans
       scans = [el for i, el in payload]
       # extract part numbers
-      pn_list = [(self.extract_pn(el)) for i, el in payload]
+      pn_list = [(self.extract_pn(el)) for i, el in payload if func.is_valid(el)]
 
       # compare pn
-      b_repeat = len(set(scans)) == 1
-      pn_match = len(set(pn_list)) == 1
-      barcode_match = len(set(scans)) == 2
+      b_repeat = len(set(scans)) == 1 and len(scans) == 4
+      pn_match = len(set(pn_list)) == 1 and len(pn_list) == 4 
+      barcode_match = len(set(scans)) == 2 and len(scans) == 4
       
       # result to store in db
       if b_repeat:
@@ -141,7 +141,7 @@ def button_logout_click(self, **event_args):
       return result
 
   def add_to_database(self, result):
-    scans = func.get_scan_text(self)
+    scans = self.get_scan_text()
     anvil.server.call('add_scan', scans, result)
 
   def extract_pn(self, barcode):
