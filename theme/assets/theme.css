@@ -620,9 +620,11 @@ button.close > span, button.close {
 }
 
 .anvil-role-warning {
-  background-color: red;
-  font-size: 2em;
+  background-color: #D64D47;
+  font-size: 1em;
+  text-align: center;
   color: black;
+  font-weight: bold;
 }
 
 .anvil-role-outlined-button > .btn, .anvil-role-outlined-button.file-loader>label {

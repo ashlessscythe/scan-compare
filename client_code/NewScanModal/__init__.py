@@ -1,4 +1,4 @@
-from ._anvil_designer import NewScanTemplate
+from ._anvil_designer import NewScanModalTemplate
 from anvil import *
 import anvil.server
 import anvil.users
@@ -7,7 +7,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from .. import globals
 
-class NewScan(NewScanTemplate):
+class NewScanModal(NewScanModalTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)

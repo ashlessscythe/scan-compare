@@ -303,32 +303,32 @@ color_scheme:
       - {name: Primary Overlay 2, color: 'rgba(255, 181, 155, 0.08)'}
       - {name: Primary Overlay 3, color: 'rgba(255, 181, 155, 0.11)'}
   colors:
-  - {name: Primary, color: '#006874'}
-  - {name: Primary Container, color: '#96F0FF'}
+  - {name: Primary, color: '#006C48'}
+  - {name: Primary Container, color: '#00A36C'}
   - {name: On Primary, color: '#FFFFFF'}
-  - {name: On Primary Container, color: '#001F24'}
-  - {name: Secondary, color: '#486367'}
-  - {name: Secondary Container, color: '#CBE8ED'}
+  - {name: On Primary Container, color: '#002113'}
+  - {name: Secondary, color: '#496455'}
+  - {name: Secondary Container, color: '#CBEAD6'}
   - {name: On Secondary, color: '#FFFFFF'}
-  - {name: On Secondary Container, color: '#031F23'}
-  - {name: Tertiary, color: '#515E80'}
-  - {name: Tertiary Container, color: '#DAE2FF'}
+  - {name: On Secondary Container, color: '#052014'}
+  - {name: Tertiary, color: '#326576'}
+  - {name: Tertiary Container, color: '#B8EAFF'}
   - {name: On Tertiary, color: '#FFFFFF'}
-  - {name: On Tertiary Container, color: '#0C1A39'}
-  - {name: Error, color: '#BA1A1A'}
-  - {name: Background, color: '#FAFDFD'}
-  - {name: Surface, color: '#FAFDFD'}
-  - {name: On Background, color: '#191C1D'}
-  - {name: On Surface, color: '#191C1D'}
-  - {name: Surface Variant, color: '#DBE4E6'}
-  - {name: On Surface Variant, color: '#3F484A'}
-  - {name: Outline, color: '#6F797A'}
-  - {name: On Disabled, color: 'rgba(25, 28, 29, 0.38)'}
-  - {name: Disabled Container, color: 'rgba(25, 28, 29, 0.12)'}
-  - {name: Light Overlay 1, color: 'rgba(255, 255, 255, 0.08)'}
+  - {name: On Tertiary Container, color: '#001F28'}
+  - {name: Error, color: '#D64D47'}
+  - {name: Background, color: '#FBFDF8'}
+  - {name: Surface, color: '#FBFDF8'}
+  - {name: On Background, color: '#191C1A'}
+  - {name: On Surface, color: '#191C1A'}
+  - {name: Surface Variant, color: '#DCE5DD'}
+  - {name: On Surface Variant, color: '#404943'}
+  - {name: Outline, color: '#707973'}
+  - {name: On Disabled, color: 'rgba(25, 28, 26, 0.38)'}
+  - {name: Disabled Container, color: 'rgba(25, 28, 26, 0.12)'}
+  - {name: Light Overlay 1, color: 'rgba(255, 255, 255, 0.8)'}
   - {name: Light Overlay 2, color: 'rgba(255, 255, 255, 0.12)'}
-  - {name: Dark Overlay 1, color: 'rgba(3, 31, 35, 0.08)'}
-  - {name: Dark Overlay 2, color: 'rgba(3, 31, 35, 0.12)'}
-  - {name: Primary Overlay 1, color: 'rgba(0, 104, 116, 0.05)'}
-  - {name: Primary Overlay 2, color: 'rgba(0, 104, 116, 0.08)'}
-  - {name: Primary Overlay 3, color: 'rgba(0, 104, 116, 0.11)'}
+  - {name: Dark Overlay 1, color: 'rgba(5, 32, 20, 0.8)'}
+  - {name: Dark Overlay 2, color: 'rgba(51, 51, 61, 0.12)'}
+  - {name: Primary Overlay 1, color: 'rgba(0, 108, 72, 0.05)'}
+  - {name: Primary Overlay 2, color: 'rgba(0, 108, 72, 0.08)'}
+  - {name: Primary Overlay 3, color: 'rgba(0, 108, 72, 0.11)'}

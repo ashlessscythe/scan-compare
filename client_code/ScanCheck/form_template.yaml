@@ -16,11 +16,17 @@ components:
     name: label_1
     layout_properties: {grid_position: 'QAUFQT,RTORBY'}
   - type: Label
-    properties: {}
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
     name: label_delivery
     layout_properties: {grid_position: 'QAUFQT,FRHZWY'}
   - type: Label
-    properties: {}
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
     name: label_pallets
     layout_properties: {grid_position: 'QAUFQT,XSGXZG'}
   - type: Label

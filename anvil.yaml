@@ -51,6 +51,9 @@ db_schema:
     - name: user_unblock
       admin_ui: {order: 7, width: 200}
       type: string
+    - name: delivery
+      admin_ui: {order: -1, width: 200}
+      type: string
   files:
     title: Files
     client: none

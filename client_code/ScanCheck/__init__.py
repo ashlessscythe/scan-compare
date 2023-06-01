@@ -8,7 +8,7 @@ import anvil.server
 import re
 from ..import func
 from .. import globals
-from ..NewScan import NewScan
+from ..NewScanModal import NewScanModal
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -26,11 +26,17 @@ class ScanCheck(sc):
     r = self.new_scan()
     if r:
       self.label_delivery.text = globals.deliv
-      self.label_pallets.text = globals.pallets  
+      self.label_pallets.text = globals.pallets
+    else:
+      # globals not changed by this
+      self.label_delivery.text = "NO ACTIVE DELIVERY"
+      self.label_delivery.role = 'warning'
+      self.label_pallets.text = "NOT VALID SCAN, TESTING USE ONLY"
+      self.label_pallets.role = 'warning'
       
   def new_scan(self):
     res = alert(
-      content=NewScan(),
+      content=NewScanModal(),
       title="Start New Scan?",
       large=True,
       buttons=[
@@ -147,7 +153,8 @@ class ScanCheck(sc):
       with Notification("Checking Scans"):
         r = self.compare_scans()
         func.add_to_database(
-          self, 
+          self,
+          globals.deliv,
           self.get_scan_text(), 
           r
         )

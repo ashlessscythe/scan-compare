@@ -30,14 +30,14 @@ def get_user():
   return user
 
 @anvil.server.callable
-def add_scan(scans, result):
+def add_scan(delivery, scans, result):
   scan = [s for i, s in scans]
   scan_1 = scan[0]
   scan_2 = scan[1]
   scan_3 = scan[2]
   scan_4 = scan[3]
-    
   app_tables.scans.add_row(
+    delivery=delivery,
     scan_1=scan_1,
     scan_2=scan_2,
     scan_3=scan_3,
@@ -46,11 +46,10 @@ def add_scan(scans, result):
     created=datetime.now(),
     user_scan = get_user()
   )
-  print(f'added row to db {scans} ')
+  print(f'added row to db {scans} deliv {delivery} ')
 
 @anvil.server.callable
 def session_add_row(index, valid_scans, result):
-  
   app_tables.session_scan.add_row(
     index=index,
     valid_scans=valid_scans,

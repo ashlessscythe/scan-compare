@@ -16,8 +16,8 @@ from . import globals
 #    Module1.say_hello()
 #
 
-def add_to_database(self, scans, result):
-  anvil.server.call('add_scan', scans, result)
+def add_to_database(self, delivery, scans, result):
+  anvil.server.call('add_scan', delivery, scans, result)
   # add to session db
   anvil.server.call(
     'session_add_row',
