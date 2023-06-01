@@ -1,3 +1,4 @@
+from ._anvil_designer import ScanCheck_copyTemplate
 from ._anvil_designer import ScanCheckTemplate as sc
 from anvil import *
 import anvil.users
@@ -7,8 +8,6 @@ from anvil.tables import app_tables
 import anvil.server
 import re
 from ..import func
-from .. import globals
-from ..NewScan import NewScan
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -16,41 +15,15 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
-    self.logged_in_user.text = anvil.server.call('get_user')
     self.refresh()
-    # ask if new scan on startup (dismissable)
-    r = self.new_scan()
-    if r:
-      self.label_delivery = globals.deliv
-      self.label_pallets = globals.pallets  
-      
-  # new scan?
-  def new_scan(self):
-    res = alert(
-      content=NewScan(),
-      title="Start New Scan?",
-      large=True,
-      buttons=[
-        ("Yes", True),
-        ("No", False),
-      ]
-    )
-    return res
-    
+
   # refresh
   def refresh(self, **event_args):
     self.repeating_panel_1.items = anvil.server.call('get_session')
-  
-  def clear_scan_page(self):
-    self.clear_text_boxes()
-    self.text_box_1.focus()
-    anvil.server.call('reset_session_db')
-    self.refresh()
-    
+
   def button_logout_click(self, **event_args):
-    self.clear_scan_page()
     func.logout(self)
-    
+
   # return scans as dict
   def get_scan_text(self):
     s1 = self.text_box_1.text
@@ -60,7 +33,7 @@ class ScanCheck(sc):
     s = [s1, s2, s3, s4]
     scans = [ (i, el) for i, el in enumerate(s, start=1) ]
     return scans
-    
+
   def text_box_1_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.text_box_2.focus()
@@ -76,7 +49,7 @@ class ScanCheck(sc):
   def text_box_4_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.button_compare_click()
-  
+
   def check_fields_valid(self):
     scans = self.get_scan_text()
     for i, s in scans:
@@ -85,7 +58,7 @@ class ScanCheck(sc):
         return False
       else:
         return True
-      
+
   def check_fields_populated(self):
     scans = self.get_scan_text()
     s = [s for i, s in scans]    # denumerate
@@ -115,14 +88,14 @@ class ScanCheck(sc):
     else:
       return True
       # compare
-  
-  def clear_text_boxes(self):
+
+  def clear_page(self):
     self.text_box_1.text = ""
     self.text_box_2.text = ""
     self.text_box_3.text = ""
     self.text_box_4.text = ""
     self.text_box_1.focus()
-    
+
   def startup_focus(self, **event_args):
     """This method is called when the Label is shown on the screen"""
     self.text_box_1.focus()
@@ -131,8 +104,11 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     c = confirm("Clear page?")
     if c:
-      self.clear_scan_page()
-    
+      self.clear_page()
+      self.text_box_1.focus()
+      anvil.server.call('reset_session_db')
+      self.refresh()
+
   def button_compare_click(self, **event_args):
     """This method is called when the button is clicked"""
     if not self.check_fields_populated():
@@ -142,15 +118,10 @@ class ScanCheck(sc):
     else:
       with Notification("Checking Scans"):
         r = self.compare_scans()
-        func.add_to_database(
-          self, 
-          self.get_scan_text(), 
-          r
-        )
-        globals.idx += 1    # increment
-        self.refresh()
+        self.add_to_database(r)
+        func.idx += 1    # increment
       self.clear_page()
-    
+
   def compare_scans(self):
     # check if populated
     if not self.check_fields_populated():
@@ -165,16 +136,16 @@ class ScanCheck(sc):
       # extract scans
       scans = [el for i, el in payload]
       # extract part numbers
-      pn_list = [(func.extract_pn(self, el)) for i, el in payload if func.is_valid(el)]
+      pn_list = [(func.extract_pn(el)) for i, el in payload if func.is_valid(el)]
 
       # compare pn
       b_repeat = len(set(scans)) == 1 and len(scans) == 4
-      pn_match = len(set(pn_list)) == 1 and len(pn_list) == 4 
+      pn_match = len(set(pn_list)) == 1 and len(pn_list) == 4
       barcode_match = len(set(scans)) == 2 and len(scans) == 4
-      
+
       # result to store in db
       if b_repeat:
-          result = 'same barcode scanned 4 times'
+        result = 'same barcode scanned 4 times'
       else:
         result = f'pn match = {pn_match}, barcode match = {barcode_match}'
 
@@ -185,19 +156,31 @@ class ScanCheck(sc):
       )
       return result
 
+  def add_to_database(self, result):
+    scans = self.get_scan_text()
+    anvil.server.call('add_scan', scans, result)
+    # add to session db
+    anvil.server.call(
+      'session_add_row',
+      func.idx,
+      len([s for i, s in scans if func.is_valid(s)]),
+      result
+    )
+    self.refresh()
+
   def text_box_1_unfocus(self, **event_args):
     """This method is called when the TextBox loses focus"""
     self.text_box_1.role = 'outlined-error'
 
-  # def text_box_focus(self, **event_args):
-  #   """This method is called when the TextBox gets focus"""
-  #   event_args['sender'].role = 'default'
-  
+  def text_box_focus(self, **event_args):
+    """This method is called when the TextBox gets focus"""
+    self.role = 'default'
+
   def check_valid(self, obj):
     r = func.is_valid(obj.text)
     # alert(r)
     return r
-  
+
   def text_box_lost_focus(self, **event_args):
     """This method is called when the TextBox loses focus"""
     obj = event_args['sender']
@@ -207,17 +190,3 @@ class ScanCheck(sc):
       print(f'pn is {func.extract_pn(self,obj.text)}')
     else:
       obj.role = 'outlined-error'
-
-
-
-
-
-
-
-
-
-
-
-    
-
-

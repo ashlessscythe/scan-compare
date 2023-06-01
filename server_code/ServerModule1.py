@@ -46,7 +46,7 @@ def add_scan(scans, result):
     created=datetime.now(),
     user_scan = get_user()
   )
-  print('added row to db')
+  print(f'added row to db {scans} ')
 
 @anvil.server.callable
 def session_add_row(index, valid_scans, result):
@@ -57,7 +57,7 @@ def session_add_row(index, valid_scans, result):
     result=result,
     user=get_user()
   )
-  print('added row to session_db')
+  print(f'added row to session_db {valid_scans} ')
 
 @anvil.server.callable
 def get_session():

@@ -6,6 +6,7 @@ from anvil.tables import app_tables
 from .Login import *
 from .Logout import *
 import re
+from . import globals
 
 # This is a module.
 # You can define variables and functions here, and use them from any form. For example, in a top-level form:
@@ -14,8 +15,16 @@ import re
 #
 #    Module1.say_hello()
 #
-# // global
-idx = 0
+
+def add_to_database(self, scans, result):
+  anvil.server.call('add_scan', scans, result)
+  # add to session db
+  anvil.server.call(
+    'session_add_row',
+    globals.idx,
+    len([s for i, s in scans if func.is_valid(s)]),
+    result
+  )
 
 def get_message(b_repeat, b_pn, b_barcode):
   if b_repeat:
