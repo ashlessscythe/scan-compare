@@ -26,11 +26,14 @@ def add_scan(scans, result):
   scan_2 = scan[1]
   scan_3 = scan[2]
   scan_4 = scan[3]
+  user = anvil.users.get_user()['email']
   app_tables.scans.add_row(
     scan_1=scan_1,
     scan_2=scan_2,
     scan_3=scan_3,
     scan_4=scan_4,
     result=result,
-    created=datetime.now()
+    created=datetime.now(),
+    user_scan = user
   )
+  print('added row to db')

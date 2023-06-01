@@ -27,7 +27,7 @@ def get_message(b_repeat, b_pn, b_barcode):
 def login(self, **event_args):
   user = anvil.users.login_with_form()
   if user:
-    print(f'user {anvil.users.get_user()} logged in.')
+    print(f'user {anvil.users.get_user()["email"]} logged in.')
     open_form('ScanCheck')
     
 def logout(self, **event_args):

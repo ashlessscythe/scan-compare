@@ -56,6 +56,10 @@ class ScanCheck(sc):
   def check_fields_populated(self):
     scans = self.get_scan_text()
     s = [s for i, s in scans]    # denumerate
+    # check for all blanks
+    if len(set(s)) == 1 and s[0] == '':
+      alert('All fields blank')
+      return False
     if not s[0]:
       alert("Error: Scan 1 empty")
       self.text_box_1.focus()
@@ -100,7 +104,7 @@ class ScanCheck(sc):
   def button_compare_click(self, **event_args):
     """This method is called when the button is clicked"""
     if not self.check_fields_populated():
-      pass
+      return
     if not self.check_fields_valid():
       pass
     else:
