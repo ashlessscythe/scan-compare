@@ -37,3 +37,12 @@ def add_scan(scans, result):
     user_scan = user
   )
   print('added row to db')
+
+@anvil.server.callable
+def session_add_row(index, valid_scans, result):
+  
+  app_tables.session_scan.add_row(
+    index=index,
+    valid_scans=valid_scans,
+    result=result
+  )

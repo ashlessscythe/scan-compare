@@ -71,6 +71,35 @@ components:
     name: button_compare
     layout_properties: {grid_position: 'NQYNIS,XSOBSQ'}
     event_bindings: {click: button_compare_click}
+  - type: Spacer
+    properties: {height: 45}
+    name: spacer_1
+    layout_properties: {grid_position: 'NEVECH,AFHWWD'}
+  - type: DataGrid
+    properties:
+      role: null
+      columns:
+      - {id: EFXUVR, title: Index, data_key: column_1, $$hashKey: 'object:66979'}
+      - {id: CQBZAO, title: Valid Scans, data_key: column_2, $$hashKey: 'object:66980'}
+      - {id: LPHULM, title: Result, data_key: column_3, $$hashKey: 'object:66981'}
+      auto_header: true
+      tooltip: ''
+      border: ''
+      foreground: ''
+      rows_per_page: 20
+      visible: true
+      wrap_on: never
+      show_page_controls: true
+      spacing_above: small
+      spacing_below: small
+      background: ''
+    name: data_grid_1
+    layout_properties: {grid_position: 'ALXDJJ,FFUQWP'}
+    components:
+    - type: RepeatingPanel
+      properties: {spacing_above: none, spacing_below: none, item_template: ScanCheck.RowTemplate1}
+      name: repeating_panel_1
+      layout_properties: {}
 - type: FlowPanel
   properties: {}
   name: navbar_links
