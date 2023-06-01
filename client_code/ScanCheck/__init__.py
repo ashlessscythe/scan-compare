@@ -25,10 +25,12 @@ class ScanCheck(sc):
   def startup_with_scan(self):
     r = self.new_scan()
     if r:
+      globals.reset_globals(self)
       self.label_delivery.text = globals.deliv
       self.label_pallets.text = globals.pallets
     else:
       # globals not changed by this
+      # TODO - figure this out
       self.label_delivery.text = "NO ACTIVE DELIVERY"
       self.label_delivery.role = 'warning'
       self.label_pallets.text = "NOT VALID SCAN, TESTING USE ONLY"

@@ -14,3 +14,9 @@ from anvil.tables import app_tables
 idx = 0
 deliv = 'no_deliv'
 pallets = 0
+
+def reset_globals(self):
+  self.idx = 0
+  self.deliv = 'no_deliv'
+  self.pallets = 0
+  
