@@ -20,13 +20,23 @@ import anvil.server
 #   return 42
 #
 @anvil.server.callable
+def get_session():
+  return app_tables.session_scan.search()
+  
+@anvil.server.callable
 def add_scan(scans, result):
   scan = [s for i, s in scans]
   scan_1 = scan[0]
   scan_2 = scan[1]
   scan_3 = scan[2]
   scan_4 = scan[3]
-  user = anvil.users.get_user()['email']
+  
+  u = anvil.users.get_user()
+  if u:
+    user = anvil.users.get_user()['email']
+  else:
+    user = 'no_login'
+    
   app_tables.scans.add_row(
     scan_1=scan_1,
     scan_2=scan_2,
@@ -46,3 +56,8 @@ def session_add_row(index, valid_scans, result):
     valid_scans=valid_scans,
     result=result
   )
+  print('added row to session_db')
+
+@anvil.server.callable
+def reset_session_db():
+  app_tables.session_scan.delete_all_rows()

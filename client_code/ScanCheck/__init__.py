@@ -14,6 +14,7 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
+    self.repeating_panel_1.items = anvil.server.call('get_session')
   
 # return scans as dict
   def get_scan_text(self):
@@ -100,6 +101,8 @@ class ScanCheck(sc):
     if c:
       self.clear_page()
       self.text_box_1.focus()
+      anvil.server.call('reset_session_db')
+      self.refresh_data_bindings()
   
   def button_compare_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -111,6 +114,7 @@ class ScanCheck(sc):
       with Notification("Checking Scans"):
         r = self.compare_scans()
         self.add_to_database(r)
+        func.idx += 1    # increment
       self.clear_page()
     
   def compare_scans(self):
@@ -150,6 +154,14 @@ class ScanCheck(sc):
   def add_to_database(self, result):
     scans = self.get_scan_text()
     anvil.server.call('add_scan', scans, result)
+    # add to session db
+    anvil.server.call(
+      'session_add_row',
+      func.idx,
+      len([s for i, s in scans if func.is_valid(s)]),
+      result
+    )
+    self.refresh_data_bindings()
 
   def extract_pn(self, barcode):
     match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)

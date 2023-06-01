@@ -79,9 +79,9 @@ components:
     properties:
       role: null
       columns:
-      - {id: EFXUVR, title: Index, data_key: column_1, $$hashKey: 'object:66979'}
-      - {id: CQBZAO, title: Valid Scans, data_key: column_2, $$hashKey: 'object:66980'}
-      - {id: LPHULM, title: Result, data_key: column_3, $$hashKey: 'object:66981'}
+      - {id: JKYNYT, title: Index, data_key: index, $$hashKey: 'object:319'}
+      - {id: RMFSSY, title: Valid Scans, data_key: valid_scans, $$hashKey: 'object:320'}
+      - {id: EMYMEX, title: Result, data_key: result, $$hashKey: 'object:321'}
       auto_header: true
       tooltip: ''
       border: ''
@@ -100,6 +100,7 @@ components:
       properties: {spacing_above: none, spacing_below: none, item_template: ScanCheck.RowTemplate1}
       name: repeating_panel_1
       layout_properties: {}
+    data_bindings: []
 - type: FlowPanel
   properties: {}
   name: navbar_links

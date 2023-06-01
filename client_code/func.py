@@ -14,6 +14,8 @@ from .Logout import *
 #    Module1.say_hello()
 #
 
+idx = 0
+
 def get_message(b_repeat, b_pn, b_barcode):
   if b_repeat:
     return 'Err: Same Barcode scanned 4 times'
