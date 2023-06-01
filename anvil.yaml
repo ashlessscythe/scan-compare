@@ -11,7 +11,7 @@ services:
   client_config: {allow_signup: false, enable_automatically: true, use_email: true,
     confirm_email: true, allow_remember_me: false, remember_me_days: 30}
   server_config: {user_table: users}
-startup: {type: form, module: ScanCheck}
+startup: {type: form, module: Login}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
@@ -45,6 +45,12 @@ db_schema:
     - name: created
       admin_ui: {width: 200}
       type: datetime
+    - name: user_scan
+      admin_ui: {order: 6, width: 200}
+      type: string
+    - name: user_unblock
+      admin_ui: {order: 7, width: 200}
+      type: string
   files:
     title: Files
     client: none
