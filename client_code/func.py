@@ -5,6 +5,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from .Login import *
 from .Logout import *
+import re
 
 # This is a module.
 # You can define variables and functions here, and use them from any form. For example, in a top-level form:
@@ -39,6 +40,14 @@ def logout(self, **event_args):
 
 def is_valid(s):
   return s.__contains__(":P")
+
+def extract_pn(self, barcode):
+  match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
+  return match.group()
+
+def extract_lic(self, barcode):
+  match = re.search(r"(?<=[6:6J|6:1J]).+?(?=\:P)", barcode)
+  return match.group()
 
 # TODO
 def flash_message(m):

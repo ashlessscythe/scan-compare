@@ -135,7 +135,7 @@ class ScanCheck(sc):
       # extract scans
       scans = [el for i, el in payload]
       # extract part numbers
-      pn_list = [(self.extract_pn(el)) for i, el in payload if func.is_valid(el)]
+      pn_list = [(func.extract_pn(el)) for i, el in payload if func.is_valid(el)]
 
       # compare pn
       b_repeat = len(set(scans)) == 1 and len(scans) == 4
@@ -167,10 +167,6 @@ class ScanCheck(sc):
     )
     self.refresh()
 
-  def extract_pn(self, barcode):
-    match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
-    return match.group()
-
   def text_box_1_unfocus(self, **event_args):
     """This method is called when the TextBox loses focus"""
     self.text_box_1.role = 'outlined-error'
@@ -189,6 +185,8 @@ class ScanCheck(sc):
     obj = event_args['sender']
     if self.check_valid(obj):
       obj.role = 'default'
+      print(f'lic plate {func.extract_lic(self,obj.text)}')
+      print(f'pn is {func.extract_pn(self,obj.text)}')
     else:
       obj.role = 'outlined-error'
 
