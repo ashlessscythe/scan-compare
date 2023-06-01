@@ -24,37 +24,37 @@ components:
     layout_properties: {grid_position: 'BTDBHL,ZYGWAS'}
     event_bindings: {show: startup_focus}
   - type: TextBox
-    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Barcode A,
+    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Pallet Label,
       border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
       font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
       background: '', bold: false, underline: false}
     name: text_box_1
     layout_properties: {grid_position: 'WMGKOH,YPVCQM'}
-    event_bindings: {pressed_enter: text_box_1_pressed_enter}
+    event_bindings: {pressed_enter: text_box_1_pressed_enter, lost_focus: text_box_lost_focus}
   - type: TextBox
-    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Barcode B,
+    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: New Label,
       border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
       font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
       background: '', bold: false, underline: false}
     name: text_box_2
     layout_properties: {grid_position: 'WMGKOH,INMYJZ'}
-    event_bindings: {pressed_enter: text_box_2_pressed_enter}
+    event_bindings: {pressed_enter: text_box_2_pressed_enter, lost_focus: text_box_lost_focus}
   - type: TextBox
-    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Barcode C,
+    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Pallet Label,
       border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
       font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
       background: '', bold: false, underline: false}
     name: text_box_3
     layout_properties: {grid_position: 'OQSECS,RWLDRA'}
-    event_bindings: {pressed_enter: text_box_3_pressed_enter}
+    event_bindings: {pressed_enter: text_box_3_pressed_enter, lost_focus: text_box_lost_focus}
   - type: TextBox
-    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Barcode D,
+    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: New Label,
       border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
       font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
       background: '', bold: false, underline: false}
     name: text_box_4
     layout_properties: {grid_position: 'OQSECS,MZKRXN'}
-    event_bindings: {pressed_enter: text_box_4_pressed_enter}
+    event_bindings: {pressed_enter: text_box_4_pressed_enter, lost_focus: text_box_lost_focus}
   - type: Button
     properties: {role: tonal-button, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Reset, font_size: null, font: '', spacing_above: small,
@@ -79,9 +79,9 @@ components:
     properties:
       role: null
       columns:
-      - {id: JKYNYT, title: Index, data_key: index, $$hashKey: 'object:319'}
-      - {id: RMFSSY, title: Valid Scans, data_key: valid_scans, $$hashKey: 'object:320'}
-      - {id: EMYMEX, title: Result, data_key: result, $$hashKey: 'object:321'}
+      - {id: FQKENQ, title: Index, data_key: index, $$hashKey: 'object:15863'}
+      - {id: XTKAPC, title: Valid Scans, data_key: valid_scans, $$hashKey: 'object:15864'}
+      - {id: ZUWQMV, title: Result, data_key: result, $$hashKey: 'object:15865'}
       auto_header: true
       tooltip: ''
       border: ''
@@ -94,13 +94,12 @@ components:
       spacing_below: small
       background: ''
     name: data_grid_1
-    layout_properties: {grid_position: 'ALXDJJ,FFUQWP'}
+    layout_properties: {grid_position: 'ODBUQP,XCTYVW'}
     components:
     - type: RepeatingPanel
       properties: {spacing_above: none, spacing_below: none, item_template: ScanCheck.RowTemplate1}
       name: repeating_panel_1
       layout_properties: {}
-    data_bindings: []
 - type: FlowPanel
   properties: {}
   name: navbar_links

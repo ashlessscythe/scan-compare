@@ -13,7 +13,7 @@ from .Logout import *
 #
 #    Module1.say_hello()
 #
-
+# // global
 idx = 0
 
 def get_message(b_repeat, b_pn, b_barcode):

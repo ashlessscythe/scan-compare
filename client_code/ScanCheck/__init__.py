@@ -14,9 +14,16 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
+    self.refresh()
+    
+  # refresh
+  def refresh(self, **event_args):
     self.repeating_panel_1.items = anvil.server.call('get_session')
   
-# return scans as dict
+  def button_logout_click(self, **event_args):
+    func.logout(self)
+    
+  # return scans as dict
   def get_scan_text(self):
     s1 = self.text_box_1.text
     s2 = self.text_box_2.text
@@ -25,9 +32,6 @@ class ScanCheck(sc):
     s = [s1, s2, s3, s4]
     scans = [ (i, el) for i, el in enumerate(s, start=1) ]
     return scans
-
-  def button_logout_click(self, **event_args):
-    func.logout(self)
     
   def text_box_1_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
@@ -102,8 +106,8 @@ class ScanCheck(sc):
       self.clear_page()
       self.text_box_1.focus()
       anvil.server.call('reset_session_db')
-      self.refresh_data_bindings()
-  
+      self.refresh()
+      
   def button_compare_click(self, **event_args):
     """This method is called when the button is clicked"""
     if not self.check_fields_populated():
@@ -161,11 +165,37 @@ class ScanCheck(sc):
       len([s for i, s in scans if func.is_valid(s)]),
       result
     )
-    self.refresh_data_bindings()
+    self.refresh()
 
   def extract_pn(self, barcode):
     match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
     return match.group()
+
+  def text_box_1_unfocus(self, **event_args):
+    """This method is called when the TextBox loses focus"""
+    self.text_box_1.role = 'outlined-error'
+
+  def text_box_focus(self, **event_args):
+    """This method is called when the TextBox gets focus"""
+    self.role = 'default'
+  
+  def check_valid(self, obj):
+    r = func.is_valid(obj.text)
+    # alert(r)
+    return r
+  
+  def text_box_lost_focus(self, **event_args):
+    """This method is called when the TextBox loses focus"""
+    obj = event_args['sender']
+    if self.check_valid(obj):
+      obj.role = 'default'
+    else:
+      obj.role = 'outlined-error'
+
+
+
+
+
 
 
 

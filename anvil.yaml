@@ -11,7 +11,7 @@ services:
   client_config: {allow_signup: true, enable_automatically: true, use_email: true,
     confirm_email: true, allow_remember_me: false, remember_me_days: 30}
   server_config: {user_table: users}
-startup: {type: form, module: Login}
+startup: {type: form, module: ScanCheck}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
@@ -110,5 +110,8 @@ db_schema:
     - name: index
       admin_ui: {order: 2, width: 200}
       type: number
+    - name: user
+      admin_ui: {order: 3, width: 200}
+      type: string
     title: session_scan
 renamed: true
