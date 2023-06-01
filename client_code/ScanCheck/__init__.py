@@ -19,12 +19,15 @@ class ScanCheck(sc):
     self.logged_in_user.text = anvil.server.call('get_user')
     self.refresh()
     # ask if new scan on startup (dismissable)
+    self.startup_with_scan()
+      
+  # new scan?
+  def startup_with_scan(self):
     r = self.new_scan()
     if r:
       self.label_delivery.text = globals.deliv
       self.label_pallets.text = globals.pallets  
       
-  # new scan?
   def new_scan(self):
     res = alert(
       content=NewScan(),
@@ -132,6 +135,7 @@ class ScanCheck(sc):
     c = confirm("Clear page?")
     if c:
       self.clear_scan_page()
+      self.startup_with_scan()
     
   def button_compare_click(self, **event_args):
     """This method is called when the button is clicked"""
