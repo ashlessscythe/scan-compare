@@ -14,7 +14,15 @@ class NewScan(NewScanTemplate):
 
     # Any code you write here will run before the form opens.
 
-  def text_box_change(self, **event_args):
+  def text_deliv_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
-    globals.deli event_args['sender'].text
+    globals.deliv = event_args['sender'].text
+  
+  def text_pallets_box_change(self, **event_args):
+    """This method is called when the text in this text box is edited"""
+    globals.pallets = event_args['sender'].text
+
+  def label_1_show(self, **event_args):
+    """This method is called when the Label is shown on the screen"""
+    self.text_box_deliv.focus()
 

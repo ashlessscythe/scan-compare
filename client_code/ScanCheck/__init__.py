@@ -21,8 +21,8 @@ class ScanCheck(sc):
     # ask if new scan on startup (dismissable)
     r = self.new_scan()
     if r:
-      self.label_delivery = globals.deliv
-      self.label_pallets = globals.pallets  
+      self.label_delivery.text = globals.deliv
+      self.label_pallets.text = globals.pallets  
       
   # new scan?
   def new_scan(self):
@@ -149,7 +149,7 @@ class ScanCheck(sc):
         )
         globals.idx += 1    # increment
         self.refresh()
-      self.clear_page()
+      self.clear_text_boxes()
     
   def compare_scans(self):
     # check if populated
