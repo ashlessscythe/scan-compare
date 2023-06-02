@@ -33,6 +33,7 @@ class ScanCheck(sc):
     self.button_compare_click()
 
   # return scans as dict
+  
   def get_scan_text(self):
     s1 = self.text_box_1.text
     s2 = self.text_box_2.text
