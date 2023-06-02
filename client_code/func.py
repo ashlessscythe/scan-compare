@@ -59,6 +59,9 @@ def logout(self, **event_args):
 def is_valid(s):
   return s.__contains__(":P")
 
+def is_populated(s):
+  return len(s) > 0
+
 def extract_pn(self, barcode):
   match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
   return match.group()

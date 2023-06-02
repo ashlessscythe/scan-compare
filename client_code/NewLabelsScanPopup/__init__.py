@@ -6,6 +6,7 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from .. import globals
+from .. import func
 
 class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def __init__(self, **properties):
@@ -55,10 +56,53 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def compare_scans(self):
     # get
     scans = self.get_scans()
-    # check populated
-
-    # check valid
-    # check lic match
-    # check pn match
-
+    # check populated (len 4)
+    populated = [s for s in scans if func.is_populated(s)]
+    # check valid (len 4)
+    valid = [s for s in populated if func.is_valid(s)]
+    # check lic match  (len 4, match = true)
+    licenses = [func.extract_lic(self, s) for s in valid]
+    b_license_match = len(set(licenses)) == 1
+    # check pn match (len 4, b_pn_match = true)
+    part_numbers = [func.extract_pn(self, s) for s in valid]
+    b_pn_match = len(set(part_numbers)) == 1 and globals.pn == part_numbers[0]
     
+    # notify
+    with Notification(
+      message='Checking Scans', 
+      timeout=2, 
+      style='info'
+    ):
+      if len(populated) == 4 and len(valid) == 4 and b_license_match and b_pn_match:
+        res = True
+        role = 'default'
+      else:
+        res = False
+        role = 'warning-popup'
+      print(f'res is {res}')
+      # build msg
+      msg = ''
+      if not len(populated) == 4:
+        msg =  'Need 4 valid scans'
+      else:
+        if not len(valid) == 4:
+          msg = msg + 'Invalid Barcodes scanned'
+        else:
+          if not b_license_match:
+            msg = msg + 'License plates mismatch'
+          else:
+            msg = msg + 'License plates on new labels match. '
+            if not b_license_match:
+              msg = msg + 'Part numbers mismatch'
+            else:
+              msg = msg + 'Part numbers match. '
+        print(f'msg is {msg}')
+      
+      # display msg
+      func.display_message(
+        self,
+        title='Result',
+        message=msg,
+        role=role,
+        bool_large=True
+      )
