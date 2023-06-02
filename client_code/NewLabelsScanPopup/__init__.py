@@ -1,4 +1,4 @@
-from ._anvil_designer import NewScanModalTemplate
+from ._anvil_designer import NewLabelsScanPopupTemplate
 from anvil import *
 import anvil.server
 import anvil.users
@@ -7,7 +7,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from .. import globals
 
-class NewScanModal(NewScanModalTemplate):
+class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -17,7 +17,7 @@ class NewScanModal(NewScanModalTemplate):
   def text_deliv_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     globals.deliv = event_args['sender'].text
-  
+
   def text_pallets_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     globals.pallets = event_args['sender'].text
@@ -25,4 +25,3 @@ class NewScanModal(NewScanModalTemplate):
   def label_1_show(self, **event_args):
     """This method is called when the Label is shown on the screen"""
     self.text_box_deliv.focus()
-

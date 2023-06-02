@@ -8,7 +8,7 @@ import anvil.server
 import re
 from ..import func
 from .. import globals
-from ..NewScanModal import NewScanModal
+from ..StartNewScanPopup import StartNewScanPopup
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -38,7 +38,7 @@ class ScanCheck(sc):
       
   def new_scan(self):
     res = alert(
-      content=NewScanModal(),
+      content=StartNewScanPopup(),
       title="Start New Scan?",
       large=True,
       buttons=[
@@ -74,19 +74,7 @@ class ScanCheck(sc):
     
   def text_box_1_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
-    self.text_box_2.focus()
-
-  def text_box_2_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    self.text_box_3.focus()
-
-  def text_box_3_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    self.text_box_4.focus()
-
-  def text_box_4_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    self.button_compare_click()
+    # check if valid, maybe display PN somewhere on screen
   
   def check_fields_valid(self):
     scans = self.get_scan_text()
@@ -136,7 +124,7 @@ class ScanCheck(sc):
     
   def startup_focus(self, **event_args):
     """This method is called when the Label is shown on the screen"""
-    self.text_box_1.focus()
+    self.text_box_original.focus()
 
   def button_reset_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -198,14 +186,11 @@ class ScanCheck(sc):
       )
       return result
 
-  def text_box_1_unfocus(self, **event_args):
+  def text_box_unfocus(self, **event_args):
     """This method is called when the TextBox loses focus"""
-    self.text_box_1.role = 'outlined-error'
+    if not func.is_valid(event_args['sender'].text):
+      event_args['sender'] = 'outlined-error'
 
-  # def text_box_focus(self, **event_args):
-  #   """This method is called when the TextBox gets focus"""
-  #   event_args['sender'].role = 'default'
-  
   def check_valid(self, obj):
     r = func.is_valid(obj.text)
     # alert(r)
@@ -220,6 +205,22 @@ class ScanCheck(sc):
       print(f'pn is {func.extract_pn(self,obj.text)}')
     else:
       obj.role = 'outlined-error'
+
+  def button_next_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    alert(
+      content=NewLabelsScanPopup(),
+      title='Scan New Labels',
+      buttons={('Done', 'done')},
+      large=True
+    )
+
+  def text_box_original_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.outlined_button_2.click()
+
+
+
 
 
 
