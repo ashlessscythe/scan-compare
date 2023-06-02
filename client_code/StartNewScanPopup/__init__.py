@@ -16,7 +16,7 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
 
   def text_deliv_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
-    globals.deliv = event_args['sender'].text
+    globals.shipment = event_args['sender'].text
   
   def text_pallets_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""

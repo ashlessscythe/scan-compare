@@ -28,14 +28,16 @@ class ScanCheck(sc):
     if r:
       globals.reset_globals(self)
       self.label_shipment.text = globals.shipment
+      self.label_shipment.role = 'green-shadow-label'
       self.label_pallets.text = globals.pallets
+      self.label_pallets.role = 'green-shadow-label'
     else:
       # globals not changed by this
       # TODO - figure this out
       self.label_shipment.text = "NO ACTIVE SHIPMENT"
-      self.label_shipment.role = 'warning'
+      self.label_shipment.role = 'warning-label'
       self.label_pallets.text = "NOT VALID SCAN, TESTING USE ONLY"
-      self.label_pallets.role = 'warning'
+      self.label_pallets.role = 'warning-label'
       
   def new_scan(self):
     res = alert(
@@ -199,8 +201,9 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     #check if valid
     barcode = self.text_box_original.text
-    pn = func.extract_pn(self, barcode)
     if func.is_valid(barcode):
+      # Extract pn
+      pn = func.extract_pn(self, barcode)
       alert(
         content=NewLabelsScanPopup(pn=pn),
         title='Scan New Labels',

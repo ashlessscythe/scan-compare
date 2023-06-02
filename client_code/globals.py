@@ -12,11 +12,13 @@ from anvil.tables import app_tables
 #
 # // global
 idx = 0
-shipment = 'no_deliv'
+shipment = 'no_shipment'
 pallets = 0
+pn = 'no_pn'
 
 def reset_globals(self):
   self.idx = 0
   self.shipment = 'no_shipment'
   self.pallets = 0
+  self.pn = 'no_pn'
   

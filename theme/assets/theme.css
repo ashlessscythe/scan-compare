@@ -619,6 +619,32 @@ button.close > span, button.close {
   color: %color:Primary%;
 }
 
+.anvil-role-green-shadow-label {
+	width: 300px;	
+  height: 100px;
+  font-size: 1em;
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid black;
+  padding: 20px;
+  background-color: #9EEDBE;	
+  position: relative;	
+/*   box-shadow: 6px 7px 5px 0px cyan; */
+}
+
+.anvil-role-warning-label {
+	width: 300px;	
+  height: 100px;	
+  font-size: 1em;
+  text-align: center;
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px;
+  background-color: #EDCECE;	
+  position: relative;	
+/*   box-shadow: 6px 7px 5px 0px red; */
+}
+
 .anvil-role-warning-popup {
   background-color: #DAE2FF;
   font-size: 1em;
@@ -631,7 +657,7 @@ button.close > span, button.close {
 }
 
 .anvil-role-warning {
-  background-color: #D64D47;
+  background-color: #EDCECE;
   font-size: 1em;
   text-align: center;
   border-radius: 25px;

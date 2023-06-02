@@ -66,8 +66,3 @@ def extract_pn(self, barcode):
 def extract_lic(self, barcode):
   match = re.search(r"(?<=[6:6J|6:1J]).+?(?=\:P)", barcode)
   return match.group()
-
-# TODO
-def flash_message(m):
-  alert(m, large=True, role="anvil-role-warning")
-        

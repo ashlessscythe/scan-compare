@@ -50,7 +50,10 @@ roles:
 - name: input-error
   components: [TextBox, TextArea, DatePicker, DropDown]
 - {name: warning, components: null, display_in_toolbox: true}
-- {name: warning-popup}
+- name: warning-popup
+  components: []
+- {name: warning-label}
+- {name: green-shadow-label}
 color_scheme:
   preset_groups:
   - name: Colour Scheme
