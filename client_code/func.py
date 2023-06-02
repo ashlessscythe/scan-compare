@@ -59,6 +59,9 @@ def logout(self, **event_args):
 def is_valid(s):
   return s.__contains__(":P")
 
+def is_valid_lic(s):
+  return s.__contains__(":Z")
+
 def is_populated(s):
   return len(s) > 0
 
@@ -68,4 +71,8 @@ def extract_pn(self, barcode):
 
 def extract_lic(self, barcode):
   match = re.search(r"(?<=[6:6J|6:1J]).+?(?=\:P)", barcode)
+  return match.group()
+
+def extract_lic_short(self, barcode):
+  match = re.search(r"(?<=[6J|1J]).+?(?=\:Z)", barcode)
   return match.group()

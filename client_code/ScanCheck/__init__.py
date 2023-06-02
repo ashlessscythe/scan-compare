@@ -201,12 +201,14 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     #check if valid
     scans = (
-      self.text_box_original.text,
-      self.text_box_new.text
+      self.text_box_original.text.strip(),
+      self.text_box_new.text.strip()
     )
     # 2 scans
     print(scans)
-    if not len(scans) == 2:
+    b_missing = True in set([len(s) == 0 for s in scans])
+    print(f'b_missing is {b_missing}')
+    if b_missing:
       func.display_message(
         self,
         title='Missing Scan',
@@ -214,6 +216,7 @@ class ScanCheck(sc):
         role='warning-popup',
         bool_large = True
       )
+      self.text_box_original.focus()
     else:
       # 2 different scans
       if len(set(scans)) == 1:

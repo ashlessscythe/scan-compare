@@ -46,25 +46,30 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
 
   def get_scans(self):
     scans = (
-      self.barcode_1.text,
-      self.barcode_2.text,
-      self.barcode_3.text,
-      self.barcode_4.text
+      self.barcode_1.text.strip(), 
+      self.barcode_2.text.strip(),
+      self.barcode_3.text.strip(),
+      self.barcode_4.text.strip()
     )
     return scans
 
   def compare_scans(self):
     # get
     scans = self.get_scans()
-    # repeat
-    b_repeat = len(set(scans)) == 1
-    b_unique = len(set(scans)) == 4
+    # repeat and unique
+    b_unique = False
+    b_repeat = False
+    if len(set(scans)) == 4:
+      b_unique = True
+    else:
+      b_repeat = True
+      
     # check populated (len 4)
     populated = [s for s in scans if func.is_populated(s)]
     # check valid (len 4)
-    valid = [s for s in populated if func.is_valid(s)]
+    valid = [s for s in populated if func.is_valid_lic(s)]
     # check lic match  (len 4, match = true)
-    licenses = [func.extract_lic(self, s) for s in valid]
+    licenses = [func.extract_lic_short(self, s) for s in valid]
     b_license_match = len(set(licenses)) == 1
     
     # notify
@@ -74,10 +79,10 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       style='info'
     ):
       if not b_repeat and b_unique and len(populated) == 4 and len(valid) == 4 and b_license_match:
-        res = True
+        res = 'OK'
         role = 'default'
       else:
-        res = False
+        res = 'ERROR'
         role = 'warning-popup'
       print(f'res is {res}')
       # build msg
@@ -101,7 +106,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       # display msg
       func.display_message(
         self,
-        title='Result',
+        title='Result: ' + res,
         message=msg,
         role=role,
         bool_large=True
