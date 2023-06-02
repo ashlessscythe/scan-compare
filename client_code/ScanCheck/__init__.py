@@ -200,24 +200,66 @@ class ScanCheck(sc):
   def button_next_click(self, **event_args):
     """This method is called when the button is clicked"""
     #check if valid
-    barcode = self.text_box_original.text
-    if func.is_valid(barcode):
-      # Extract pn
-      pn = func.extract_pn(self, barcode)
-      alert(
-        content=NewLabelsScanPopup(pn=pn),
-        title='Scan New Labels',
-        buttons={('Done', 'done')},
-        large=True
-        )
+    scans = (
+      self.text_box_original.text,
+      self.text_box_new.text
+    )
+    # 2 scans
+    print(scans)
+    if not len(scans) == 2:
+      func.display_message(
+        self,
+        title='Missing Scan',
+        message='Please scan 2 barcodes',
+        role='warning-popup',
+        bool_large = True
+      )
     else:
-      # if invalid, show err, focus textbox
-      func.display_message(self, 'Invalid Scan', 'Pallet Label Scan Invalid', 'warning', True)
-      self.text_box_original.focus()
+      # 2 different scans
+      if len(set(scans)) == 1:
+        func.display_message(
+          self,
+          title='Error',
+          message = 'Same barcode scanned twice',
+          role='warning-popup',
+          bool_large=True
+        )
+      else:
+        # 2 valid scans
+        if not func.is_valid(scans[0]) or not func.is_valid(scans[1]):
+          func.display_message(
+            self,
+            title='Error',
+            message='Invalid Barcode',
+            role='warning-popup',
+            bool_large=True
+          )
+        else:
+          # Extract pn
+          pn1 = func.extract_pn(self, scans[0])
+          pn2 = func.extract_pn(self, scans[1])
+          # alert if both pn match
+          if not pn1 == pn2:
+            # if invalid, show err, focus textbox
+            func.display_message(self, 'Invalid Scan', 'Part numbers do not match', 'warning', True)
+            self.text_box_original.focus()
+          else:
+            result = alert(
+              content=NewLabelsScanPopup(pn=pn1),
+              title='Scan New Labels',
+              buttons={('Done', 'done')},
+              large=True
+              )
+            print(result)
 
   def text_box_original_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
+    self.text_box_new.focus()
+
+  def text_box_new_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
     self.button_next_click()
+
 
 
 

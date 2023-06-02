@@ -56,6 +56,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def compare_scans(self):
     # get
     scans = self.get_scans()
+    b_repeat = len(set(scans)) == 1
     # check populated (len 4)
     populated = [s for s in scans if func.is_populated(s)]
     # check valid (len 4)
@@ -73,7 +74,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       timeout=2, 
       style='info'
     ):
-      if len(populated) == 4 and len(valid) == 4 and b_license_match and b_pn_match:
+      if not b_repeat and len(populated) == 4 and len(valid) == 4 and b_license_match and b_pn_match:
         res = True
         role = 'default'
       else:
@@ -82,20 +83,24 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       print(f'res is {res}')
       # build msg
       msg = ''
-      if not len(populated) == 4:
-        msg =  'Need 4 valid scans'
+      if b_repeat:
+        msg = 'Repeat barcodes'
       else:
-        if not len(valid) == 4:
-          msg = msg + 'Invalid Barcodes scanned'
+        msg = 'Barcodes no repeat'
+        if not len(populated) == 4:
+          msg =  'Need 4 valid scans'
         else:
-          if not b_license_match:
-            msg = msg + 'License plates mismatch'
+          if not len(valid) == 4:
+            msg = msg + 'Invalid Barcodes scanned'
           else:
-            msg = msg + 'License plates on new labels match. '
             if not b_license_match:
-              msg = msg + 'Part numbers mismatch'
+              msg = msg + 'License plates mismatch'
             else:
-              msg = msg + 'Part numbers match. '
+              msg = msg + 'License plates on new labels match. '
+              if not b_license_match:
+                msg = msg + 'Part numbers mismatch'
+              else:
+                msg = msg + 'Part numbers match. '
         print(f'msg is {msg}')
       
       # display msg
