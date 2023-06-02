@@ -27,13 +27,13 @@ class ScanCheck(sc):
     r = self.new_scan()
     if r:
       globals.reset_globals(self)
-      self.label_delivery.text = globals.deliv
+      self.label_shipment.text = globals.shipment
       self.label_pallets.text = globals.pallets
     else:
       # globals not changed by this
       # TODO - figure this out
-      self.label_delivery.text = "NO ACTIVE DELIVERY"
-      self.label_delivery.role = 'warning'
+      self.label_shipment.text = "NO ACTIVE SHIPMENT"
+      self.label_shipment.role = 'warning'
       self.label_pallets.text = "NOT VALID SCAN, TESTING USE ONLY"
       self.label_pallets.role = 'warning'
       
@@ -55,7 +55,7 @@ class ScanCheck(sc):
   
   def clear_scan_page(self):
     self.clear_text_boxes()
-    self.text_box_1.focus()
+    self.text_box_original.focus()
     anvil.server.call('reset_session_db')
     self.refresh()
     
@@ -73,10 +73,6 @@ class ScanCheck(sc):
     scans = [ (i, el) for i, el in enumerate(s, start=1) ]
     return scans
     
-  def text_box_1_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    # check if valid, maybe display PN somewhere on screen
-  
   def check_fields_valid(self):
     scans = self.get_scan_text()
     for i, s in scans:
@@ -117,11 +113,8 @@ class ScanCheck(sc):
       # compare
   
   def clear_text_boxes(self):
-    self.text_box_1.text = ""
-    self.text_box_2.text = ""
-    self.text_box_3.text = ""
-    self.text_box_4.text = ""
-    self.text_box_1.focus()
+    self.text_box_original.text = ""
+    self.text_box_original.focus()
     
   def startup_focus(self, **event_args):
     """This method is called when the Label is shown on the screen"""
@@ -187,11 +180,6 @@ class ScanCheck(sc):
       )
       return result
 
-  def text_box_unfocus(self, **event_args):
-    """This method is called when the TextBox loses focus"""
-    if not func.is_valid(event_args['sender'].text):
-      event_args['sender'].role = 'outlined-error'
-
   def check_valid(self, obj):
     r = func.is_valid(obj.text)
     # alert(r)
@@ -209,16 +197,24 @@ class ScanCheck(sc):
 
   def button_next_click(self, **event_args):
     """This method is called when the button is clicked"""
-    alert(
-      content=NewLabelsScanPopup(),
-      title='Scan New Labels',
-      buttons={('Done', 'done')},
-      large=True
-    )
+    #check if valid
+    barcode = self.text_box_original.text
+    pn = func.extract_pn(self, barcode)
+    if func.is_valid(barcode):
+      alert(
+        content=NewLabelsScanPopup(pn=pn),
+        title='Scan New Labels',
+        buttons={('Done', 'done')},
+        large=True
+        )
+    else:
+      # if invalid, show err, focus textbox
+      func.display_message(self, 'Invalid Scan', 'Pallet Label Scan Invalid', 'warning', True)
+      self.text_box_original.focus()
 
   def text_box_original_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
-    self.outlined_button_2.click()
+    self.button_next_click()
 
 
 

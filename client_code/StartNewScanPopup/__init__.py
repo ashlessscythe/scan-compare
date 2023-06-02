@@ -24,5 +24,5 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
 
   def label_1_show(self, **event_args):
     """This method is called when the Label is shown on the screen"""
-    self.text_box_deliv.focus()
+    self.text_box_shipment.focus()
 

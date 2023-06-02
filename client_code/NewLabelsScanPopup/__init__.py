@@ -11,7 +11,9 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
-
+    pn = properties['pn']
+    if len(pn) > 0:
+      self.popup_pn.text = pn
     # Any code you write here will run before the form opens.
 
   def label_title_show(self, **event_args):
