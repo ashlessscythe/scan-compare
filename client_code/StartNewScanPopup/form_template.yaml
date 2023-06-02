@@ -12,7 +12,7 @@ components:
   event_bindings: {show: label_1_show}
 - type: Label
   properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: Delivery ID, font_size: null, font: '', spacing_above: small,
+    visible: true, text: Shipment ID, font_size: null, font: '', spacing_above: small,
     icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
     underline: false, icon: ''}
   name: label_2
@@ -22,7 +22,7 @@ components:
     border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
     font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
     background: '', bold: false, underline: false}
-  name: text_box_deliv
+  name: text_box_shipment
   layout_properties: {grid_position: 'XAOOKA,VRTDDJ'}
   event_bindings: {change: text_deliv_box_change}
 - type: Label

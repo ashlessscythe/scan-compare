@@ -7,6 +7,7 @@ from .Login import *
 from .Logout import *
 import re
 from . import globals
+from .popup_alert import popup_alert
 
 # This is a module.
 # You can define variables and functions here, and use them from any form. For example, in a top-level form:
@@ -24,6 +25,14 @@ def add_to_database(self, delivery, scans, result):
     globals.idx,
     len([s for i, s in scans if func.is_valid(s)]),
     result
+  )
+
+# call below from outside func via
+#     func.display_message(self, 'Test Title', 'mesg, whats the haps', 'warning', True)
+def display_message(self, title, message, role, bool_large):
+  alert(
+    content=popup_alert(title=title, message=message, role=role),
+    large=bool_large
   )
 
 def get_message(b_repeat, b_pn, b_barcode):

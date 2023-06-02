@@ -30,14 +30,14 @@ def get_user():
   return user
 
 @anvil.server.callable
-def add_scan(delivery, scans, result):
+def add_scan(shipment, scans, result):
   scan = [s for i, s in scans]
   scan_1 = scan[0]
   scan_2 = scan[1]
   scan_3 = scan[2]
   scan_4 = scan[3]
   app_tables.scans.add_row(
-    delivery=delivery,
+    shipment=shipment,
     scan_1=scan_1,
     scan_2=scan_2,
     scan_3=scan_3,

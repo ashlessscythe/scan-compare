@@ -9,6 +9,7 @@ import re
 from ..import func
 from .. import globals
 from ..StartNewScanPopup import StartNewScanPopup
+from ..NewLabelsScanPopup import NewLabelsScanPopup
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -189,7 +190,7 @@ class ScanCheck(sc):
   def text_box_unfocus(self, **event_args):
     """This method is called when the TextBox loses focus"""
     if not func.is_valid(event_args['sender'].text):
-      event_args['sender'] = 'outlined-error'
+      event_args['sender'].role = 'outlined-error'
 
   def check_valid(self, obj):
     r = func.is_valid(obj.text)
@@ -201,8 +202,8 @@ class ScanCheck(sc):
     obj = event_args['sender']
     if self.check_valid(obj):
       obj.role = 'default'
-      print(f'lic plate {func.extract_lic(self,obj.text)}')
-      print(f'pn is {func.extract_pn(self,obj.text)}')
+      print(f'lic plate {func.extract_lic(self, obj.text)}')
+      print(f'pn is {func.extract_pn(self, obj.text)}')
     else:
       obj.role = 'outlined-error'
 

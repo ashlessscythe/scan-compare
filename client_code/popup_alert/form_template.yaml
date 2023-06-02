@@ -1,0 +1,29 @@
+container:
+  type: ColumnPanel
+  properties: {col_widths: '{}'}
+components:
+- type: Label
+  properties: {role: headline, align: center, tooltip: '', border: '', foreground: '',
+    visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+    spacing_below: small, italic: false, background: '', bold: false, underline: false,
+    icon: ''}
+  name: form_title
+  layout_properties: {grid_position: 'TZTTBJ,RTISPW'}
+- type: Spacer
+  properties: {height: 121}
+  name: spacer_1
+  layout_properties: {grid_position: 'TZTTBJ,KIYSHS'}
+- type: Label
+  properties: {role: headline, align: center, tooltip: '', border: '', foreground: '',
+    visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+    spacing_below: small, italic: false, background: '', bold: false, underline: false,
+    icon: ''}
+  name: form_message
+  layout_properties: {grid_position: 'GRBOEM,GMDXIM'}
+- type: Spacer
+  properties: {height: 121}
+  name: spacer_1_copy
+  layout_properties:
+    col_widths: {}
+    grid_position: JYGJOD,XUINZZ
+is_package: true

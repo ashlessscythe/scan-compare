@@ -1,21 +1,18 @@
-from ._anvil_designer import NewLabelsScanPopupTemplate
+from ._anvil_designer import popup_alertTemplate
 from anvil import *
 import anvil.server
 import anvil.users
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-from .. import globals
 
-class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
+class popup_alert(popup_alertTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
 
     # Any code you write here will run before the form opens.
-
-  def label_title_show(self, **event_args):
-    """This method is called when the Label is shown on the screen"""
-    self.barcode_1.focus()
-
-  
+    self.form_message.text = properties['message']
+    self.form_title.text = properties['title']
+    self.role = properties['role']
+    

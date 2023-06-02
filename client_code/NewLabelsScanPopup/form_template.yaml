@@ -9,6 +9,7 @@ components:
     underline: false, icon: ''}
   name: label_title
   layout_properties: {grid_position: 'QGFENX,VIMVBJ'}
+  event_bindings: {show: label_title_show}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: SCAN 1, font_size: null, font: '', spacing_above: small, icon_align: left,
