@@ -56,7 +56,9 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def compare_scans(self):
     # get
     scans = self.get_scans()
+    # repeat
     b_repeat = len(set(scans)) == 1
+    b_unique = len(set(scans)) == 4
     # check populated (len 4)
     populated = [s for s in scans if func.is_populated(s)]
     # check valid (len 4)
@@ -64,9 +66,6 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # check lic match  (len 4, match = true)
     licenses = [func.extract_lic(self, s) for s in valid]
     b_license_match = len(set(licenses)) == 1
-    # check pn match (len 4, b_pn_match = true)
-    part_numbers = [func.extract_pn(self, s) for s in valid]
-    b_pn_match = len(set(part_numbers)) == 1 and globals.pn == part_numbers[0]
     
     # notify
     with Notification(
@@ -74,7 +73,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       timeout=2, 
       style='info'
     ):
-      if not b_repeat and len(populated) == 4 and len(valid) == 4 and b_license_match and b_pn_match:
+      if not b_repeat and b_unique and len(populated) == 4 and len(valid) == 4 and b_license_match:
         res = True
         role = 'default'
       else:
@@ -84,24 +83,20 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       # build msg
       msg = ''
       if b_repeat:
-        msg = 'Repeat barcodes'
+        msg = 'Repeat barcodes. '
       else:
-        msg = 'Barcodes no repeat'
+        msg = 'Barcodes are unique. '
         if not len(populated) == 4:
-          msg =  'Need 4 valid scans'
+          msg =  'Need 4 valid scans. '
         else:
           if not len(valid) == 4:
-            msg = msg + 'Invalid Barcodes scanned'
+            msg = msg + 'Invalid Barcodes scanned. '
           else:
             if not b_license_match:
-              msg = msg + 'License plates mismatch'
+              msg = msg + 'License plates mismatch. '
             else:
               msg = msg + 'License plates on new labels match. '
-              if not b_license_match:
-                msg = msg + 'Part numbers mismatch'
-              else:
-                msg = msg + 'Part numbers match. '
-        print(f'msg is {msg}')
+        print(f'Result is: {msg}')
       
       # display msg
       func.display_message(
