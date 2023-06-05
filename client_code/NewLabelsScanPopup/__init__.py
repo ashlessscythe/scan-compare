@@ -123,6 +123,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # if ok, write to db?
     if res == 'OK':
       print(f'pn is {globals.pn}')
+      # bundle args into obj
       data = {'shipment':globals.shipment, 
                 'count_pallets':globals.pallets,
                 'pn':globals.pn,
@@ -130,11 +131,15 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                 'qr_s':globals.qr_s,
                 'result':msg
                }
+      # add to db
       anvil.server.call('add_scan',
                        **data)
+      # TODO, verify add session
+      # TODO, define how current_pallet is passed
       anvil.server.call('session_add_row', 
-                       index=current_pallet,
+                       index=globals.current_pallet,
                        valid_scans=len(valid),
-                       result=msg)
+                       result=msg, 
+                       user=anvil.server.call('get_user'))
       self.raise_event('x-close-alert', value='OK')
     

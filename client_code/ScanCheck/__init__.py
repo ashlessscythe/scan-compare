@@ -32,6 +32,7 @@ class ScanCheck(sc):
       self.label_shipment.role = 'green-shadow-label'
       self.label_pallets.text = globals.pallets
       self.label_pallets.role = 'green-shadow-label'
+      self.label_msg.text = ''
     else:
       # globals not changed by this
       # TODO - figure this out
@@ -39,6 +40,8 @@ class ScanCheck(sc):
       self.label_shipment.role = 'warning-label'
       self.label_pallets.text = "NOT VALID SCAN, TESTING USE ONLY"
       self.label_pallets.role = 'warning-label'
+      self.label_msg.text = 'Please reset to start new scan.'
+      self.label_msg.role = 'warning-label'
       
   def new_scan(self):
     res = alert(
@@ -46,8 +49,7 @@ class ScanCheck(sc):
       title="Start New Scan?",
       large=True,
       buttons=[
-        ("No", False),
-        ("Yes", True),
+        ("OK", True),
       ]
     )
     return res
@@ -161,9 +163,10 @@ class ScanCheck(sc):
               buttons={('Done', 'done')},
               large=True
               )
+            # ok if scans passed, and added to db and session
             if result == 'OK':
               self.clear_text_boxes()
-              # TODO, add to session_db
+              
 
   def text_box_original_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""

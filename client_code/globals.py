@@ -15,6 +15,7 @@ idx = 0
 qr_s = []
 shipment = 'no_shipment'
 pallets = 0
+current_pallet = 0
 pn = 'no_pn'
 
 def reset_globals(self):

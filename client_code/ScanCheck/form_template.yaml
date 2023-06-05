@@ -30,6 +30,13 @@ components:
     name: label_pallets
     layout_properties: {grid_position: 'QAUFQT,EOGYJM'}
   - type: Label
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: label_msg
+    layout_properties: {grid_position: 'AKAKTD,MIADCW'}
+  - type: Label
     properties: {role: display, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: Scan Barcode, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
