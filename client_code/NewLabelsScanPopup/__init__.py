@@ -110,4 +110,12 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
         message=msg,
         role=role,
         bool_large=True
-      )
+      ) 
+      # end with Notification()
+    
+    # TODO shorten this function, it's getting kinda long 
+    # if ok, write to db?
+    if res == 'OK':
+      print(f'pn is {globals.pn}')
+      anvil.server.call('add_scan')  
+    

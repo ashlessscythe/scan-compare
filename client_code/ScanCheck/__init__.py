@@ -45,8 +45,8 @@ class ScanCheck(sc):
       title="Start New Scan?",
       large=True,
       buttons=[
-        ("Yes", True),
         ("No", False),
+        ("Yes", True),
       ]
     )
     return res
