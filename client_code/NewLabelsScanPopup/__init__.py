@@ -14,8 +14,12 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     self.init_components(**properties)
     # pn passed in via properties from scancheck
     pn = properties['pn']
+    pallets = properties['pallets']
+    shipment = properties['shipment']
     if len(pn) > 0:
       globals.pn = pn
+      globals.shipment = shipment
+      globals.pallets = pallets
       self.popup_pn.text = pn
     # Any code you write here will run before the form opens.
 
@@ -117,5 +121,10 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # if ok, write to db?
     if res == 'OK':
       print(f'pn is {globals.pn}')
-      anvil.server.call('add_scan')  
-    
+      anvil.server.call('add_scan',
+                       shipment=globals.shipment, 
+                       count_pallets=globals.pallets,
+                       pn=globals.pn,
+                       scans=self.get_scans(),
+                       result=msg)  
+    open_form('ScanCheck')

@@ -74,48 +74,10 @@ class ScanCheck(sc):
     s = [s1, s2, s3, s4]
     scans = [ (i, el) for i, el in enumerate(s, start=1) ]
     return scans
-    
-  def check_fields_valid(self):
-    scans = self.get_scan_text()
-    for i, s in scans:
-      if not func.is_valid(s):
-        alert(f'Scan {i} invalid')
-        return False
-      else:
-        return True
-      
-  def check_fields_populated(self):
-    scans = self.get_scan_text()
-    s = [s for i, s in scans]    # denumerate
-    # check for all blanks
-    if len(set(s)) == 1 and s[0] == '':
-      alert('All fields blank')
-      return False
-    if not s[0]:
-      alert("Error: Scan 1 empty")
-      self.text_box_1.focus()
-      return False
-    elif not s[1]:
-      alert("Error: Scan 2 empty")
-      # focus 2
-      self.text_box_2.focus()
-      return False
-    elif not s[2]:
-      alert("Error: Scan 3 empty")
-      # focus 3
-      self.text_box_3.focus()
-      return False
-    elif not s[3]:
-      alert("Error: Scan 4 empty")
-      # focus 4
-      self.text_box_4.focus()
-      return False
-    else:
-      return True
-      # compare
   
   def clear_text_boxes(self):
     self.text_box_original.text = ""
+    self.text_box_new.text = ""
     self.text_box_original.focus()
     
   def startup_focus(self, **event_args):
@@ -128,59 +90,6 @@ class ScanCheck(sc):
     if c:
       self.clear_scan_page()
       self.startup_with_scan()
-    
-  def button_compare_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    if not self.check_fields_populated():
-      return
-    if not self.check_fields_valid():
-      pass
-    else:
-      with Notification("Checking Scans"):
-        r = self.compare_scans()
-        func.add_to_database(
-          self,
-          globals.deliv,
-          self.get_scan_text(), 
-          r
-        )
-        globals.idx += 1    # increment
-        self.refresh()
-      self.clear_text_boxes()
-    
-  def compare_scans(self):
-    # check if populated
-    if not self.check_fields_populated():
-      alert("Missing Information")
-      return 'missing_info'
-    # check if valid
-    elif not self.check_fields_valid():
-      alert("Invalid Barcodes scanned, please verify")
-      return 'invalid_info'
-    else:
-      payload = self.get_scan_text()
-      # extract scans
-      scans = [el for i, el in payload]
-      # extract part numbers
-      pn_list = [(func.extract_pn(self, el)) for i, el in payload if func.is_valid(el)]
-
-      # compare pn
-      b_repeat = len(set(scans)) == 1 and len(scans) == 4
-      pn_match = len(set(pn_list)) == 1 and len(pn_list) == 4 
-      barcode_match = len(set(scans)) == 2 and len(scans) == 4
-      
-      # result to store in db
-      if b_repeat:
-          result = 'same barcode scanned 4 times'
-      else:
-        result = f'pn match = {pn_match}, barcode match = {barcode_match}'
-
-      func.flash_message(
-        func.get_message(
-          b_repeat, pn_match, barcode_match
-        )
-      )
-      return result
 
   def check_valid(self, obj):
     r = func.is_valid(obj.text)
@@ -248,7 +157,7 @@ class ScanCheck(sc):
             self.text_box_original.focus()
           else:
             result = alert(
-              content=NewLabelsScanPopup(pn=pn1),
+              content=NewLabelsScanPopup(pn=pn1, shipment=globals.shipment, pallets=globals.pallets),
               title='Scan New Labels',
               buttons={('Done', 'done')},
               large=True
