@@ -54,6 +54,7 @@ roles:
   components: []
 - {name: warning-label}
 - {name: green-shadow-label}
+- {name: ok-popup}
 color_scheme:
   preset_groups:
   - name: Colour Scheme
