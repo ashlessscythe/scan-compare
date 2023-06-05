@@ -51,9 +51,6 @@ db_schema:
     - name: user_unblock
       admin_ui: {order: 7, width: 200}
       type: string
-    - name: shipment
-      admin_ui: {order: -1, width: 200}
-      type: string
     - name: qr_orig
       admin_ui: {order: -0.5, width: 200}
       type: string
@@ -62,6 +59,9 @@ db_schema:
       type: string
     - name: num_pallets
       admin_ui: {order: -0.9375, width: 200}
+      type: number
+    - name: shipment
+      admin_ui: {order: -2, width: 200}
       type: number
   files:
     title: Files

@@ -25,6 +25,7 @@ class ScanCheck(sc):
   # new scan?
   def startup_with_scan(self):
     r = self.new_scan()
+    print(f"value from new_scan is {r}")
     if r:
       globals.reset_globals(self)
       self.label_shipment.text = globals.shipment

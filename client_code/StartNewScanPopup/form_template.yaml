@@ -20,7 +20,7 @@ components:
 - type: TextBox
   properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
     border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-    font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
+    font: '', spacing_above: small, type: number, spacing_below: small, italic: false,
     background: '', bold: false, underline: false}
   name: text_box_shipment
   layout_properties: {grid_position: 'XAOOKA,VRTDDJ'}
@@ -35,7 +35,7 @@ components:
 - type: TextBox
   properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
     border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-    font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
+    font: '', spacing_above: small, type: number, spacing_below: small, italic: false,
     background: '', bold: false, underline: false}
   name: text_box_pallets
   layout_properties: {grid_position: 'NIVAZO,JWYGUZ'}

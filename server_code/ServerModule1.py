@@ -38,7 +38,7 @@ def add_scan(**properties):
   scan_3 = scan[2]
   scan_4 = scan[3]
   app_tables.scans.add_row(
-    shipment=properties['shipment'],
+    shipment=int(properties['shipment']),
     num_pallets=int(properties['count_pallets']),
     qr_orig=properties['qr_s'][0],
     qr_new=properties['qr_s'][1],
