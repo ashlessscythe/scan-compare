@@ -131,5 +131,6 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                 'result':msg
                }
       anvil.server.call('add_scan',
-                       **kwargs)  
+                       **kwargs)
+      self.raise_event('x-close-alert', value='OK')
     

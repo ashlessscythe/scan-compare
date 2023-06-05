@@ -50,7 +50,7 @@ def add_scan(**properties):
     created=datetime.now(),
     user_scan = get_user()
   )
-  print(f"added row to db shipment: {properties['shipment']} result {properties['result']}")
+  print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
 
 @anvil.server.callable
 def session_add_row(index, valid_scans, result):

@@ -170,7 +170,9 @@ class ScanCheck(sc):
               buttons={('Done', 'done')},
               large=True
               )
-            print(result)
+            if result == 'OK':
+              self.clear_text_boxes()
+              # TODO, add to session_db
 
   def text_box_original_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
