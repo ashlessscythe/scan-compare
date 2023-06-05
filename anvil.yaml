@@ -8,7 +8,7 @@ services:
   client_config: {}
   server_config: {file_table: files}
 - source: /runtime/services/anvil/users.yml
-  client_config: {allow_signup: true, enable_automatically: true, use_email: true,
+  client_config: {allow_signup: true, enable_automatically: false, use_email: true,
     confirm_email: true, allow_remember_me: false, remember_me_days: 30}
   server_config: {user_table: users}
 startup: {type: form, module: ScanCheck}
