@@ -73,6 +73,13 @@ components:
     properties: {height: 93}
     name: spacer_1
     layout_properties: {grid_position: 'NEVECH,AFHWWD'}
+  - type: Label
+    properties: {role: headline, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: __PORTION BELOW STILL UNDER DEVELOPMENT__, font_size: 20,
+      font: Consolas red, spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: label_4
+    layout_properties: {grid_position: 'QKSZZW,YIVQBQ'}
   - type: DataGrid
     properties:
       role: null

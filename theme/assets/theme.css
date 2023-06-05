@@ -620,6 +620,7 @@ button.close > span, button.close {
 }
 
 .anvil-role-green-shadow-label {
+  color: black;
 	width: 300px;	
   height: 100px;
   font-size: 1em;
@@ -652,12 +653,24 @@ button.close > span, button.close {
   border: 2px solid black;
   padding: 20px;
   background-color: #EDCECE;	
-  position: relative;	
+  position: relative;
+  color: black;
 /*   box-shadow: 6px 7px 5px 0px red; */
 }
 
-.anvil-role-warning-popup {
+.anvil-role-ok-popup {
   background-color: #DAE2FF;
+  font-size: 1em;
+  text-align: center;
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px;
+  color: black;
+  font-weight: bold;
+}
+
+.anvil-role-warning-popup {
+  background-color: #EDCECE;
   font-size: 1em;
   text-align: center;
   border-radius: 25px;

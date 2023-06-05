@@ -110,7 +110,6 @@ db_schema:
       admin_ui: {width: 200}
       type: string
   session_scan:
-    title: session_scan
     client: none
     server: full
     columns:
@@ -126,4 +125,5 @@ db_schema:
     - name: user
       admin_ui: {width: 200}
       type: string
+    title: session_scan
 renamed: true

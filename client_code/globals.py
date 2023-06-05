@@ -12,6 +12,7 @@ from anvil.tables import app_tables
 #
 # // global
 idx = 0
+qr_s = []
 shipment = 'no_shipment'
 pallets = 0
 pn = 'no_pn'
