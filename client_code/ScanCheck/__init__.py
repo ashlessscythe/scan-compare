@@ -136,6 +136,7 @@ class ScanCheck(sc):
           role='warning-popup',
           bool_large=True
         )
+        self.text_box_original.focus()
       else:
         # 2 valid scans
         if not func.is_valid(scans[0]) or not func.is_valid(scans[1]):
@@ -146,6 +147,7 @@ class ScanCheck(sc):
             role='warning-popup',
             bool_large=True
           )
+          self.text_box_original.focus()
         else:
           # Extract pn
           pn1 = func.extract_pn(self, scans[0])
@@ -156,8 +158,14 @@ class ScanCheck(sc):
             func.display_message(self, 'Invalid Scan', 'Part numbers do not match', 'warning', True)
             self.text_box_original.focus()
           else:
+            kwargs = {
+              'qr_s':scans,
+              'pn':pn1,
+              'shipment':globals.shipment,
+              'pallets':globals.pallets
+            }
             result = alert(
-              content=NewLabelsScanPopup(pn=pn1, shipment=globals.shipment, pallets=globals.pallets),
+              content=NewLabelsScanPopup(**kwargs),
               title='Scan New Labels',
               buttons={('Done', 'done')},
               large=True

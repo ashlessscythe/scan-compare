@@ -30,27 +30,27 @@ def get_user():
   return user
 
 @anvil.server.callable
-def add_scan(shipment, count_pallets, pn, scans, result):
-  print(scans)
-  scan = [s for i, s in scans]
+def add_scan(**properties):
+  print(properties['scans'])
+  scan = [s for s in properties['scans']]
   scan_1 = scan[0]
   scan_2 = scan[1]
   scan_3 = scan[2]
   scan_4 = scan[3]
   app_tables.scans.add_row(
-    shipment=shipment,
-    num_pallets=count_pallets,
-    qr_orig=qr_orig,
-    qr_new=qr_new,
+    shipment=properties['shipment'],
+    num_pallets=int(properties['count_pallets']),
+    qr_orig=properties['qr_s'][0],
+    qr_new=properties['qr_s'][1],
     scan_1=scan_1,
     scan_2=scan_2,
     scan_3=scan_3,
     scan_4=scan_4,
-    result=result,
+    result=properties['result'],
     created=datetime.now(),
     user_scan = get_user()
   )
-  print(f'added row to db shipment: {shipment} result {result} ')
+  print(f"added row to db shipment: {properties['shipment']} result {properties['result']}")
 
 @anvil.server.callable
 def session_add_row(index, valid_scans, result):

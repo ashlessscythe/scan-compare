@@ -16,10 +16,12 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     pn = properties['pn']
     pallets = properties['pallets']
     shipment = properties['shipment']
+    qr_s = properties['qr_s']
     if len(pn) > 0:
       globals.pn = pn
       globals.shipment = shipment
       globals.pallets = pallets
+      globals.qr_s = qr_s
       self.popup_pn.text = pn
     # Any code you write here will run before the form opens.
 
@@ -121,10 +123,13 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # if ok, write to db?
     if res == 'OK':
       print(f'pn is {globals.pn}')
+      kwargs = {'shipment':globals.shipment, 
+                'count_pallets':globals.pallets,
+                'pn':globals.pn,
+                'scans':self.get_scans(),
+                'qr_s':globals.qr_s,
+                'result':msg
+               }
       anvil.server.call('add_scan',
-                       shipment=globals.shipment, 
-                       count_pallets=globals.pallets,
-                       pn=globals.pn,
-                       scans=self.get_scans(),
-                       result=msg)  
-    open_form('ScanCheck')
+                       **kwargs)  
+    

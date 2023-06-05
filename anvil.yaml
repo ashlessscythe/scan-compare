@@ -54,14 +54,14 @@ db_schema:
     - name: shipment
       admin_ui: {order: -1, width: 200}
       type: string
-    - name: orig_qr
+    - name: qr_orig
       admin_ui: {order: -0.5, width: 200}
       type: string
-    - name: new_qr
+    - name: qr_new
       admin_ui: {order: -0.25, width: 200}
       type: string
     - name: num_pallets
-      admin_ui: {order: -0.75, width: 200}
+      admin_ui: {order: -0.9375, width: 200}
       type: number
   files:
     title: Files
