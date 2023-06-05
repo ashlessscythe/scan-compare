@@ -65,16 +65,6 @@ class ScanCheck(sc):
   def button_logout_click(self, **event_args):
     self.clear_scan_page()
     func.logout(self)
-    
-  # return scans as dict
-  def get_scan_text(self):
-    s1 = self.text_box_1.text
-    s2 = self.text_box_2.text
-    s3 = self.text_box_3.text
-    s4 = self.text_box_4.text
-    s = [s1, s2, s3, s4]
-    scans = [ (i, el) for i, el in enumerate(s, start=1) ]
-    return scans
   
   def clear_text_boxes(self):
     self.text_box_original.text = ""

@@ -123,7 +123,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # if ok, write to db?
     if res == 'OK':
       print(f'pn is {globals.pn}')
-      kwargs = {'shipment':globals.shipment, 
+      data = {'shipment':globals.shipment, 
                 'count_pallets':globals.pallets,
                 'pn':globals.pn,
                 'scans':self.get_scans(),
@@ -131,6 +131,10 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                 'result':msg
                }
       anvil.server.call('add_scan',
-                       **kwargs)
+                       **data)
+      anvil.server.call('session_add_row', 
+                       index=current_pallet,
+                       valid_scans=len(valid),
+                       result=msg)
       self.raise_event('x-close-alert', value='OK')
     

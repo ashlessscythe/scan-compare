@@ -21,14 +21,14 @@ components:
       spacing_below: small, italic: false, background: '', bold: false, underline: false,
       icon: ''}
     name: label_shipment
-    layout_properties: {grid_position: 'QAUFQT,FRHZWY'}
+    layout_properties: {grid_position: 'QAUFQT,ASCLEW'}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
       visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
       spacing_below: small, italic: false, background: '', bold: false, underline: false,
       icon: ''}
     name: label_pallets
-    layout_properties: {grid_position: 'QAUFQT,XSGXZG'}
+    layout_properties: {grid_position: 'QAUFQT,EOGYJM'}
   - type: Label
     properties: {role: display, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: Scan Barcode, font_size: null, font: '', spacing_above: small,
@@ -84,7 +84,7 @@ components:
     properties:
       role: null
       columns:
-      - {id: FQKENQ, title: Index, data_key: index, $$hashKey: 'object:15863'}
+      - {id: FQKENQ, title: Pallet Number, data_key: index, $$hashKey: 'object:15863'}
       - {id: XTKAPC, title: Valid Scans, data_key: valid_scans, $$hashKey: 'object:15864'}
       - {id: ZUWQMV, title: Result, data_key: result, $$hashKey: 'object:15865'}
       auto_header: true
