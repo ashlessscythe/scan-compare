@@ -11,6 +11,9 @@ services:
   client_config: {allow_signup: true, enable_automatically: false, use_email: true,
     confirm_email: true, allow_remember_me: false, remember_me_days: 30}
   server_config: {user_table: users}
+- source: /runtime/services/anvil/email.yml
+  client_config: {}
+  server_config: {}
 startup: {type: form, module: ScanCheck}
 package_name: Scan_Compare
 allow_embedding: false
