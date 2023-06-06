@@ -110,22 +110,22 @@ class ScanCheck(sc):
     if test.TESTING_MODE:
       scans = (
         test.qr_orig.strip(), 
-        test.qr_new.strip()
+        test.qr_new_match.strip()
       )
       print(f"test scans {scans}")
-      scan_ok = self.check_if_valid(self, **scans)
+      scan_ok = self.check_if_valid(scans)
     else:
       scans = (
         self.text_box_original.text.strip(),
         self.text_box_new.text.strip()
       )
       print(f"non-test scans {scans}")
-      scan_ok = self.check_if_valid(self, scans)
+      scan_ok = self.check_if_valid(scans)
     # ref
     if scan_ok:
       kwargs = {
         'qr_s':scans,
-        'pn':pn1,
+        'pn':func.extract_pn(self, scans[0]),
         'shipment':globals.shipment,
         'pallets':globals.pallets
       }

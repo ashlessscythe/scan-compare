@@ -60,10 +60,9 @@ def session_add_row(index, valid_scans, qr_s, result):
   print(f"find old is {find_old}")
   find_new = app_tables.session_scan.search(qr_new=qr_s[1])
   print(f"find new is {find_new}")
-  if len(find_old) > 0:
-    print(f"original qr code {qr_s[0]} already exists")
-    if len(find_new) > 0:
-      print(f"New qr {qr_s[1]} already exists in session db")
+  if len(find_old) > 0 or len(find_new) > 0:
+    print(f"qr codes {qr_s} already exist in session db")
+    return 'ERR'
   else:
     print(f"New label scanned {qr_s}")    
     app_tables.session_scan.add_row(

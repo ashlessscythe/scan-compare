@@ -7,6 +7,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from .. import globals
 from .. import func
+from .. import test
 
 class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def __init__(self, **properties):
@@ -51,12 +52,16 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     self.compare_scans()
 
   def get_scans(self):
-    scans = (
-      self.barcode_1.text.strip(), 
-      self.barcode_2.text.strip(),
-      self.barcode_3.text.strip(),
-      self.barcode_4.text.strip()
-    )
+    if test.TESTING_MODE:
+      scans = test.lic_plates
+      print('testing qr_s loaded')
+    else:
+      scans = (
+        self.barcode_1.text.strip(), 
+        self.barcode_2.text.strip(),
+        self.barcode_3.text.strip(),
+        self.barcode_4.text.strip()
+      )
     return scans
 
   def compare_scans(self):
@@ -141,7 +146,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                        valid_scans=len(valid),
                        qr_s = globals.qr_s,
                        result=msg)
-      if session_res == 'err_duplicate':
+      if session_res == 'ERR':
         func.display_message(
           self,
           title='Error Duplicate',
