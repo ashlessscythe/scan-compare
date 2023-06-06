@@ -68,13 +68,16 @@ def is_populated(s):
   return len(s) > 0
 
 def extract_pn(self, barcode):
-  match = re.search(r"(?<=:P).+?(?=\:Q)", barcode)
+  pattern = '(?<=:P).+?(?=:Q)'
+  match = re.search(pattern, barcode)
   return match.group()
 
 def extract_lic(self, barcode):
-  match = re.search(r"(?<=[6:6J|6:1J]).+?(?=\:P)", barcode)
+  pattern = '(?<=(:6J|:1J)).+?(?=:P)'
+  match = re.search(pattern, barcode)
   return match.group()
 
 def extract_lic_short(self, barcode):
-  match = re.search(r"(?<=[6J|1J]).+?(?=\:Z)", barcode)
+  pattern = '(?<=[6J|1J]).+?(?=:Z)'
+  match = re.search(pattern, barcode)
   return match.group()
