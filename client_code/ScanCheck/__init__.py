@@ -199,7 +199,7 @@ class ScanCheck(sc):
         # pin popup
         pin_response = alert(
           content = pin_popup(),
-          title='ERROR Scanning:',
+          title='ERROR Scanning: Need ADMIN PIN:',
           large=True,
           dismissible=False,
           buttons=''

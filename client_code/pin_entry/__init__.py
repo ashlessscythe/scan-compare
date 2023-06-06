@@ -38,8 +38,8 @@ class pin_entry(pin_entryTemplate):
     else:
       self._pin = value
       self.flow_panel_1.get_components()[len(value)].focus()
-         
-  @property
+
+  
   def reset(self):
     print("reset")
     for box in self.flow_panel_1.get_components():
