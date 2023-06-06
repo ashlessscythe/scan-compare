@@ -22,9 +22,11 @@ import pandas as pd
 #   print("Hello, " + name + "!")
 #   return 42
 #
-data = app_tables.session_scan.search()
+
 @anvil.server.callable
-def export_to_excel(data, columns):
+def export_to_excel():
+    # data here instead of byRef
+    data = app_tables.session_scan.search()   
     df = pd.DataFrame(data)
     content = io.BytesIO()
     df.to_excel(content, index=False)
