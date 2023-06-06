@@ -5,7 +5,7 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
-import regex as re
+import re
 from ..import func
 from .. import globals
 from ..StartNewScanPopup import StartNewScanPopup
