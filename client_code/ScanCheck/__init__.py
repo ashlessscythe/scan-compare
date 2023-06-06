@@ -25,7 +25,7 @@ class ScanCheck(sc):
       self.startup_with_scan()
     else:
       print("testing mode....")
-      pass
+      print(self.button_next_click())
       
   # new scan?
   def startup_with_scan(self):
@@ -107,11 +107,22 @@ class ScanCheck(sc):
   def button_next_click(self, **event_args):
     """This method is called when the button is clicked"""
     #check if valid
-    scans = (
-      self.text_box_original.text.strip(),
-      self.text_box_new.text.strip()
-    )
-    if self.check_if_valid(self, scans):
+    if test.TESTING_MODE:
+      scans = (
+        test.qr_orig.strip(), 
+        test.qr_new.strip()
+      )
+      print(f"test scans {scans}")
+      scan_ok = self.check_if_valid(self, **scans)
+    else:
+      scans = (
+        self.text_box_original.text.strip(),
+        self.text_box_new.text.strip()
+      )
+      print(f"non-test scans {scans}")
+      scan_ok = self.check_if_valid(self, scans)
+    # ref
+    if scan_ok:
       kwargs = {
         'qr_s':scans,
         'pn':pn1,
@@ -131,7 +142,7 @@ class ScanCheck(sc):
         self.clear_text_boxes()
               
   def check_if_valid(self, scans):
-      # 2 scans
+    # 2 scans
     print(scans)
     b_missing = True in set([len(s) == 0 for s in scans])
     print(f'b_missing is {b_missing}')
