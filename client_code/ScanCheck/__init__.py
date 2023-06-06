@@ -165,6 +165,8 @@ class ScanCheck(sc):
               )
             # ok if scans passed, and added to db and session
             if result == 'OK':
+              # raise current pallet number
+              globals.current_pallet += 1
               self.clear_text_boxes()
               
 

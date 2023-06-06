@@ -136,10 +136,10 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                        **data)
       # TODO, verify add session
       # TODO, define how current_pallet is passed
-      anvil.server.call('session_add_row', 
+      session_res = anvil.server.call('session_add_row', 
                        index=globals.current_pallet,
                        valid_scans=len(valid),
-                       result=msg, 
-                       user=anvil.server.call('get_user'))
+                       qr_s = qr_s,
+                       result=msg)
       self.raise_event('x-close-alert', value='OK')
     

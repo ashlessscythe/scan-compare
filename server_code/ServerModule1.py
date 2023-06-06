@@ -54,14 +54,19 @@ def add_scan(**properties):
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
 
 @anvil.server.callable
-def session_add_row(index, valid_scans, result):
+def session_add_row(index, valid_scans, qr_s, result):
   app_tables.session_scan.add_row(
     index=index,
     valid_scans=valid_scans,
     result=result,
+    qr_orig=qr_s[0],
+    qr_new=qr_s[1],
     user=get_user()
   )
   print(f'added row to session_db {valid_scans} ')
+  # check if session_db already has qr_s
+  # if 
+  # return 'ok'
 
 @anvil.server.callable
 def get_session():

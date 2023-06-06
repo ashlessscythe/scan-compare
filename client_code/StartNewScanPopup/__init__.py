@@ -32,8 +32,7 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
 
   def text_box_pallets_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
-    ret_val = {}
-    self.raise_event('x-close-alert', value=ret_val)
+    self.raise_event('x-close-alert', value='OK')
 
 
 
