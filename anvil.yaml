@@ -32,14 +32,14 @@ db_schema:
     columns:
     - name: shipment
       admin_ui: {width: 200}
-      type: string
+      type: number
     - name: num_pallets
       admin_ui: {width: 200}
       type: number
-    - name: orig_qr
+    - name: qr_orig
       admin_ui: {width: 200}
       type: string
-    - name: new_qr
+    - name: qr_new
       admin_ui: {width: 200}
       type: string
     - name: scan_1
@@ -113,6 +113,7 @@ db_schema:
       admin_ui: {width: 200}
       type: string
   session_scan:
+    title: session_scan
     client: none
     server: full
     columns:
@@ -128,5 +129,10 @@ db_schema:
     - name: user
       admin_ui: {width: 200}
       type: string
-    title: session_scan
+    - name: qr_orig
+      admin_ui: {width: 200}
+      type: string
+    - name: qr_new
+      admin_ui: {width: 200}
+      type: string
 renamed: true
