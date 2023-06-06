@@ -15,7 +15,7 @@ components:
   name: flow_panel_1
   layout_properties: {grid_position: 'BGQJFJ,FZLMIA'}
   components:
-  - type: form:pin_entry
+  - type: form:local_pin_entry
     properties: {}
     name: custom_1
     layout_properties: {}
@@ -26,5 +26,5 @@ components:
     spacing_below: small, italic: false, background: '', bold: false, underline: false,
     icon: ''}
   name: label_2
-  layout_properties: {grid_position: 'APPSVP,DKHTES'}
+  layout_properties: {grid_position: 'ISPZFS,GKNPDZ'}
 is_package: true

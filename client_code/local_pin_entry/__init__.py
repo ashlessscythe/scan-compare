@@ -1,7 +1,7 @@
-from ._anvil_designer import pin_entryTemplate
+from ._anvil_designer import local_pin_entryTemplate
 from anvil import *
 
-class pin_entry(pin_entryTemplate):
+class local_pin_entry(local_pin_entryTemplate):
   def __init__(self, **properties):
     size = properties.get('size', 60)
     self.length = properties.get('length', 4)
