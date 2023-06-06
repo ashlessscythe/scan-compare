@@ -7,6 +7,8 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from datetime import datetime
 import anvil.server
+import io
+import pandas as pd
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -20,6 +22,15 @@ import anvil.server
 #   print("Hello, " + name + "!")
 #   return 42
 #
+data = app_tables.session_scan.search()
+
+@anvil.server.callable
+def export_to_excel(data, columns):
+    df = pd.DataFrame(data, columns=columns)
+    content = io.BytesIO()
+    df.to_excel(content, index=False)
+    content.seek(0, 0)
+    return BlobMedia(content=content.read(), content_type="application/vnd.ms-excel")
 
 @anvil.server.callable
 def get_user():
