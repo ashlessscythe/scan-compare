@@ -6,6 +6,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
 import re
+from .. import test
 from ..import func
 from .. import globals
 from ..StartNewScanPopup import StartNewScanPopup
@@ -17,10 +18,14 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
-    self.logged_in_user.text = anvil.server.call('get_user')
-    self.refresh()
-    # ask if new scan on startup (dismissable)
-    self.startup_with_scan()
+    if not test.TESTING_MODE:
+      self.logged_in_user.text = anvil.server.call('get_user')
+      self.refresh()
+      # ask if new scan on startup (dismissable)
+      self.startup_with_scan()
+    else:
+      print("testing mode....")
+      pass
       
   # new scan?
   def startup_with_scan(self):
@@ -106,7 +111,27 @@ class ScanCheck(sc):
       self.text_box_original.text.strip(),
       self.text_box_new.text.strip()
     )
-    # 2 scans
+    if self.check_if_valid(self, scans):
+      kwargs = {
+        'qr_s':scans,
+        'pn':pn1,
+        'shipment':globals.shipment,
+        'pallets':globals.pallets
+      }
+      result = alert(
+        content=NewLabelsScanPopup(**kwargs),
+        title='Scan New Labels',
+        buttons={('Done', 'done')},
+        large=True
+        )
+      # ok if scans passed, and added to db and session
+      if result == 'OK':
+        # raise current pallet number
+        globals.current_pallet += 1
+        self.clear_text_boxes()
+              
+  def check_if_valid(self, scans):
+      # 2 scans
     print(scans)
     b_missing = True in set([len(s) == 0 for s in scans])
     print(f'b_missing is {b_missing}')
@@ -151,25 +176,8 @@ class ScanCheck(sc):
             func.display_message(self, 'Invalid Scan', 'Part numbers do not match', 'warning', True)
             self.text_box_original.focus()
           else:
-            kwargs = {
-              'qr_s':scans,
-              'pn':pn1,
-              'shipment':globals.shipment,
-              'pallets':globals.pallets
-            }
-            result = alert(
-              content=NewLabelsScanPopup(**kwargs),
-              title='Scan New Labels',
-              buttons={('Done', 'done')},
-              large=True
-              )
-            # ok if scans passed, and added to db and session
-            if result == 'OK':
-              # raise current pallet number
-              globals.current_pallet += 1
-              self.clear_text_boxes()
-              
-
+            return True
+            
   def text_box_original_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.text_box_new.focus()

@@ -29,7 +29,7 @@ def get_user():
   else:
     user = 'no_login'
   return user
-
+  
 @anvil.server.callable
 def add_scan(**properties):
   print(properties['scans'])
@@ -52,7 +52,7 @@ def add_scan(**properties):
     user_scan = get_user()
   )
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
-
+  
 @anvil.server.callable
 def session_add_row(index, valid_scans, qr_s, result):
   # check if session_db already has qr_s
@@ -62,10 +62,8 @@ def session_add_row(index, valid_scans, qr_s, result):
   print(f"find new is {find_new}")
   if len(find_old) > 0:
     print(f"original qr code {qr_s[0]} already exists")
-    return 'err_duplicate'
     if len(find_new) > 0:
       print(f"New qr {qr_s[1]} already exists in session db")
-      return 'err_duplicate'
   else:
     print(f"New label scanned {qr_s}")    
     app_tables.session_scan.add_row(
@@ -86,3 +84,4 @@ def get_session():
 @anvil.server.callable
 def reset_session_db():
   app_tables.session_scan.delete_all_rows()
+  
