@@ -11,6 +11,7 @@ from ..import func
 from .. import globals
 from ..StartNewScanPopup import StartNewScanPopup
 from ..NewLabelsScanPopup import NewLabelsScanPopup
+from ..pin_popup import pin_popup
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -195,13 +196,23 @@ class ScanCheck(sc):
         self.clear_text_boxes()
         self.refresh()
       elif result == 'ERR':
-        func.display_message(
-          self,
-          title='Error Duplicate',
-          message='Barcodes already scanned in this session.',
-          role='warning-popup',
-          bool_large=True
-          )
+        # pin popup
+        pin_response = alert(
+          content = pin_popup(),
+          title='ERROR Scanning:',
+          large=True,
+          dismissible=False,
+          buttons=''
+        )
+        print(f"pin response is {pin_response}")
+        # original msg
+        # func.display_message(
+        #   self,
+        #   title='Error Duplicate',
+        #   message='Barcodes already scanned in this session.',
+        #   role='warning-popup',
+        #   bool_large=True
+        #   )
         self.clear_text_boxes()
         self.refresh()
         

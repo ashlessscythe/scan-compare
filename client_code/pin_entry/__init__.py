@@ -1,7 +1,7 @@
-from ._anvil_designer import pin_inputTemplate
+from ._anvil_designer import pin_entryTemplate
 from anvil import *
 
-class pin_input(pin_inputTemplate):
+class pin_entry(pin_entryTemplate):
   def __init__(self, **properties):
     size = properties.get('size', 60)
     self.length = properties.get('length', 4)
@@ -19,7 +19,7 @@ class pin_input(pin_inputTemplate):
                     background=bg_color,
                     foreground=fg_color,
                     border=f"0px;border-radius:8px;width:{size}px;height:{size}px;")
-      self.flow_panel_container.add_component(box)
+      self.flow_panel_1.add_component(box)
       box.set_event_handler('change', self.box_on_change)
     
     self.pin = ''
@@ -37,12 +37,12 @@ class pin_input(pin_inputTemplate):
       self.reset()
     else:
       self._pin = value
-      self.flow_panel_container.get_components()[len(value)].focus()
+      self.flow_panel_1.get_components()[len(value)].focus()
          
-  
+  @property
   def reset(self):
     print("reset")
-    for box in self.flow_panel_container.get_components():
+    for box in self.flow_panel_1.get_components():
       box.text = ''
     self.pin = ''
     

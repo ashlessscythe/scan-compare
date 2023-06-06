@@ -1,0 +1,18 @@
+properties:
+- {name: length, type: number, default_value: 4, default_binding_prop: true}
+- {name: size, type: number, default_value: 60}
+- {name: bg_color, type: color, default_value: 'rgba(0,0,200,0.1)'}
+- {name: fg_color, type: color, default_value: purple}
+is_package: true
+events:
+- {name: pin_set, default_event: true}
+custom_component: true
+components:
+- type: FlowPanel
+  properties: {role: null, spacing: medium, align: justify, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+  name: flow_panel_1
+  layout_properties: {grid_position: 'AZIWSI,HBNLTS'}
+container:
+  type: ColumnPanel
+  properties: {col_widths: '{}'}
