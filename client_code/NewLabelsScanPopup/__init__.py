@@ -139,7 +139,12 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       session_res = anvil.server.call('session_add_row', 
                        index=globals.current_pallet,
                        valid_scans=len(valid),
-                       qr_s = qr_s,
+                       qr_s = globals.qr_s,
                        result=msg)
+      if session_res:
+      func.display_message(
+        self,
+        title='Error Duplicate'
+      )
       self.raise_event('x-close-alert', value='OK')
     
