@@ -25,14 +25,17 @@ class ScanCheck(sc):
       self.startup_with_scan()
     else:
       print("testing mode....")
-      print(self.button_next_click())
+      self.startup_with_scan()
+      self.button_next_click()
       
   # new scan?
   def startup_with_scan(self):
     r = self.new_scan()
     print(f"value from new_scan is {r}")
     if r:
+      # TODO check if blanks (maybe in popup, before here)
       globals.reset_globals(self)
+      self.text_box_original.focus()
       self.label_shipment.text = globals.shipment
       self.label_shipment.role = 'green-shadow-label'
       self.label_pallets.text = globals.pallets
@@ -103,43 +106,6 @@ class ScanCheck(sc):
       print(f'pn is {func.extract_pn(self, obj.text)}')
     else:
       obj.role = 'outlined-error'
-
-  def button_next_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    #check if valid
-    if test.TESTING_MODE:
-      scans = (
-        test.qr_orig.strip(), 
-        test.qr_new_match.strip()
-      )
-      print(f"test scans {scans}")
-      scan_ok = self.check_if_valid(scans)
-    else:
-      scans = (
-        self.text_box_original.text.strip(),
-        self.text_box_new.text.strip()
-      )
-      print(f"non-test scans {scans}")
-      scan_ok = self.check_if_valid(scans)
-    # ref
-    if scan_ok:
-      kwargs = {
-        'qr_s':scans,
-        'pn':func.extract_pn(self, scans[0]),
-        'shipment':globals.shipment,
-        'pallets':globals.pallets
-      }
-      result = alert(
-        content=NewLabelsScanPopup(**kwargs),
-        title='Scan New Labels',
-        buttons={('Done', 'done')},
-        large=True
-        )
-      # ok if scans passed, and added to db and session
-      if result == 'OK':
-        # raise current pallet number
-        globals.current_pallet += 1
-        self.clear_text_boxes()
               
   def check_if_valid(self, scans):
     # 2 scans
@@ -187,8 +153,58 @@ class ScanCheck(sc):
             func.display_message(self, 'Invalid Scan', 'Part numbers do not match', 'warning', True)
             self.text_box_original.focus()
           else:
+            Notification('Part numbers match.', timeout=2)
             return True
             
+  def button_next_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    #check if valid
+    if test.TESTING_MODE:
+      scans = (
+        test.qr_s
+      )
+      print(f"test scans {scans}")
+      scan_ok = self.check_if_valid(scans)
+    else:
+      scans = (
+        self.text_box_original.text.strip(),
+        self.text_box_new.text.strip()
+      )
+      print(f"non-test scans {scans}")
+      scan_ok = self.check_if_valid(scans)
+    # ref
+    if scan_ok:
+      kwargs = {
+        'qr_s':scans,
+        'pn':func.extract_pn(self, scans[0]),
+        'shipment':globals.shipment,
+        'pallets':globals.pallets
+      }
+      # will return either ERR or OK
+      result = alert(
+        content=NewLabelsScanPopup(**kwargs),
+        title='Scan New Labels',
+        buttons={('Done', 'done')},
+        large=True
+        )
+      print(f"result of newlabelscanpopup is {result}")
+      # ok if scans passed, and added to db and session
+      if result == 'OK':
+        # raise current pallet number
+        globals.current_pallet += 1
+        self.clear_text_boxes()
+        self.refresh()
+      elif result == 'ERR':
+        func.display_message(
+          self,
+          title='Error Duplicate',
+          message='Barcodes already scanned in this session.',
+          role='warning-popup',
+          bool_large=True
+          )
+        self.clear_text_boxes()
+        self.refresh()
+        
   def text_box_original_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.text_box_new.focus()

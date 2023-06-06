@@ -137,8 +137,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                 'result':msg
                }
       # add to db
-      anvil.server.call('add_scan',
-                       **data)
+      anvil.server.call('add_scan', **data)
       # TODO, verify add session
       # TODO, define how current_pallet is passed
       session_res = anvil.server.call('session_add_row', 
@@ -146,13 +145,5 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                        valid_scans=len(valid),
                        qr_s = globals.qr_s,
                        result=msg)
-      if session_res == 'ERR':
-        func.display_message(
-          self,
-          title='Error Duplicate',
-          message='Barcodes already scanned in this session.',
-          role='warning-popup',
-          bool_large=True
-        )
-      self.raise_event('x-close-alert', value='OK')
-    
+      self.raise_event('x-close-alert', value=session_res)
+      
