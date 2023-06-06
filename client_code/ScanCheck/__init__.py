@@ -224,6 +224,12 @@ class ScanCheck(sc):
     """This method is called when the user presses Enter in this text box"""
     self.button_next_click()
 
+  def outlined_button_2_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    result = anvil.server.call("export_to_excel")
+    anvil.media.download(result)
+
+
 
 
 

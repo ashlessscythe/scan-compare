@@ -23,10 +23,9 @@ import pandas as pd
 #   return 42
 #
 data = app_tables.session_scan.search()
-
 @anvil.server.callable
 def export_to_excel(data, columns):
-    df = pd.DataFrame(data, columns=columns)
+    df = pd.DataFrame(data)
     content = io.BytesIO()
     df.to_excel(content, index=False)
     content.seek(0, 0)

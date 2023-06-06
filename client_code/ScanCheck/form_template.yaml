@@ -87,6 +87,14 @@ components:
       italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_4
     layout_properties: {grid_position: 'QKSZZW,YIVQBQ'}
+  - type: Button
+    properties: {role: outlined-button, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: download, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: outlined_button_2
+    layout_properties: {grid_position: 'QKSZZW,IRIIQW'}
+    event_bindings: {click: outlined_button_2_click}
   - type: DataGrid
     properties:
       role: null
