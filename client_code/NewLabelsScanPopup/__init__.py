@@ -141,10 +141,13 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
                        valid_scans=len(valid),
                        qr_s = globals.qr_s,
                        result=msg)
-      if session_res:
-      func.display_message(
-        self,
-        title='Error Duplicate'
-      )
+      if session_res == 'err_duplicate':
+        func.display_message(
+          self,
+          title='Error Duplicate',
+          message='Barcodes already scanned in this session.',
+          role='warning-popup',
+          bool_large=True
+        )
       self.raise_event('x-close-alert', value='OK')
     

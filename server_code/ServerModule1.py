@@ -53,12 +53,15 @@ def add_scan(**properties):
   )
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
 
+def find_in_session_db(col, item):
+  return app_tables.session_scan.search(col=item)
+
 @anvil.server.callable
 def session_add_row(index, valid_scans, qr_s, result):
   # check if session_db already has qr_s
-  find_old = app_tables.session_scan.search(qr_orig=qr_s[0])
+  find_old = find_in_session_db(qr_orig, qr_s[0])
   print(f"find old is {find_old}")
-  find_new = app_tables.session_scan.search(qr_new=qr_s[1])
+  find_new = find_in_session_db(qr_new, qr_s[1])
   print(f"find new is {find_new}")
   if len(find_old) > 0:
     print(f"original qr code {qr_s[0]} already exists")
