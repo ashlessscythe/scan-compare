@@ -12,7 +12,7 @@ from random import randint
 #    Module1.say_hello()
 #
 
-TESTING_MODE = True
+TESTING_MODE = False
 
 def random_N_digits(n):
     range_start = 10**(n-1)

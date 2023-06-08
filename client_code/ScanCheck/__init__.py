@@ -21,6 +21,9 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
+    self.text_box_original.tag = 0
+    self.text_box_new.tag = 1
+    
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
       self.refresh()
@@ -99,14 +102,25 @@ class ScanCheck(sc):
     r = func.is_valid(obj.text)
     # alert(r)
     return r
+    
   
   def text_box_lost_focus(self, **event_args):
     """This method is called when the TextBox loses focus"""
     obj = event_args['sender']
-    if self.check_valid(obj):
+    exists = anvil.server.call('is_in_db', obj.tag, obj.text)
+    if self.check_valid(obj) and not exists:
       obj.role = 'default'
       print(f'lic plate {func.extract_lic(self, obj.text)}')
       print(f'pn is {func.extract_pn(self, obj.text)}')
+    elif exists:
+      # already in db
+      alert(
+        content='Scan already in database',
+        title='Barcode in Database',
+        large=True,
+        dismissible=True
+      )
+      obj.text = ''
     else:
       obj.role = 'outlined-error'
               

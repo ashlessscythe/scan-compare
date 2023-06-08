@@ -24,6 +24,15 @@ import pandas as pd
 #
 
 @anvil.server.callable
+def is_in_db(tag, code):
+  # col should be 0 or 1
+  if tag == 0:
+    r = app_tables.scans.search(qr_orig=code)
+  elif tag == 1:
+    r = app_tables.scans.search(qr_new=code)
+  print(f" r is {r}")
+  
+@anvil.server.callable
 def export_to_excel():
     # data here instead of byRef
     data = app_tables.session_scan.search()   
@@ -95,4 +104,4 @@ def get_session():
 @anvil.server.callable
 def reset_session_db():
   app_tables.session_scan.delete_all_rows()
-  
+
