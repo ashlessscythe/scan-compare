@@ -2,6 +2,8 @@ scheduled_tasks: []
 dependencies:
 - app_id: 6DKL4IXCJRD375AA
   version: {dev: false}
+- app_id: V7HPR2AOTVC5IUEI
+  version: {dev: false}
 services:
 - source: /runtime/services/tables.yml
   client_config: {}
