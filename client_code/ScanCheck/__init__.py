@@ -38,7 +38,7 @@ class ScanCheck(sc):
   def startup_with_scan(self):
     r = self.new_scan()
     print(f"value from new_scan is {r}")
-    if r:
+    if r == 'OK':
       # TODO check if blanks (maybe in popup, before here)
       globals.reset_globals(self)
       self.text_box_original.focus()
@@ -47,6 +47,8 @@ class ScanCheck(sc):
       self.label_pallets.text = globals.pallets
       self.label_pallets.role = 'green-shadow-label'
       self.label_msg.text = ''
+    elif r == 'E75':
+      test.TESTING_MODE = True
     else:
       # globals not changed by this
       # TODO - figure this out

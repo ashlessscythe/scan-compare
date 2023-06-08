@@ -65,7 +65,10 @@ def is_valid_lic(s):
   return s.__contains__(":Z")
 
 def is_populated(s):
-  return len(s) > 0
+  if s == None:
+    return False
+  else:
+    return len(s) > 0
 
 def extract_pn(self, barcode):
   pattern = '(?<=:P).+?(?=:Q)'

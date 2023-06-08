@@ -9,6 +9,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from .. import globals
 from .. import test
+from .. import func
 
 class StartNewScanPopup(StartNewScanPopupTemplate):
   def __init__(self, **properties):
@@ -20,8 +21,14 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
       globals.shipment = test.shipment
       globals.pallets = test.pallets
       self.raise_event('x-close-alert', value='OK')
-  
-  def text_deliv_box_change(self, **event_args):
+
+  def fields_blank(self, **event_args):
+    if self.text_box_shipment.text != '' and self.text_box_pallets.text != '':
+      return False
+    else:
+      return True
+    
+  def text_box_shipment_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     globals.shipment = event_args['sender'].text
   
@@ -39,7 +46,19 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
 
   def text_box_pallets_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
-    self.raise_event('x-close-alert', value='OK')
+    print(self.fields_blank())
+    if not self.fields_blank():
+      self.raise_event('x-close-alert', value='OK')
+    else:
+      alert(content='Fields cannot be blank',
+           large=True,
+           dismissible=True, 
+           role='warning-popup'
+        )
+      self.text_box_shipment.focus()
+
+
+
 
 
 
