@@ -94,7 +94,7 @@ components:
       underline: false, icon: ''}
     name: outlined_button_2
     layout_properties: {grid_position: 'QKSZZW,IRIIQW'}
-    event_bindings: {click: outlined_button_2_click}
+    event_bindings: {}
   - type: DataGrid
     properties:
       role: null

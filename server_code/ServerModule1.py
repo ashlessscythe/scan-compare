@@ -24,13 +24,16 @@ import pandas as pd
 #
 
 @anvil.server.callable
-def is_in_db(tag, code):
+def is_in_db(code):
   # col should be 0 or 1
-  if tag == 0:
-    r = app_tables.scans.search(qr_orig=code)
-  elif tag == 1:
-    r = app_tables.scans.search(qr_new=code)
-  print(f" r is {r}")
+  print(f"checking if db has {code}")
+  r = app_tables.scans.search(
+    q.any_of(
+      qr_orig=code,
+      qr_new=code
+    )
+  )
+  return True if len(r) > 0 else False
   
 @anvil.server.callable
 def export_to_excel():

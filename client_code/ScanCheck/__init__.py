@@ -107,23 +107,29 @@ class ScanCheck(sc):
   def text_box_lost_focus(self, **event_args):
     """This method is called when the TextBox loses focus"""
     obj = event_args['sender']
-    exists = anvil.server.call('is_in_db', obj.tag, obj.text)
-    if self.check_valid(obj) and not exists:
-      obj.role = 'default'
-      print(f'lic plate {func.extract_lic(self, obj.text)}')
-      print(f'pn is {func.extract_pn(self, obj.text)}')
-    elif exists:
-      # already in db
-      alert(
-        content='Scan already in database',
-        title='Barcode in Database',
-        large=True,
-        dismissible=True
-      )
-      obj.text = ''
+    if len(obj.text) == 0:
+      pass
     else:
-      obj.role = 'outlined-error'
-              
+      if self.check_valid(obj):
+        obj.role = 'default'
+        with Notification(message="Checking against DB..."):
+          exists = anvil.server.call('is_in_db', obj.text) 
+          print(f'lic plate {func.extract_lic(self, obj.text)}')
+          print(f'pn is {func.extract_pn(self, obj.text)}')
+        if exists:
+          # already in db
+          alert(
+            content='Scan already in database',
+            title='Barcode in Database',
+            large=True,
+            dismissible=True
+          )
+          obj.text = ''
+          obj.focus()
+      else:
+        Notification('Invalid Barcode...')
+        obj.role = 'outlined-error'
+            
   def check_if_valid(self, scans):
     # 2 scans
     print(scans)
