@@ -201,7 +201,7 @@ class ScanCheck(sc):
         # pin popup
         pin_response = alert(
           content = pin_popup(),
-          title='ERROR Scanning: Need ADMIN PIN:',
+          title='ERROR DUPLICATE SCAN: Need ADMIN PIN:',
           large=True,
           dismissible=False,
           buttons=''
