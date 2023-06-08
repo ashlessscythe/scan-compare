@@ -58,14 +58,15 @@ class ScanCheck(sc):
       self.label_msg.role = 'warning-label'
       
   def new_scan(self):
-    res = alert(
-      content=StartNewScanPopup(),
-      title="Start New Scan?",
-      large=True,
-      buttons=[
-        ("OK", True),
-      ]
-    )
+    if test.TESTING_MODE:
+      res = alert(
+        content=StartNewScanPopup(),
+        title="Start New Scan?",
+        large=True,
+        buttons=[
+          ("OK", True),
+        ]
+      )
     return res
     
   # refresh
