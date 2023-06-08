@@ -14,6 +14,7 @@ from .. import globals
 from ..StartNewScanPopup import StartNewScanPopup
 from ..NewLabelsScanPopup import NewLabelsScanPopup
 from ..pin_popup import pin_popup
+from ValidatedTextBox import whiteboard_all
 
 class ScanCheck(sc):
   def __init__(self, **properties):
