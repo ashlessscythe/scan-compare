@@ -621,8 +621,6 @@ button.close > span, button.close {
 
 .anvil-role-green-shadow-label {
   color: black;
-	width: 300px;	
-  height: 100px;
   font-size: 1em;
   text-align: center;
   border-radius: 10px;
@@ -645,8 +643,6 @@ button.close > span, button.close {
 }
 
 .anvil-role-warning-label {
-	width: 300px;	
-  height: 100px;	
   font-size: 1em;
   text-align: center;
   border-radius: 25px;

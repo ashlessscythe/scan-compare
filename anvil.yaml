@@ -1,5 +1,7 @@
 scheduled_tasks: []
-dependencies: []
+dependencies:
+- app_id: 6DKL4IXCJRD375AA
+  version: {dev: false}
 services:
 - source: /runtime/services/tables.yml
   client_config: {}
@@ -9,12 +11,12 @@ services:
   server_config: {file_table: files}
 - source: /runtime/services/anvil/users.yml
   client_config: {allow_signup: true, enable_automatically: false, use_email: true,
-    confirm_email: true, allow_remember_me: false, remember_me_days: 30, use_google: true}
+    confirm_email: true, allow_remember_me: false, remember_me_days: 30, use_google: false}
   server_config: {user_table: users}
 - source: /runtime/services/google.yml
   client_config: {}
   server_config: {}
-startup: {type: form, module: Login}
+startup: {type: form, module: ScanCheck}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
@@ -22,7 +24,7 @@ runtime_options:
   version: 2
   client_version: '3'
   server_version: python3-sandbox
-  server_spec: {base: python310-minimal}
+  server_spec: {base: python310-standard}
 startup_form: null
 db_schema:
   scans:
@@ -113,7 +115,6 @@ db_schema:
       admin_ui: {width: 200}
       type: string
   session_scan:
-    title: session_scan
     client: none
     server: full
     columns:
@@ -135,4 +136,5 @@ db_schema:
     - name: qr_new
       admin_ui: {width: 200}
       type: string
+    title: session_scan
 renamed: true

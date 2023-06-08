@@ -1,5 +1,4 @@
-import anvil.google.auth, anvil.google.drive, anvil.google.mail
-from anvil.google.drive import app_files
+import anvil.email
 import anvil.users
 import anvil.files
 from anvil.files import data_files
@@ -8,6 +7,8 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from datetime import datetime
 import anvil.server
+import io
+import pandas as pd
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -23,6 +24,16 @@ import anvil.server
 #
 
 @anvil.server.callable
+def export_to_excel():
+    # data here instead of byRef
+    data = app_tables.session_scan.search()   
+    df = pd.DataFrame(data)
+    content = io.BytesIO()
+    df.to_excel(content, index=False)
+    content.seek(0, 0)
+    return BlobMedia(content=content.read(), content_type="application/vnd.ms-excel")
+
+@anvil.server.callable
 def get_user():
   u = anvil.users.get_user()
   if u:
@@ -30,7 +41,7 @@ def get_user():
   else:
     user = 'no_login'
   return user
-
+  
 @anvil.server.callable
 def add_scan(**properties):
   print(properties['scans'])
@@ -53,16 +64,29 @@ def add_scan(**properties):
     user_scan = get_user()
   )
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
-
+  
 @anvil.server.callable
-def session_add_row(index, valid_scans, result):
-  app_tables.session_scan.add_row(
-    index=index,
-    valid_scans=valid_scans,
-    result=result,
-    user=get_user()
-  )
-  print(f'added row to session_db {valid_scans} ')
+def session_add_row(index, valid_scans, qr_s, result):
+  # check if session_db already has qr_s
+  find_old = app_tables.session_scan.search(qr_orig=qr_s[0])
+  print(f"find old is {find_old}")
+  find_new = app_tables.session_scan.search(qr_new=qr_s[1])
+  print(f"find new is {find_new}")
+  if len(find_old) > 0 or len(find_new) > 0:
+    print(f"qr codes {qr_s} already exist in session db")
+    return 'ERR'
+  else:
+    print(f"New label scanned {qr_s}")    
+    app_tables.session_scan.add_row(
+      index=index,
+      valid_scans=valid_scans,
+      result=result,
+      qr_orig=qr_s[0],
+      qr_new=qr_s[1],
+      user=get_user()
+    )
+    print(f'added row to session_db {valid_scans} ')
+    return 'OK'
 
 @anvil.server.callable
 def get_session():
@@ -71,3 +95,4 @@ def get_session():
 @anvil.server.callable
 def reset_session_db():
   app_tables.session_scan.delete_all_rows()
+  

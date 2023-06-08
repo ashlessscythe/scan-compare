@@ -8,14 +8,19 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from .. import globals
+from .. import test
 
 class StartNewScanPopup(StartNewScanPopupTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
-
+    
     # Any code you write here will run before the form opens.
-
+    if test.TESTING_MODE:
+      globals.shipment = test.shipment
+      globals.pallets = test.pallets
+      self.raise_event('x-close-alert', value='OK')
+  
   def text_deliv_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     globals.shipment = event_args['sender'].text
@@ -34,7 +39,7 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
 
   def text_box_pallets_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
-    self.raise_event('x-close-alert', value=True)
+    self.raise_event('x-close-alert', value='OK')
 
 
 

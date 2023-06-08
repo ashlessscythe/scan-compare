@@ -9,6 +9,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from .. import globals
 from .. import func
+from .. import test
 
 class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   def __init__(self, **properties):
@@ -53,12 +54,16 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     self.compare_scans()
 
   def get_scans(self):
-    scans = (
-      self.barcode_1.text.strip(), 
-      self.barcode_2.text.strip(),
-      self.barcode_3.text.strip(),
-      self.barcode_4.text.strip()
-    )
+    if test.TESTING_MODE:
+      scans = test.lic_plates
+      print('testing qr_s loaded')
+    else:
+      scans = (
+        self.barcode_1.text.strip(), 
+        self.barcode_2.text.strip(),
+        self.barcode_3.text.strip(),
+        self.barcode_4.text.strip()
+      )
     return scans
 
   def compare_scans(self):
@@ -125,14 +130,22 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # if ok, write to db?
     if res == 'OK':
       print(f'pn is {globals.pn}')
-      kwargs = {'shipment':globals.shipment, 
+      # bundle args into obj
+      data = {'shipment':globals.shipment, 
                 'count_pallets':globals.pallets,
                 'pn':globals.pn,
                 'scans':self.get_scans(),
                 'qr_s':globals.qr_s,
                 'result':msg
                }
-      anvil.server.call('add_scan',
-                       **kwargs)
-      self.raise_event('x-close-alert', value='OK')
-    
+      # add to db
+      anvil.server.call('add_scan', **data)
+      # TODO, verify add session
+      # TODO, define how current_pallet is passed
+      session_res = anvil.server.call('session_add_row', 
+                       index=globals.current_pallet,
+                       valid_scans=len(valid),
+                       qr_s = globals.qr_s,
+                       result=msg)
+      self.raise_event('x-close-alert', value=session_res)
+      

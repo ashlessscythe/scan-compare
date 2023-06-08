@@ -8,10 +8,12 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
 import re
+from .. import test
 from ..import func
 from .. import globals
 from ..StartNewScanPopup import StartNewScanPopup
 from ..NewLabelsScanPopup import NewLabelsScanPopup
+from ..pin_popup import pin_popup
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -19,21 +21,29 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
-    self.logged_in_user.text = anvil.server.call('get_user')
-    self.refresh()
-    # ask if new scan on startup (dismissable)
-    self.startup_with_scan()
+    if not test.TESTING_MODE:
+      self.logged_in_user.text = anvil.server.call('get_user')
+      self.refresh()
+      # ask if new scan on startup (dismissable)
+      self.startup_with_scan()
+    else:
+      print("testing mode....")
+      self.startup_with_scan()
+      self.button_next_click()
       
   # new scan?
   def startup_with_scan(self):
     r = self.new_scan()
     print(f"value from new_scan is {r}")
     if r:
+      # TODO check if blanks (maybe in popup, before here)
       globals.reset_globals(self)
+      self.text_box_original.focus()
       self.label_shipment.text = globals.shipment
       self.label_shipment.role = 'green-shadow-label'
       self.label_pallets.text = globals.pallets
       self.label_pallets.role = 'green-shadow-label'
+      self.label_msg.text = ''
     else:
       # globals not changed by this
       # TODO - figure this out
@@ -41,6 +51,8 @@ class ScanCheck(sc):
       self.label_shipment.role = 'warning-label'
       self.label_pallets.text = "NOT VALID SCAN, TESTING USE ONLY"
       self.label_pallets.role = 'warning-label'
+      self.label_msg.text = 'Please reset to start new scan.'
+      self.label_msg.role = 'warning-label'
       
   def new_scan(self):
     res = alert(
@@ -48,8 +60,7 @@ class ScanCheck(sc):
       title="Start New Scan?",
       large=True,
       buttons=[
-        ("No", False),
-        ("Yes", True),
+        ("OK", True),
       ]
     )
     return res
@@ -67,16 +78,6 @@ class ScanCheck(sc):
   def button_logout_click(self, **event_args):
     self.clear_scan_page()
     func.logout(self)
-    
-  # return scans as dict
-  def get_scan_text(self):
-    s1 = self.text_box_1.text
-    s2 = self.text_box_2.text
-    s3 = self.text_box_3.text
-    s4 = self.text_box_4.text
-    s = [s1, s2, s3, s4]
-    scans = [ (i, el) for i, el in enumerate(s, start=1) ]
-    return scans
   
   def clear_text_boxes(self):
     self.text_box_original.text = ""
@@ -108,14 +109,8 @@ class ScanCheck(sc):
       print(f'pn is {func.extract_pn(self, obj.text)}')
     else:
       obj.role = 'outlined-error'
-
-  def button_next_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    #check if valid
-    scans = (
-      self.text_box_original.text.strip(),
-      self.text_box_new.text.strip()
-    )
+              
+  def check_if_valid(self, scans):
     # 2 scans
     print(scans)
     b_missing = True in set([len(s) == 0 for s in scans])
@@ -161,22 +156,68 @@ class ScanCheck(sc):
             func.display_message(self, 'Invalid Scan', 'Part numbers do not match', 'warning', True)
             self.text_box_original.focus()
           else:
-            kwargs = {
-              'qr_s':scans,
-              'pn':pn1,
-              'shipment':globals.shipment,
-              'pallets':globals.pallets
-            }
-            result = alert(
-              content=NewLabelsScanPopup(**kwargs),
-              title='Scan New Labels',
-              buttons={('Done', 'done')},
-              large=True
-              )
-            if result == 'OK':
-              self.clear_text_boxes()
-              # TODO, add to session_db
-
+            Notification('Part numbers match.', timeout=2)
+            return True
+            
+  def button_next_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    #check if valid
+    if test.TESTING_MODE:
+      scans = (
+        test.qr_s
+      )
+      print(f"test scans {scans}")
+      scan_ok = self.check_if_valid(scans)
+    else:
+      scans = (
+        self.text_box_original.text.strip(),
+        self.text_box_new.text.strip()
+      )
+      print(f"non-test scans {scans}")
+      scan_ok = self.check_if_valid(scans)
+    # ref
+    if scan_ok:
+      kwargs = {
+        'qr_s':scans,
+        'pn':func.extract_pn(self, scans[0]),
+        'shipment':globals.shipment,
+        'pallets':globals.pallets
+      }
+      # will return either ERR or OK
+      result = alert(
+        content=NewLabelsScanPopup(**kwargs),
+        title='Scan New Labels',
+        buttons={('Done', 'done')},
+        large=True
+        )
+      print(f"result of newlabelscanpopup is {result}")
+      # ok if scans passed, and added to db and session
+      if result == 'OK':
+        # raise current pallet number
+        globals.current_pallet += 1
+        self.clear_text_boxes()
+        self.refresh()
+      elif result == 'ERR':
+        # pin popup
+        pin_response = alert(
+          content = pin_popup(),
+          title='ERROR Scanning: Need ADMIN PIN:',
+          large=True,
+          dismissible=False,
+          buttons=''
+        )
+        print(f"pin response is {pin_response}")
+        # original msg
+        # func.display_message(
+        #   self,
+        #   title='Error Duplicate',
+        #   message='Barcodes already scanned in this session.',
+        #   role='warning-popup',
+        #   bool_large=True
+        #   )
+        self.clear_text_boxes()
+        self.refresh()
+        
   def text_box_original_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.text_box_new.focus()
@@ -184,6 +225,12 @@ class ScanCheck(sc):
   def text_box_new_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     self.button_next_click()
+
+  # def outlined_button_2_click(self, **event_args):
+  #   """This method is called when the button is clicked"""
+  #   result = anvil.server.call("export_to_excel")
+  #   anvil.media.download(result)
+
 
 
 
