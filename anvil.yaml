@@ -16,7 +16,7 @@ services:
 - source: /runtime/services/google.yml
   client_config: {}
   server_config: {}
-startup: {type: form, module: ScanCheck}
+startup: {type: form, module: Login}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
