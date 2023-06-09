@@ -287,9 +287,7 @@ class ScanCheck(sc):
 
   def button_email_click(self, **event_args):
     """This method is called when the button is clicked"""
-    with Notification(
-      'Sending email'
-    )
+    with Notification("Sending email..."):
       anvil.server.call('send_email', globals.shipment)
 
 
