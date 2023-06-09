@@ -16,7 +16,7 @@ from ..NewLabelsScanPopup import NewLabelsScanPopup
 from ..pin_popup import pin_popup
 from ValidatedTextBox import whiteboard_all
 from ValidatedTextBox import TextValueBox
-
+from anvil_extras.non_blocking import call_async
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -26,9 +26,12 @@ class ScanCheck(sc):
     # globals?
     self.text_box_original.tag = 0
     self.text_box_new.tag = 1
+    self.button_email.visible = False
+    self.button_download.visible = False
     
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
+      # self.link_1.url = anvil.server.call('get_link')
       self.refresh()
       # ask if new scan on startup (dismissable)
       self.startup_with_scan()
@@ -135,6 +138,7 @@ class ScanCheck(sc):
             print(f'TESTING: pn is {func.extract_pn(self, obj.text)}')
         else:
           with Notification(message="Checking against DB..."):
+            # TODO try async
             exists = anvil.server.call('is_in_db', obj.text) 
             print(f'lic plate {func.extract_lic(self, obj.text)}')
             print(f'pn is {func.extract_pn(self, obj.text)}')
@@ -246,6 +250,8 @@ class ScanCheck(sc):
             role='green-shadow-label',
             bool_large=True
           )
+          self.button_download.visible = True
+          self.button_email.visible = True
         self.clear_text_boxes()
         self.refresh()
       elif result == 'ERR':
@@ -280,7 +286,7 @@ class ScanCheck(sc):
   def text_box_select_on_focus(self, **event_args):
     """This method is called when the TextBox gets focus"""
     event_args['sender'].select()
-
+  
   def button_download_click(self, **event_args):
     """This method is called when the button is clicked"""
     result = anvil.server.call("export_to_excel", globals.shipment)
