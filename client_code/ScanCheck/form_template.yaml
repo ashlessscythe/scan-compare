@@ -91,12 +91,20 @@ components:
     layout_properties: {grid_position: 'QKSZZW,YIVQBQ'}
   - type: Button
     properties: {role: outlined-button, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: download, font_size: null, font: '', spacing_above: small,
+      foreground: '', visible: true, text: Download, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: ''}
     name: outlined_button_2
-    layout_properties: {grid_position: 'QKSZZW,IRIIQW'}
+    layout_properties: {grid_position: 'QKSZZW,IRIIQW THPIFX,YEGUDD'}
     event_bindings: {click: button_download_click}
+  - type: Button
+    properties: {role: outlined-button, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Send Email, font_size: null, font: '',
+      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: ''}
+    name: outlined_button_3
+    layout_properties: {grid_position: 'QKSZZW,IRIIQW THPIFX,PTYHNV'}
+    event_bindings: {click: button_email_click}
   - type: DataGrid
     properties:
       role: null

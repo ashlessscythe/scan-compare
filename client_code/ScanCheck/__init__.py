@@ -282,8 +282,14 @@ class ScanCheck(sc):
 
   def button_download_click(self, **event_args):
     """This method is called when the button is clicked"""
-    result = anvil.server.call("export_to_excel")
+    result = anvil.server.call("export_to_excel", globals.shipment)
     anvil.media.download(result)
+
+  def button_email_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    with Notification("Sending email..."):
+      anvil.server.call('send_email', globals.shipment)
+
 
 
 
