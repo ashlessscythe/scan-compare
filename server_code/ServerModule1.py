@@ -49,7 +49,7 @@ def send_email(sid):
 @anvil.server.callable
 def export_to_excel(sid):
     # data here instead of byRef
-    data = app_tables.session_scan.search(user=anvil.users.get_user())   
+    data = app_tables.session_scan.search(user=get_user())   
     df = pd.DataFrame(data)
     content = io.BytesIO()
     df.to_excel(content, index=False)
@@ -123,5 +123,9 @@ def get_session():
   
 @anvil.server.callable
 def reset_session_db():
-  app_tables.session_scan.delete_all_rows()
+  user = get_user()
+  # app_tables.session_scan.delete_all_rows()
+  rows = app_tables.session_scan.search(user=user)
+  print(f"deleting {len(rows)} rows from session db for user {user}")
+  [r.delete() for r in rows]
 
