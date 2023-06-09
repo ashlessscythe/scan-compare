@@ -34,16 +34,27 @@ def is_in_db(code):
     )
   )
   return True if len(r) > 0 else False
-  
+  import anvil
+
 @anvil.server.callable
-def export_to_excel():
+def send_email(sid):
+  user = anvil.users.get_user()['email']
+  print(f"sending email to {user}")
+  anvil.email.send(from_name="Tesla Scan",
+                 to=user,
+                 subject=f"Shipment {sid} Completed",
+                 text="File attached",
+                 attachments=[export_to_excel(sid)])
+
+@anvil.server.callable
+def export_to_excel(sid):
     # data here instead of byRef
     data = app_tables.session_scan.search()   
     df = pd.DataFrame(data)
     content = io.BytesIO()
     df.to_excel(content, index=False)
     content.seek(0, 0)
-    return anvil.BlobMedia(content=content.read(), content_type="application/vnd.ms-excel")
+    return anvil.BlobMedia(content=content.read(), content_type="application/vnd.ms-excel", name=f"shipment_{sid}")
 
 @anvil.server.callable
 def get_user():
