@@ -33,6 +33,7 @@ class ScanCheck(sc):
       # ask if new scan on startup (dismissable)
       self.startup_with_scan()
       self.refresh()
+      self.get_download_link()
     else:
       print("testing mode....")
       self.startup_with_scan()
@@ -281,6 +282,10 @@ class ScanCheck(sc):
     """This method is called when the TextBox gets focus"""
     event_args['sender'].select()
 
+def get_download_link():
+  items = app_tables.session_scan.client_readable(user=anvil.users.get_user()['email'])
+  self.link_1.url = items.search().to_csv().url
+  
   def button_download_click(self, **event_args):
     """This method is called when the button is clicked"""
     result = anvil.server.call("export_to_excel", globals.shipment)

@@ -97,6 +97,10 @@ components:
     name: outlined_button_2
     layout_properties: {grid_position: 'QKSZZW,IRIIQW THPIFX,YEGUDD'}
     event_bindings: {click: button_download_click}
+  - type: Link
+    properties: {}
+    name: link_1
+    layout_properties: {grid_position: 'QKSZZW,IRIIQW THPIFX,UPCJFF'}
   - type: Button
     properties: {role: outlined-button, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Send Email, font_size: null, font: '',
