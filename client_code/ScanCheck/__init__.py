@@ -16,7 +16,6 @@ from ..NewLabelsScanPopup import NewLabelsScanPopup
 from ..pin_popup import pin_popup
 from ValidatedTextBox import whiteboard_all
 from ValidatedTextBox import TextValueBox
-from anvil_extras.non_blocking import call_async
 
 class ScanCheck(sc):
   def __init__(self, **properties):
