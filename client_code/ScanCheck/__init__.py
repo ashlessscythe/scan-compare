@@ -14,6 +14,9 @@ from .. import globals
 from ..StartNewScanPopup import StartNewScanPopup
 from ..NewLabelsScanPopup import NewLabelsScanPopup
 from ..pin_popup import pin_popup
+from ValidatedTextBox import whiteboard_all
+from ValidatedTextBox import TextValueBox
+
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -21,6 +24,9 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
+    self.text_box_original.tag = 0
+    self.text_box_new.tag = 1
+    
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
       self.refresh()
@@ -35,9 +41,9 @@ class ScanCheck(sc):
   def startup_with_scan(self):
     r = self.new_scan()
     print(f"value from new_scan is {r}")
-    if r:
+    if r == 'OK':
       # TODO check if blanks (maybe in popup, before here)
-      globals.reset_globals(self)
+      # globals.reset_globals(self)
       self.text_box_original.focus()
       self.label_shipment.text = globals.shipment
       self.label_shipment.role = 'green-shadow-label'
@@ -55,14 +61,24 @@ class ScanCheck(sc):
       self.label_msg.role = 'warning-label'
       
   def new_scan(self):
-    res = alert(
-      content=StartNewScanPopup(),
-      title="Start New Scan?",
-      large=True,
-      buttons=[
-        ("OK", True),
-      ]
-    )
+  # if testing allow dismiss
+    if test.TESTING_MODE:
+      res = alert(
+        content=StartNewScanPopup(),
+        title="Start New Scan?",
+        large=True,
+        buttons=[
+          ("OK", True)
+        ]
+      )
+    else:
+      res = alert(
+        content=StartNewScanPopup(),
+        title="Start New Scan?",
+        large=True,
+        buttons=None,
+        dismissible=False
+      )
     return res
     
   # refresh
@@ -93,23 +109,48 @@ class ScanCheck(sc):
     c = confirm("Clear page?")
     if c:
       self.clear_scan_page()
+      globals.reset_globals(self)
       self.startup_with_scan()
 
   def check_valid(self, obj):
     r = func.is_valid(obj.text)
     # alert(r)
     return r
+    
   
   def text_box_lost_focus(self, **event_args):
     """This method is called when the TextBox loses focus"""
     obj = event_args['sender']
-    if self.check_valid(obj):
-      obj.role = 'default'
-      print(f'lic plate {func.extract_lic(self, obj.text)}')
-      print(f'pn is {func.extract_pn(self, obj.text)}')
+    if len(obj.text) == 0:
+      pass
     else:
-      obj.role = 'outlined-error'
-              
+      if self.check_valid(obj):
+        obj.role = 'default'
+        if test.TESTING_MODE:
+          # no db check if testing
+          with Notification(message="TESTING MODE, NO DB CHECK"):
+            exists = False
+            print(f'TESTING: lic plate {func.extract_lic(self, obj.text)}')
+            print(f'TESTING: pn is {func.extract_pn(self, obj.text)}')
+        else:
+          with Notification(message="Checking against DB..."):
+            exists = anvil.server.call('is_in_db', obj.text) 
+            print(f'lic plate {func.extract_lic(self, obj.text)}')
+            print(f'pn is {func.extract_pn(self, obj.text)}')
+        if exists:
+          # already in db
+          alert(
+            content='Scan already in database',
+            title='Barcode in Database',
+            large=True,
+            dismissible=True
+          )
+          obj.text = ''
+          obj.focus()
+      else:
+        Notification('Invalid Barcode...')
+        obj.role = 'outlined-error'
+            
   def check_if_valid(self, scans):
     # 2 scans
     print(scans)
@@ -177,13 +218,15 @@ class ScanCheck(sc):
       scan_ok = self.check_if_valid(scans)
     # ref
     if scan_ok:
+      globals.current_pallet += 1
+      print(f"globals pallet increased to {globals.current_pallet}")
       kwargs = {
         'qr_s':scans,
         'pn':func.extract_pn(self, scans[0]),
         'shipment':globals.shipment,
         'pallets':globals.pallets
       }
-      # will return either ERR or OK
+      # will return either {'result': 'err', 'value': index} or result ok
       result = alert(
         content=NewLabelsScanPopup(**kwargs),
         title='Scan New Labels',
@@ -192,16 +235,23 @@ class ScanCheck(sc):
         )
       print(f"result of newlabelscanpopup is {result}")
       # ok if scans passed, and added to db and session
-      if result == 'OK':
-        # raise current pallet number
-        globals.current_pallet += 1
+      if result['result'] == 'ok' or result == 'done':
+        # check if done
+        if globals.pallets == result['value']:
+          func.display_message(
+            self,
+            title='Done Scanning',
+            message='Scanning complete, file can be downloaded',
+            role='green-shadow-label',
+            bool_large=True
+          )
         self.clear_text_boxes()
         self.refresh()
       elif result == 'ERR':
         # pin popup
         pin_response = alert(
           content = pin_popup(),
-          title='ERROR Scanning: Need ADMIN PIN:',
+          title='ERROR DUPLICATE SCAN: Need ADMIN PIN:',
           large=True,
           dismissible=False,
           buttons=''
@@ -226,10 +276,18 @@ class ScanCheck(sc):
     """This method is called when the user presses Enter in this text box"""
     self.button_next_click()
 
-  # def outlined_button_2_click(self, **event_args):
-  #   """This method is called when the button is clicked"""
-  #   result = anvil.server.call("export_to_excel")
-  #   anvil.media.download(result)
+  def text_box_select_on_focus(self, **event_args):
+    """This method is called when the TextBox gets focus"""
+    event_args['sender'].select()
+
+  def button_download_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    result = anvil.server.call("export_to_excel")
+    anvil.media.download(result)
+
+
+
+
 
 
 

@@ -141,11 +141,16 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       # add to db
       anvil.server.call('add_scan', **data)
       # TODO, verify add session
-      # TODO, define how current_pallet is passed
+      # current pallet is index from session_add_row
       session_res = anvil.server.call('session_add_row', 
                        index=globals.current_pallet,
                        valid_scans=len(valid),
                        qr_s = globals.qr_s,
                        result=msg)
       self.raise_event('x-close-alert', value=session_res)
+
+  def barcode_select_on_focus(self, **event_args):
+    """This method is called when the TextBox gets focus"""
+    event_args['sender'].select()
+
       

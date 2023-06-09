@@ -4,7 +4,7 @@ container:
 components:
 - type: Label
   properties: {role: headline, align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: 'Start New Scan?', font_size: null, font: '', spacing_above: small,
+    visible: true, text: 'Start New Scan:', font_size: null, font: '', spacing_above: small,
     icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
     underline: false, icon: ''}
   name: label_1
@@ -24,7 +24,7 @@ components:
     background: '', bold: false, underline: false}
   name: text_box_shipment
   layout_properties: {grid_position: 'XAOOKA,VRTDDJ'}
-  event_bindings: {change: text_deliv_box_change, pressed_enter: text_box_shipment_pressed_enter}
+  event_bindings: {pressed_enter: text_box_shipment_pressed_enter, change: text_box_shipment_change}
 - type: Label
   properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
     visible: true, text: Number of Pallets (Numbers Only), font_size: null, font: '',
@@ -40,4 +40,11 @@ components:
   name: text_box_pallets
   layout_properties: {grid_position: 'NIVAZO,JWYGUZ'}
   event_bindings: {change: text_pallets_box_change, pressed_enter: text_box_pallets_pressed_enter}
+- type: Label
+  properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+    visible: true, text: Press Enter to continue, font_size: null, font: '', spacing_above: small,
+    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+    underline: false, icon: ''}
+  name: label_4
+  layout_properties: {grid_position: 'UYJRBF,CBMCQD'}
 is_package: true

@@ -2,6 +2,8 @@ scheduled_tasks: []
 dependencies:
 - app_id: 6DKL4IXCJRD375AA
   version: {dev: false}
+- app_id: V7HPR2AOTVC5IUEI
+  version: {dev: true}
 services:
 - source: /runtime/services/tables.yml
   client_config: {}
@@ -16,7 +18,7 @@ services:
 - source: /runtime/services/google.yml
   client_config: {}
   server_config: {}
-startup: {type: form, module: Login}
+startup: {type: form, module: ScanCheck}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
