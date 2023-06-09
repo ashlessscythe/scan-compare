@@ -64,7 +64,7 @@ def is_valid(s):
 def is_valid_lic(s):
   return s.__contains__(":Z")
 
-def is_populated(s):
+def is_blankc(s):
   if s == None:
     return False
   else:
