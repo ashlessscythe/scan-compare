@@ -23,6 +23,7 @@ pin_number = '3333'
 
 def reset_globals(self):
   self.idx = 0
+  self.current_pallet = 0
   self.shipment = 'no_shipment'
   self.pallets = 0
   self.pn = 'no_pn'

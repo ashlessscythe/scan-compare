@@ -43,7 +43,7 @@ def export_to_excel():
     content = io.BytesIO()
     df.to_excel(content, index=False)
     content.seek(0, 0)
-    return BlobMedia(content=content.read(), content_type="application/vnd.ms-excel")
+    return anvil.BlobMedia(content=content.read(), content_type="application/vnd.ms-excel")
 
 @anvil.server.callable
 def get_user():
@@ -87,7 +87,7 @@ def session_add_row(index, valid_scans, qr_s, result):
   print(f"find new is {find_new}")
   if len(find_old) > 0 or len(find_new) > 0:
     print(f"qr codes {qr_s} already exist in session db")
-    return 'ERR'
+    return {'result': 'err', 'value': index}
   else:
     print(f"New label scanned {qr_s}")    
     app_tables.session_scan.add_row(
@@ -99,7 +99,7 @@ def session_add_row(index, valid_scans, qr_s, result):
       user=get_user()
     )
     print(f'added row to session_db {valid_scans} ')
-    return 'OK'
+    return {'result': 'ok', 'value': index}
 
 @anvil.server.callable
 def get_session():

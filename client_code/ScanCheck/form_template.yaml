@@ -51,7 +51,8 @@ components:
       background: '', bold: false, underline: false}
     name: text_box_original
     layout_properties: {grid_position: 'WMGKOH,INMYJZ'}
-    event_bindings: {lost_focus: text_box_lost_focus, pressed_enter: text_box_original_pressed_enter}
+    event_bindings: {lost_focus: text_box_lost_focus, pressed_enter: text_box_original_pressed_enter,
+      focus: text_box_select_on_focus}
   - type: TextBox
     properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: New Label (small QR code),
       border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
@@ -59,7 +60,8 @@ components:
       background: '', bold: false, underline: false}
     name: text_box_new
     layout_properties: {grid_position: 'WMGKOH,YCXFPR'}
-    event_bindings: {lost_focus: text_box_lost_focus, pressed_enter: text_box_new_pressed_enter}
+    event_bindings: {lost_focus: text_box_lost_focus, pressed_enter: text_box_new_pressed_enter,
+      focus: text_box_select_on_focus}
   - type: Button
     properties: {role: tonal-button, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Reset, font_size: null, font: '', spacing_above: small,
@@ -94,7 +96,7 @@ components:
       underline: false, icon: ''}
     name: outlined_button_2
     layout_properties: {grid_position: 'QKSZZW,IRIIQW'}
-    event_bindings: {}
+    event_bindings: {click: button_download_click}
   - type: DataGrid
     properties:
       role: null

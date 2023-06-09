@@ -43,15 +43,13 @@ class ScanCheck(sc):
     print(f"value from new_scan is {r}")
     if r == 'OK':
       # TODO check if blanks (maybe in popup, before here)
-      globals.reset_globals(self)
+      # globals.reset_globals(self)
       self.text_box_original.focus()
       self.label_shipment.text = globals.shipment
       self.label_shipment.role = 'green-shadow-label'
       self.label_pallets.text = globals.pallets
       self.label_pallets.role = 'green-shadow-label'
       self.label_msg.text = ''
-    elif r == 'E75':
-      test.TESTING_MODE = True
     else:
       # globals not changed by this
       # TODO - figure this out
@@ -111,6 +109,7 @@ class ScanCheck(sc):
     c = confirm("Clear page?")
     if c:
       self.clear_scan_page()
+      globals.reset_globals(self)
       self.startup_with_scan()
 
   def check_valid(self, obj):
@@ -219,13 +218,15 @@ class ScanCheck(sc):
       scan_ok = self.check_if_valid(scans)
     # ref
     if scan_ok:
+      globals.current_pallet += 1
+      print(f"globals pallet increased to {globals.current_pallet}")
       kwargs = {
         'qr_s':scans,
         'pn':func.extract_pn(self, scans[0]),
         'shipment':globals.shipment,
         'pallets':globals.pallets
       }
-      # will return either ERR or OK
+      # will return either {'result': 'err', 'value': index} or result ok
       result = alert(
         content=NewLabelsScanPopup(**kwargs),
         title='Scan New Labels',
@@ -234,9 +235,10 @@ class ScanCheck(sc):
         )
       print(f"result of newlabelscanpopup is {result}")
       # ok if scans passed, and added to db and session
-      if result == 'OK' or result == 'done':
-        # raise current pallet number
-        globals.current_pallet += 1
+      if result['result'] == 'ok' or result == 'done':
+        # check if done
+        if globals.pallets == result['value']:
+          alert("done scanning")
         self.clear_text_boxes()
         self.refresh()
       elif result == 'ERR':
@@ -268,10 +270,18 @@ class ScanCheck(sc):
     """This method is called when the user presses Enter in this text box"""
     self.button_next_click()
 
-  # def outlined_button_2_click(self, **event_args):
-  #   """This method is called when the button is clicked"""
-  #   result = anvil.server.call("export_to_excel")
-  #   anvil.media.download(result)
+  def text_box_select_on_focus(self, **event_args):
+    """This method is called when the TextBox gets focus"""
+    event_args['sender'].select()
+
+  def button_download_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    result = anvil.server.call("export_to_excel")
+    anvil.media.download(result)
+
+
+
+
 
 
 
