@@ -238,7 +238,13 @@ class ScanCheck(sc):
       if result['result'] == 'ok' or result == 'done':
         # check if done
         if globals.pallets == result['value']:
-          alert("done scanning")
+          func.display_message(
+            self,
+            title='Done Scanning',
+            message='Scanning complete, file can be downloaded',
+            role='green-shadow-label',
+            bool_large=True
+          )
         self.clear_text_boxes()
         self.refresh()
       elif result == 'ERR':
