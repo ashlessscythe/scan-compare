@@ -23,8 +23,6 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
-    self.text_box_original.tag = 0
-    self.text_box_new.tag = 1
     self.button_email.visible = False
     self.button_download.visible = False
     
