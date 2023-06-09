@@ -16,7 +16,7 @@ from ..NewLabelsScanPopup import NewLabelsScanPopup
 from ..pin_popup import pin_popup
 from ValidatedTextBox import whiteboard_all
 from ValidatedTextBox import TextValueBox
-
+from anvil_extras.non_blocking import call_async
 
 class ScanCheck(sc):
   def __init__(self, **properties):
@@ -138,6 +138,7 @@ class ScanCheck(sc):
             print(f'TESTING: pn is {func.extract_pn(self, obj.text)}')
         else:
           with Notification(message="Checking against DB..."):
+            # TODO try async
             exists = anvil.server.call('is_in_db', obj.text) 
             print(f'lic plate {func.extract_lic(self, obj.text)}')
             print(f'pn is {func.extract_pn(self, obj.text)}')
