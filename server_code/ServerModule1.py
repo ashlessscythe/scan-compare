@@ -114,7 +114,12 @@ def session_add_row(index, valid_scans, qr_s, result):
 
 @anvil.server.callable
 def get_session():
-  return app_tables.session_scan.search(user=anvil.users.get_user())
+  user = get_user()
+  rows = app_tables.session_scan.search(user=user)
+  if rows:
+    return rows
+  else:
+    return None
   
 @anvil.server.callable
 def reset_session_db():
