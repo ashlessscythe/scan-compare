@@ -57,6 +57,11 @@ def export_to_excel(sid):
     return anvil.BlobMedia(content=content.read(), content_type="application/vnd.ms-excel", name=f"shipment_{sid}")
 
 @anvil.server.callable
+def get_link():
+  items = app_tables.session_scan.client_readable(user=get_user())
+  return items.search().to_csv().url
+
+@anvil.server.callable
 def get_user():
   u = anvil.users.get_user()
   if u:
