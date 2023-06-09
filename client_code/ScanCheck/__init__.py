@@ -26,6 +26,8 @@ class ScanCheck(sc):
     # globals?
     self.text_box_original.tag = 0
     self.text_box_new.tag = 1
+    self.button_email.visible = False
+    self.button_download.visible = False
     
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
@@ -247,6 +249,8 @@ class ScanCheck(sc):
             role='green-shadow-label',
             bool_large=True
           )
+          self.button_download.visible = True
+          self.button_email.visible = True
         self.clear_text_boxes()
         self.refresh()
       elif result == 'ERR':
