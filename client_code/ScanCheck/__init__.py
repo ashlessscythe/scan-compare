@@ -32,6 +32,7 @@ class ScanCheck(sc):
       self.refresh()
       # ask if new scan on startup (dismissable)
       self.startup_with_scan()
+      self.refresh()
     else:
       print("testing mode....")
       self.startup_with_scan()
