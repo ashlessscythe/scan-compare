@@ -80,6 +80,7 @@ def add_scan(**properties):
 @anvil.server.callable
 def session_add_row(index, valid_scans, qr_s, result):
   # check if session_db already has qr_s
+  # TODO redo below to use is_in_db()
   find_old = app_tables.session_scan.search(qr_orig=qr_s[0])
   print(f"find old is {find_old}")
   find_new = app_tables.session_scan.search(qr_new=qr_s[1])

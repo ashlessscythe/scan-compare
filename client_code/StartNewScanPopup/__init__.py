@@ -23,10 +23,10 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
       self.raise_event('x-close-alert', value='OK')
 
   def fields_blank(self, **event_args):
-    if self.text_box_shipment.text != '' and self.text_box_pallets.text != '':
-      return False
-    else:
+    if func.is_blank(self.text_box_pallets.text) or func.is_blank(self.text_box_shipment.text):
       return True
+    else:
+      return False
     
   def text_box_shipment_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
@@ -44,7 +44,7 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
     """This method is called when the user presses Enter in this text box"""
     self.text_box_pallets.focus()
 
-  # TODO PREVENT BLANKS
+  
   def text_box_pallets_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
     print(self.fields_blank())

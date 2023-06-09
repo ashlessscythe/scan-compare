@@ -127,10 +127,17 @@ class ScanCheck(sc):
     else:
       if self.check_valid(obj):
         obj.role = 'default'
-        with Notification(message="Checking against DB..."):
-          exists = anvil.server.call('is_in_db', obj.text) 
-          print(f'lic plate {func.extract_lic(self, obj.text)}')
-          print(f'pn is {func.extract_pn(self, obj.text)}')
+        if test.TESTING_MODE:
+          # no db check if testing
+          with Notification(message="TESTING MODE, NO DB CHECK"):
+            exists = False
+            print(f'TESTING: lic plate {func.extract_lic(self, obj.text)}')
+            print(f'TESTING: pn is {func.extract_pn(self, obj.text)}')
+        else:
+          with Notification(message="Checking against DB..."):
+            exists = anvil.server.call('is_in_db', obj.text) 
+            print(f'lic plate {func.extract_lic(self, obj.text)}')
+            print(f'pn is {func.extract_pn(self, obj.text)}')
         if exists:
           # already in db
           alert(
@@ -227,7 +234,7 @@ class ScanCheck(sc):
         )
       print(f"result of newlabelscanpopup is {result}")
       # ok if scans passed, and added to db and session
-      if result == 'OK':
+      if result == 'OK' or result == 'done':
         # raise current pallet number
         globals.current_pallet += 1
         self.clear_text_boxes()

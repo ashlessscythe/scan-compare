@@ -64,10 +64,15 @@ def is_valid(s):
 def is_valid_lic(s):
   return s.__contains__(":Z")
 
-def is_blankc(s):
+def is_populated(s):
+  return not func.is_blank(s)
+
+def is_blank(s):
+  print(f" s is type {type(s)}")
+  # type(s) is 'int' for number fields
   if s == None:
-    return False
-  else:
+    return True
+  elif type(s) == 'text':
     return len(s) > 0
 
 def extract_pn(self, barcode):
