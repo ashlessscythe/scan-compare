@@ -221,7 +221,7 @@ class ScanCheck(sc):
     # ref
     if scan_ok:
       globals.current_pallet += 1
-      print(f"globals pallet increased to {globals.current_pallet}")
+      print(f"globals current_pallet increased to {globals.current_pallet}")
       kwargs = {
         'qr_s':scans,
         'pn':func.extract_pn(self, scans[0]),
@@ -235,10 +235,16 @@ class ScanCheck(sc):
         buttons={('Done', 'done')},
         large=True
         )
-      print(f"result of newlabelscanpopup is {result}")
+      print(f"result of newlabelscanpopup is {result}")      
       # ok if scans passed, and added to db and session
-      if result['result'] == 'ok' or result == 'done':
-        # check if done
+      if not result:
+        # user did not click 'ok' on above alert
+        pass
+      elif result['result'] == 'ok' or result == 'done':
+        # focus textbox 1 after popup close
+        self.text_box_original.focus()
+        
+        # check if done (complete)
         if globals.pallets == result['value']:
           func.display_message(
             self,

@@ -15,6 +15,7 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
+    self.message_pill_1.visible = False
     
     # Any code you write here will run before the form opens.
     if test.TESTING_MODE:
@@ -52,12 +53,21 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
     if not self.fields_blank():
       self.raise_event('x-close-alert', value='OK')
     else:
-      alert(content='Fields cannot be blank',
-           large=True,
-           dismissible=True, 
-           role='warning-popup'
-        )
+      self.message_pill_1.visible = True
+      self.message_pill_1.level = 'warning'
+      self.message_pill_1.message = "fields cannot be blank"
+  
+      # alert(content='Fields cannot be blank',
+      #      large=True,
+      #      dismissible=True, 
+      #      role='warning-popup'
+      #   )
       self.text_box_shipment.focus()
+
+  def timer_1_tick(self, **event_args):
+    """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
+    self.message_pill_1.visible = False
+
 
 
 
