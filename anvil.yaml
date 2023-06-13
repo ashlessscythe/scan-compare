@@ -13,7 +13,7 @@ services:
   server_config: {file_table: files}
 - source: /runtime/services/anvil/users.yml
   client_config: {allow_signup: true, enable_automatically: false, use_email: true,
-    confirm_email: true, allow_remember_me: false, remember_me_days: 30, use_google: true}
+    confirm_email: true, allow_remember_me: false, remember_me_days: 30, use_google: false}
   server_config: {user_table: users}
 - source: /runtime/services/google.yml
   client_config: {}
@@ -21,7 +21,7 @@ services:
 - source: /runtime/services/anvil/email.yml
   client_config: {}
   server_config: {}
-startup: {type: form, module: Login}
+startup: {type: form, module: ScanCheck}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
