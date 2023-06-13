@@ -42,6 +42,7 @@ def send_email(sid):
   print(f"sending email to {user}")
   anvil.email.send(from_name="Tesla Scan",
                  to=user,
+                 cc=["cc@example.com"],
                  subject=f"Shipment {sid} Completed",
                  text="File attached",
                  attachments=[export_to_excel(sid)])
