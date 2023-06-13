@@ -44,7 +44,7 @@ class ScanCheck(sc):
     print(f"value from new_scan is {r}")
     if r == 'OK':
       # TODO check if blanks (maybe in popup, before here)
-      # globals.reset_globals(self)
+      globals.reset_globals(self)
       self.text_box_original.focus()
       self.label_shipment.text = globals.shipment
       self.label_shipment.role = 'green-shadow-label'
@@ -237,15 +237,14 @@ class ScanCheck(sc):
         )
       print(f"result of newlabelscanpopup is {result}")      
       # ok if scans passed, and added to db and session
-      if not result:
+      if result == None or result['result'] == 'ok' or result == 'done':
         # user did not click 'ok' on above alert
-        pass
-      elif result['result'] == 'ok' or result == 'done':
-        # focus textbox 1 after popup close
-        self.text_box_original.focus()
+        # clear textboxes and focus textbox 1 after popup close
+        self.clear_text_boxes()
+        self.refresh()
         
         # check if done (complete)
-        if globals.pallets == result['value']:
+        if result['value'] >= globals.pallets:
           func.display_message(
             self,
             title='Done Scanning',

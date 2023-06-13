@@ -22,7 +22,11 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
       globals.shipment = test.shipment
       globals.pallets = test.pallets
       self.raise_event('x-close-alert', value='OK')
-
+  
+  def label_1_show(self, **event_args):
+    """This method is called when the Label is shown on the screen"""
+    self.text_box_shipment.focus()
+    
   def fields_blank(self, **event_args):
     if func.is_blank(self.text_box_pallets.text) or func.is_blank(self.text_box_shipment.text):
       return True
@@ -32,14 +36,11 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
   def text_box_shipment_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     globals.shipment = event_args['sender'].text
+    self.timer_1.interval = 5
   
   def text_pallets_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     globals.pallets = event_args['sender'].text
-
-  def label_1_show(self, **event_args):
-    """This method is called when the Label is shown on the screen"""
-    self.text_box_shipment.focus()
 
   def text_box_shipment_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
@@ -67,6 +68,19 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     self.message_pill_1.visible = False
+
+  def text_box_shipment_lost_focus(self, **event_args):
+    """This method is called when the TextBox loses focus"""
+    # check if shipment exists
+    # skip if blank
+    obj = event_args['sender']
+    sid = obj.text
+    if type(sid) != None:
+      if anvil.server.call('shipment_exists', sid):
+        self.message_pill_1.visible = True
+        self.message_pill_1.message = f"Shipment {sid} already in Database"
+        obj.focus()
+        obj.select()
 
 
 

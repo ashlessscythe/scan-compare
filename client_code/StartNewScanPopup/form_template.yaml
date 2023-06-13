@@ -24,7 +24,8 @@ components:
     background: '', bold: false, underline: false}
   name: text_box_shipment
   layout_properties: {grid_position: 'XAOOKA,VRTDDJ'}
-  event_bindings: {pressed_enter: text_box_shipment_pressed_enter, change: text_box_shipment_change}
+  event_bindings: {pressed_enter: text_box_shipment_pressed_enter, change: text_box_shipment_change,
+    lost_focus: text_box_shipment_lost_focus}
 - type: Label
   properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
     visible: true, text: Number of Pallets (Numbers Only), font_size: null, font: '',
@@ -52,7 +53,7 @@ components:
   name: message_pill_1
   layout_properties: {grid_position: 'HLPBLC,AXXSZO'}
 - type: Timer
-  properties: {interval: 5}
+  properties: {interval: 0}
   name: timer_1
   event_bindings: {tick: timer_1_tick}
 is_package: true

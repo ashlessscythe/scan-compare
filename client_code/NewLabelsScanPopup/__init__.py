@@ -44,15 +44,6 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     """This method is called when the user presses Enter in this text box"""
     self.barcode_4.focus()
 
-  def barcode_4_pressed_enter(self, **event_args):
-    # start compare of lic and make sure pn matches pn
-    print(f'pn is {globals.pn}')
-    self.compare_scans()
-
-  def outlined_button_1_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    self.compare_scans()
-
   def get_scans(self):
     if test.TESTING_MODE:
       scans = test.lic_plates
@@ -128,29 +119,61 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     
     # TODO shorten this function, it's getting kinda long 
     # if ok, write to db?
-    if res == 'OK':
-      print(f'pn is {globals.pn}')
-      # bundle args into obj
-      data = {'shipment':globals.shipment, 
-                'count_pallets':globals.pallets,
-                'pn':globals.pn,
-                'scans':self.get_scans(),
-                'qr_s':globals.qr_s,
-                'result':msg
-               }
-      # add to db
-      anvil.server.call('add_scan', **data)
-      # TODO, verify add session
-      # current pallet is index from session_add_row
-      session_res = anvil.server.call('session_add_row', 
-                       index=globals.current_pallet,
-                       valid_scans=len(valid),
-                       qr_s = globals.qr_s,
-                       result=msg)
-      self.raise_event('x-close-alert', value=session_res)
+    print(f'pn is {globals.pn}')
+    # bundle args into obj
+    data = {'shipment':globals.shipment, 
+              'count_pallets':globals.pallets,
+              'pn':globals.pn,
+              'scans':self.get_scans(),
+              'qr_s':globals.qr_s,
+              'result':msg,
+              'res': res
+              }
+    print(f"returning data. len data is {len(data)}")
+    return data
+    
+  def barcode_4_pressed_enter(self, **event_args):
+    # start compare of lic and make sure pn matches pn
+    print(f'pn is {globals.pn}')
+    data = self.compare_scans()
+    if data['res'] == 'OK':
+      r = self.add_to_db(**data)
+    else:
+      r = {'result': 'err', 'value': globals.current_pallet}
 
+  def outlined_button_1_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    data = self.compare_scans()
+    if data['res'] == 'OK':
+      r = self.add_to_db(**data)
+    else:
+      r = {'result': 'err', 'value': globals.current_pallet}
+    
+  def add_to_db(self, **data):
+    # add to db
+    anvil.server.call('add_scan', **data)
+    # TODO, verify add session
+    # current pallet is index from session_add_row
+    session_res = anvil.server.call('session_add_row', 
+                      index=globals.current_pallet,
+                      qr_s = globals.qr_s,
+                      result=data['result'])
+    # TODO VERIFY
+    # close self(popup) on add
+    self.raise_event('x-close-alert', value=self.compare_scans())
+    return session_res
+      
   def barcode_select_on_focus(self, **event_args):
     """This method is called when the TextBox gets focus"""
     event_args['sender'].select()
+
+  # in case sessionres is closed or user dismissed without 'ok' button
+  def form_hide(self, **event_args):
+    """This method is called when the column panel is removed from the screen"""
+    print(f"returning on form hide")
+    # if scans ok compare_scans() maybe...
+    self.raise_event('x-close-alert', value=self.compare_scans())
+    
+
 
       

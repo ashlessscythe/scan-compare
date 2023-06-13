@@ -7,6 +7,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from datetime import datetime
 import anvil.server
+import anvil
 import io
 import pandas as pd
 
@@ -24,6 +25,14 @@ import pandas as pd
 #
 
 @anvil.server.callable
+def shipment_exists(sid):
+  print(f"checking if shipment {sid} exists")
+  r = app_tables.scans.search(
+    shipment=sid
+  )
+  return True if len(r) > 0 else False
+
+@anvil.server.callable
 def is_in_db(code):
   # col should be 0 or 1
   print(f"checking if db has {code}")
@@ -34,11 +43,10 @@ def is_in_db(code):
     )
   )
   return True if len(r) > 0 else False
-  import anvil
 
 @anvil.server.callable
 def send_email(sid):
-  user = anvil.users.get_user()['email']
+  user = get_user()
   print(f"sending email to {user}")
   anvil.email.send(from_name="Tesla Scan",
                  to=user,
@@ -95,7 +103,7 @@ def add_scan(**properties):
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
   
 @anvil.server.callable
-def session_add_row(index, valid_scans, qr_s, result):
+def session_add_row(index, qr_s, result):
   # check if session_db already has qr_s
   # TODO redo below to use is_in_db()
   find_old = app_tables.session_scan.search(qr_orig=qr_s[0])
@@ -109,13 +117,12 @@ def session_add_row(index, valid_scans, qr_s, result):
     print(f"New label scanned {qr_s}")    
     app_tables.session_scan.add_row(
       index=index,
-      valid_scans=valid_scans,
       result=result,
       qr_orig=qr_s[0],
       qr_new=qr_s[1],
       user=get_user()
     )
-    print(f'added row to session_db {valid_scans} ')
+    print(f'added row to session_db index {index} ')
     return {'result': 'ok', 'value': index}
 
 @anvil.server.callable

@@ -110,7 +110,6 @@ components:
       role: null
       columns:
       - {id: FQKENQ, title: Pallet Number, data_key: index, $$hashKey: 'object:15863'}
-      - {id: XTKAPC, title: Valid Scans, data_key: valid_scans, $$hashKey: 'object:15864'}
       - {id: ZUWQMV, title: Result, data_key: result, $$hashKey: 'object:15865'}
       auto_header: true
       tooltip: ''
