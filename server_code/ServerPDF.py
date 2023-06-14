@@ -13,7 +13,7 @@ from anvil.pdf import PDFRenderer
 @anvil.server.callable
 def create_pdf(**args):
     print(f"from server, args is {args}")
-    pdf = PDFRenderer(filename=f"shipment_{args['sid']}_report.pdf").render_form("ReportPDF", **args)
+    pdf = PDFRenderer(filename=f"shipment_{args['sid']}_report.pdf").render_form("ReportPDF", args)
     return pdf
 
 @anvil.server.callable
