@@ -40,12 +40,12 @@ components:
   properties:
     role: null
     columns:
-    - {id: VYRFES, title: Pallet Number, data_key: index, $$hashKey: 'object:29893'}
-    - {id: DZDJYU, title: Result, data_key: result, $$hashKey: 'object:29895'}
-    - {id: HTGVTX, title: Operator, data_key: user, $$hashKey: 'object:29896', expand: true}
-    - {id: QJZCUU, title: Original QR, data_key: qr_orig, $$hashKey: 'object:29897'}
-    - {id: EKVISV, title: Overlay QR, data_key: qr_new, $$hashKey: 'object:29898'}
-    - {id: NQLNYA, title: Timestamp, data_key: timestamp, $$hashKey: 'object:29899'}
+    - {id: UZVMCW, title: Index, data_key: index, $$hashKey: 'object:51203'}
+    - {id: JGJEVP, title: Result, data_key: result, $$hashKey: 'object:51205'}
+    - {id: SPFKEX, title: User, data_key: user, $$hashKey: 'object:51206'}
+    - {id: RDXRGP, title: Pn Orig, data_key: pn_orig, $$hashKey: 'object:51207'}
+    - {id: ETOBNG, title: Pn New, data_key: pn_new, $$hashKey: 'object:51209'}
+    - {id: TILMJS, title: Timestamp, data_key: timestamp, $$hashKey: 'object:51211'}
     auto_header: true
     tooltip: ''
     border: ''
@@ -62,7 +62,7 @@ components:
   components:
   - type: RepeatingPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
-      visible: true, spacing_above: none, spacing_below: none, item_template: ReportPDF.RowTemplate2,
+      visible: true, spacing_above: none, spacing_below: none, item_template: ReportPDF.reportpdfrow,
       background: ''}
     name: repeating_panel_1
     layout_properties: {}

@@ -19,6 +19,7 @@ shipment = 'no_shipment'
 pallets = 0
 current_pallet = 0
 pn = 'no_pn'
+pn_s = []
 pin_number = '3333'
 
 def reset_globals(self):

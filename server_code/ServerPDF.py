@@ -10,27 +10,27 @@ from anvil.tables import app_tables
 import anvil.server
 from anvil.pdf import PDFRenderer
 
-@anvil.server.callable
-def create_pdf(**args):
-    print(f"from server, args is {args}")
-    sid = args['sid']
-    pallets = args['pallets']
-    print(f"sid is {sid}, pallets is {pallets}")
-    pdf = PDFRenderer(filename=f"shipment_{sid}_report.pdf"
-                     ).render_form("ReportPDF", 
-                                   args
-                                  )
-    return pdf
+# @anvil.server.callable
+# def create_pdf(**args):
+#     print(f"from server, args is {args}")
+#     sid = args['sid']
+#     pallets = args['pallets']
+#     print(f"sid is {sid}, pallets is {pallets}")
+#     pdf = PDFRenderer(filename=f"shipment_{sid}_report.pdf"
+#                      ).render_form("ReportPDF", 
+#                                    args
+#                                   )
+#     return pdf
 
-@anvil.server.callable
-def send_pdf_email(**args):
-  pdf = create_pdf(args)
-  anvil.email.send(
-    from_address='no-reply',
-    from_name='Events', 
-    to=args['email'], 
-    subject='Tesla Scan Complete',
-    text='Attached information for Tesla Scan',
-    attachments=pdf
-  )
-  return pdf
+# @anvil.server.callable
+# def send_pdf_email(**args):
+#   pdf = create_pdf(args)
+#   anvil.email.send(
+#     from_address='no-reply',
+#     from_name='Tesla Scan', 
+#     to=user, 
+#     subject='Tesla Scan Complete',
+#     text='Attached information for Tesla Scan',
+#     attachments=pdf
+#   )
+#   return pdf

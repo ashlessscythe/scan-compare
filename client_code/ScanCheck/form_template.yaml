@@ -126,7 +126,7 @@ components:
     layout_properties: {grid_position: 'ODBUQP,XCTYVW'}
     components:
     - type: RepeatingPanel
-      properties: {spacing_above: none, spacing_below: none, item_template: ScanCheck.RowTemplate1}
+      properties: {spacing_above: none, spacing_below: none, item_template: ScanCheck.scancheckrow}
       name: repeating_panel_1
       layout_properties: {}
 - type: FlowPanel

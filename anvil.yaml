@@ -21,7 +21,7 @@ services:
 - source: /runtime/services/anvil/email.yml
   client_config: {}
   server_config: {}
-startup: {type: form, module: ScanCheck}
+startup: {type: form, module: Login}
 package_name: Scan_Compare
 allow_embedding: false
 name: ScanCompare
@@ -144,5 +144,11 @@ db_schema:
     - name: timestamp
       admin_ui: {order: 6, width: 200}
       type: datetime
+    - name: pn_orig
+      admin_ui: {order: 3.25, width: 200}
+      type: string
+    - name: pn_new
+      admin_ui: {order: 3.75, width: 200}
+      type: string
     title: session_scan
 renamed: true

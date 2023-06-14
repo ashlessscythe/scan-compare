@@ -10,20 +10,36 @@ import anvil.server
 import anvil
 import io
 import pandas as pd
+from anvil.pdf import PDFRenderer
 
-# This is a server module. It runs on the Anvil server,
-# rather than in the user's browser.
-#
-# To allow anvil.server.call() to call functions here, we mark
-# them with @anvil.server.callable.
-# Here is an example - you can replace it with your own:
-#
-# @anvil.server.callable
-# def say_hello(name):
-#   print("Hello, " + name + "!")
-#   return 42
-#
+@anvil.server.callable
+def create_pdf(**args):
+    print(f"from server, args is {args}")
+    sid = args['sid']
+    pallets = args['pallets']
+    print(f"sid is {sid}, pallets is {pallets}")
+    pdf = PDFRenderer(filename=f"shipment_{sid}_report.pdf"
+                     ).render_form("ReportPDF", 
+                                   args
+                                  )
+    return pdf
 
+@anvil.server.callable
+def send_pdf_email(**args):
+  pdf = create_pdf(**args)
+  user = get_user()
+  anvil.email.send(
+    from_address='no-reply',
+    from_name="Tesla Scan", 
+    to=[user, 'cc@example.com', 'cc@example.com'],
+    # to=[user, 'cc@example.com'],
+    cc=[],
+    subject=f"Tesla Scan Shipment {args['sid']} Complete",
+    text=f"Attached verification for Tesla Scan: Shipment {args['sid']} for {args['pallets']} pallets.",
+    attachments=pdf
+  )
+  return pdf
+  
 @anvil.server.callable
 def shipment_exists(sid):
   print(f"checking if shipment {sid} exists")
@@ -49,8 +65,9 @@ def send_email(sid):
   user = get_user()
   print(f"sending email to {user}")
   anvil.email.send(from_name="Tesla Scan",
-                 to=[user, 'recipient@example.com'],
-                 cc=["cc@example.com",'cc2@example.com', 'dev@example.com'],
+                 to=[user],
+                 cc=["cc@example.com"],
+                 bcc=[],
                  subject=f"Shipment {sid} Completed",
                  text="File attached",
                  attachments=[export_to_excel(sid)])
@@ -58,30 +75,12 @@ def send_email(sid):
 @anvil.server.callable
 def export_to_excel(sid):
     # data here instead of byRef
-    # data = app_tables.session_scan.search(user=get_user())
-    columns = ['index', 'valid_scans', 'result', 'qr_orig', 'qr_new', 'timestamp']
-    data = app_tables.session_scan.client_readable(user=get_user()).search()
-    pd.set_option('display.max_columns', None)  
-    df = pd.DataFrame(data, columns=columns)
-    df = df.loc[:,['index', 'result', 'qr_orig', 'qr_new', 'timestamp']]
-    df = df.rename(columns={
-      'index':'pallet_number',
-      'qr_orig':'original_qr',
-      'qr_new':'overlay_qr'
-    })
-    pattern = r':P(.+?):Q'
-    df['original_pn'] = df['original_qr'].str.extract(pattern)
-    df['new_pn'] = df['overlay_qr'].str.extract(pattern)
-    print(df.head())
+    data = app_tables.session_scan.search(user=get_user())   
+    df = pd.DataFrame(data)
     content = io.BytesIO()
-    # df.to_excel(content, index=False)
-    df.to_excel(content)
+    df.to_excel(content, index=False)
     content.seek(0, 0)
-    return anvil.BlobMedia(
-      content=content.read(), 
-      content_type="application/vnd.ms-excel", 
-      name=f"Shipment_{sid}.xlsx"
-    )
+    return anvil.BlobMedia(content=content.read(), content_type="application/vnd.ms-excel", name=f"shipment_{sid}")
 
 @anvil.server.callable
 def get_link():
@@ -121,7 +120,7 @@ def add_scan(**properties):
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
   
 @anvil.server.callable
-def session_add_row(index, qr_s, result):
+def session_add_row(index, qr_s, pn_s, result):
   # check if session_db already has qr_s
   # TODO redo below to use is_in_db()
   find_old = app_tables.session_scan.search(qr_orig=qr_s[0])
@@ -136,6 +135,8 @@ def session_add_row(index, qr_s, result):
     app_tables.session_scan.add_row(
       index=index,
       result=result,
+      pn_orig=pn_s[0],
+      pn_new=pn_s[1],
       qr_orig=qr_s[0],
       qr_new=qr_s[1],
       user=get_user(),

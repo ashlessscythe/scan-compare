@@ -23,8 +23,8 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
-    self.button_email.visible = True
-    self.button_download.visible = True
+    self.button_email.visible = False
+    self.button_download.visible = False
     
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
@@ -152,7 +152,13 @@ class ScanCheck(sc):
       else:
         Notification('Invalid Barcode...')
         obj.role = 'outlined-error'
-            
+
+  def get_scans(self):
+    return (
+        self.text_box_original.text.strip(),
+        self.text_box_new.text.strip()
+      )
+    
   def check_if_valid(self, scans):
     # 2 scans
     print(scans)
@@ -212,10 +218,7 @@ class ScanCheck(sc):
       print(f"test scans {scans}")
       scan_ok = self.check_if_valid(scans)
     else:
-      scans = (
-        self.text_box_original.text.strip(),
-        self.text_box_new.text.strip()
-      )
+      scans = self.get_scans()
       print(f"non-test scans {scans}")
       scan_ok = self.check_if_valid(scans)
     # ref
@@ -224,11 +227,13 @@ class ScanCheck(sc):
       print(f"globals current_pallet increased to {globals.current_pallet}")
       kwargs = {
         'qr_s':scans,
+        'pn_s':[func.extract_pn(self, pn) for pn in self.get_scans()],
         'pn':func.extract_pn(self, scans[0]),
         'shipment':globals.shipment,
         'pallets':globals.pallets,
         'current_pallet':globals.current_pallet
       }
+      print(f"kwargs is {kwargs}")
       # will return either {'result': 'err', 'value': index} or result ok
       result = alert(
         content=NewLabelsScanPopup(**kwargs),
@@ -300,18 +305,20 @@ class ScanCheck(sc):
   
   def button_download_click(self, **event_args):
     """This method is called when the button is clicked"""
-    result = anvil.server.call("export_to_excel", globals.shipment)
-    anvil.media.download(result)
-    # args = {'sid':globals.shipment,'pallets':globals.pallets}
-    # print(f"button pressed: args is {args}")
-    # pdf = anvil.server.call('create_pdf', **args)
-    # print(f"pdf returned... attempting download")
-    # anvil.media.download(pdf)
+    # result = anvil.server.call("export_to_excel", globals.shipment)
+    # anvil.media.download(result)
+    args = {'sid':globals.shipment, 'pallets':globals.pallets}
+    print(f"button pressed: args is {args}")
+    pdf = anvil.server.call('create_pdf', **args)
+    print(f"pdf returned... attempting download")
+    anvil.media.download(pdf)
 
   def button_email_click(self, **event_args):
     """This method is called when the button is clicked"""
     with Notification("Sending email..."):
-      anvil.server.call('send_email', globals.shipment)
+      # anvil.server.call('send_email', globals.shipment)
+      args = {'sid':globals.shipment, 'pallets':globals.pallets}
+      anvil.server.call('send_pdf_email', **args)
 
 
 

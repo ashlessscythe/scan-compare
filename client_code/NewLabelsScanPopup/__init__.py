@@ -17,12 +17,14 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     self.init_components(**properties)
     # pn passed in via properties from scancheck
     pn = properties['pn']
+    pn_s = properties['pn_s']
     pallets = properties['pallets']
     current_pallet = properties['current_pallet']
     shipment = properties['shipment']
     qr_s = properties['qr_s']
     if len(pn) > 0:
       globals.pn = pn
+      globals.pn_s = pn_s
       globals.shipment = shipment
       globals.pallets = pallets
       globals.qr_s = qr_s
@@ -117,6 +119,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     data = {'shipment':globals.shipment, 
               'count_pallets':globals.current_pallet,
               'pn':globals.pn,
+              'pn_s':globals.pn_s,
               'scans':self.get_scans(),
               'qr_s':globals.qr_s,
               'result':msg,
@@ -150,6 +153,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # current pallet is index from session_add_row
     session_res = anvil.server.call('session_add_row', 
                       index=globals.current_pallet,
+                      pn_s = globals.pn_s,
                       qr_s = globals.qr_s,
                       result=data['result'])
     # TODO VERIFY
