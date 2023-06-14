@@ -304,7 +304,9 @@ class ScanCheck(sc):
     # anvil.media.download(result)
     args = {'sid':globals.shipment,'pallets':globals.pallets}
     print(f"button pressed: args is {args}")
-    anvil.server.call('create_pdf', **args)
+    pdf = anvil.server.call('create_pdf', **args)
+    print(f"pdf returned... attempting download")
+    anvil.media.download(pdf)
 
   def button_email_click(self, **event_args):
     """This method is called when the button is clicked"""
