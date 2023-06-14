@@ -15,7 +15,11 @@ def create_pdf(**args):
     print(f"from server, args is {args}")
     sid = args['sid']
     pallets = args['pallets']
-    pdf = PDFRenderer(filename=f"shipment_{args['sid']}_report.pdf").render_form("ReportPDF", sid, pallets)
+    print(f"sid is {sid}, pallets is {pallets}")
+    pdf = PDFRenderer(filename=f"shipment_{sid}_report.pdf"
+                     ).render_form("ReportPDF", 
+                                   args
+                                  )
     return pdf
 
 @anvil.server.callable

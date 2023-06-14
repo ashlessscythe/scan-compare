@@ -9,9 +9,13 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 
 class ReportPDF(ReportPDFTemplate):
-  def __init__(self, sid, pallets, **properties):
+  def __init__(self, args, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
+    # doesn't print....
+    # pass in args obj
+    sid = args['sid']
+    pallets = args['pallets']
     print(f"pallets is {pallets} and sid is {sid}")
     self.label_pallets.text = pallets
     self.label_shipment.text = sid
