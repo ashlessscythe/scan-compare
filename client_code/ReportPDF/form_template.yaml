@@ -38,15 +38,32 @@ components:
     layout_properties: {x: 180, y: 86.8125, width: 160}
 - type: DataGrid
   properties:
+    role: null
     columns:
-    - {id: JYQGGD, title: Column 1, data_key: column_1}
-    - {id: ZWCIVU, title: Column 2, data_key: column_2}
-    - {id: TOVNCD, title: Column 3, data_key: column_3}
+    - {id: VYRFES, title: Pallet Number, data_key: index, $$hashKey: 'object:29893'}
+    - {id: DZDJYU, title: Result, data_key: result, $$hashKey: 'object:29895'}
+    - {id: HTGVTX, title: Operator, data_key: user, $$hashKey: 'object:29896', expand: true}
+    - {id: QJZCUU, title: Original QR, data_key: qr_orig, $$hashKey: 'object:29897'}
+    - {id: EKVISV, title: Overlay QR, data_key: qr_new, $$hashKey: 'object:29898'}
+    - {id: NQLNYA, title: Timestamp, data_key: timestamp, $$hashKey: 'object:29899'}
+    auto_header: true
+    tooltip: ''
+    border: ''
+    foreground: ''
+    rows_per_page: 20
+    visible: true
+    wrap_on: never
+    show_page_controls: true
+    spacing_above: small
+    spacing_below: small
+    background: ''
   name: data_grid_1
-  layout_properties: {grid_position: 'ETKTES,TBHEZW'}
+  layout_properties: {grid_position: 'PHZYQM,VVYERC'}
   components:
   - type: RepeatingPanel
-    properties: {spacing_above: none, spacing_below: none, item_template: ReportPDF.RowTemplate2}
+    properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
+      visible: true, spacing_above: none, spacing_below: none, item_template: ReportPDF.RowTemplate2,
+      background: ''}
     name: repeating_panel_1
     layout_properties: {}
 is_package: true

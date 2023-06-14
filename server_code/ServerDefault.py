@@ -58,12 +58,29 @@ def send_email(sid):
 @anvil.server.callable
 def export_to_excel(sid):
     # data here instead of byRef
-    data = app_tables.session_scan.search(user=get_user())   
-    df = pd.DataFrame(data)
+    # data = app_tables.session_scan.search(user=get_user())
+    columns = ['index', 'valid_scans', 'result', 'qr_orig', 'qr_new', 'timestamp']
+    data = app_tables.session_scan.client_readable(user=get_user()).search()
+    df = pd.DataFrame(data, columns=columns)
+    df = df.loc[:,['index', 'result', 'qr_orig', 'qr_new', 'timestamp']]
+    df = df.rename(columns={
+      'index':'pallet_number',
+      'qr_orig':'original_qr',
+      'qr_new':'overlay_qr'
+    })
+    print(df.head())
+    pattern = "(?<=:P).+?(?=:Q)"
+    df['original_pn'] = df['original_qr'].str.extract(pattern)
+    df['new_pn'] = df['overlay_qr'].str.extract(pattern)
     content = io.BytesIO()
-    df.to_excel(content, index=False)
+    # df.to_excel(content, index=False)
+    df.to_excel(content)
     content.seek(0, 0)
-    return anvil.BlobMedia(content=content.read(), content_type="application/vnd.ms-excel", name=f"shipment_{sid}")
+    return BlobMedia(
+      content=content.read(), 
+      content_type="application/vnd.ms-excel", 
+      name=f"Shipment_{sid}.xlsx"
+    )
 
 @anvil.server.callable
 def get_link():
@@ -120,7 +137,8 @@ def session_add_row(index, qr_s, result):
       result=result,
       qr_orig=qr_s[0],
       qr_new=qr_s[1],
-      user=get_user()
+      user=get_user(),
+      timestamp=datetime.now()
     )
     print(f'added row to session_db index {index} ')
     return {'result': 'ok', 'value': index}

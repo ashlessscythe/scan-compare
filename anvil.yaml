@@ -141,5 +141,8 @@ db_schema:
     - name: qr_new
       admin_ui: {width: 200}
       type: string
+    - name: timestamp
+      admin_ui: {order: 6, width: 200}
+      type: datetime
     title: session_scan
 renamed: true
