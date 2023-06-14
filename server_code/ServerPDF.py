@@ -11,19 +11,20 @@ import anvil.server
 from anvil.pdf import PDFRenderer
 
 @anvil.server.callable
-def create_pdf(name, date):
-    pdf = PDFRenderer(filename=f'{name} Ticket.pdf').render_form('Ticket', name, date)
+def create_pdf(**args):
+    print(f"from server, args is {args}")
+    pdf = PDFRenderer(filename=f"shipment_{args['sid']}_report.pdf").render_form("ReportPDF", **args)
     return pdf
 
 @anvil.server.callable
-def send_pdf_email(email, name, date):
-  pdf = create_pdf(name, date)
+def send_pdf_email(**args):
+  pdf = create_pdf(args)
   anvil.email.send(
     from_address='no-reply',
     from_name='Events', 
-    to=email, 
-    subject='Your Ticket',
-    text='Thanks for registering!. Your ticket is attached to this email.',
+    to=args['email'], 
+    subject='Tesla Scan Complete',
+    text='Attached information for Tesla Scan',
     attachments=pdf
   )
   return pdf

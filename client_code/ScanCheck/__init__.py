@@ -300,8 +300,11 @@ class ScanCheck(sc):
   
   def button_download_click(self, **event_args):
     """This method is called when the button is clicked"""
-    result = anvil.server.call("export_to_excel", globals.shipment)
-    anvil.media.download(result)
+    # result = anvil.server.call("export_to_excel", globals.shipment)
+    # anvil.media.download(result)
+    args = {'sid':globals.shipment,'pallets':globals.pallets}
+    print(f"button pressed: args is {args}")
+    anvil.server.call('create_pdf', **args)
 
   def button_email_click(self, **event_args):
     """This method is called when the button is clicked"""
