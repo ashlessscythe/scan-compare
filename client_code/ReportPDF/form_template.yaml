@@ -1,0 +1,39 @@
+container:
+  type: ColumnPanel
+  properties: {col_widths: '{}'}
+components:
+- type: Label
+  properties: {role: display, align: center, tooltip: '', border: '', foreground: '',
+    visible: true, text: Tesla Scan Verification, font_size: null, font: '', spacing_above: small,
+    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+    underline: false, icon: ''}
+  name: label_1
+  layout_properties: {grid_position: 'JNHXPL,GXEGSX'}
+- type: XYPanel
+  properties: {height: 142}
+  name: xy_panel_1
+  layout_properties: {grid_position: 'WDKMXY,BSTZXG'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'Shipment Number:', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: label_2
+    layout_properties: {x: 566, y: 10, width: 160}
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'Number of Pallets:', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: label_3
+    layout_properties: {x: 566, y: 86.8125, width: 160}
+  - type: Label
+    properties: {}
+    name: label_pallets
+    layout_properties: {x: 755.203125, y: 86.8125, width: 160}
+  - type: Label
+    properties: {}
+    name: label_shipment
+    layout_properties: {x: 755.203125, y: 10, width: 160}
+is_package: true

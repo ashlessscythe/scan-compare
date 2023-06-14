@@ -1,5 +1,6 @@
 from ._anvil_designer import pin_popupTemplate
 from anvil import *
+import anvil.server
 from .. import globals
 
 class pin_popup(pin_popupTemplate):

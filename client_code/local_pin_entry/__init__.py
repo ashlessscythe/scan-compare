@@ -1,5 +1,6 @@
 from ._anvil_designer import local_pin_entryTemplate
 from anvil import *
+import anvil.server
 
 class local_pin_entry(local_pin_entryTemplate):
   def __init__(self, **properties):
