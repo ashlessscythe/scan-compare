@@ -93,6 +93,10 @@ components:
   data_bindings:
   - {property: text, code: 'self.item[''bar_4'']', writeback: true}
   event_bindings: {pressed_enter: barcode_4_pressed_enter, focus: barcode_select_on_focus}
+- type: form:C6ZZPAPN4YYF5NVJ:MessagePill
+  properties: {}
+  name: message_pill_1
+  layout_properties: {grid_position: 'WDVKNU,XYTGTE'}
 - type: Button
   properties: {role: filled-button, align: center, tooltip: '', border: '', enabled: true,
     foreground: '', visible: true, text: Done, font_size: null, font: '', spacing_above: small,

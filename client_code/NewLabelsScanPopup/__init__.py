@@ -18,6 +18,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # pn passed in via properties from scancheck
     pn = properties['pn']
     pallets = properties['pallets']
+    current_pallet = properties['current_pallet']
     shipment = properties['shipment']
     qr_s = properties['qr_s']
     if len(pn) > 0:
@@ -106,15 +107,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
             else:
               msg = msg + 'License plates on new labels match. '
         print(f'Result is: {msg}')
-      
-      # display msg
-      func.display_message(
-        self,
-        title='Result: ' + res,
-        message=msg,
-        role=role,
-        bool_large=True
-      ) 
+    
       # end with Notification()
     
     # TODO shorten this function, it's getting kinda long 
@@ -122,7 +115,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     print(f'pn is {globals.pn}')
     # bundle args into obj
     data = {'shipment':globals.shipment, 
-              'count_pallets':globals.pallets,
+              'count_pallets':globals.current_pallet,
               'pn':globals.pn,
               'scans':self.get_scans(),
               'qr_s':globals.qr_s,
@@ -130,6 +123,9 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
               'res': res
               }
     print(f"returning data. len data is {len(data)}")
+    # display message on pill
+    self.message_pill_1.visible = True
+    self.message_pill_1.message = f"Result: {data['res']} with message {data['result']}"
     return data
     
   def barcode_4_pressed_enter(self, **event_args):
@@ -137,17 +133,15 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     print(f'pn is {globals.pn}')
     data = self.compare_scans()
     if data['res'] == 'OK':
-      r = self.add_to_db(**data)
-    else:
-      r = {'result': 'err', 'value': globals.current_pallet}
+      self.add_to_db(**data)
+    return data
 
   def outlined_button_1_click(self, **event_args):
     """This method is called when the button is clicked"""
     data = self.compare_scans()
     if data['res'] == 'OK':
-      r = self.add_to_db(**data)
-    else:
-      r = {'result': 'err', 'value': globals.current_pallet}
+      self.add_to_db(**data)
+    return data
     
   def add_to_db(self, **data):
     # add to db
@@ -161,7 +155,6 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     # TODO VERIFY
     # close self(popup) on add
     self.raise_event('x-close-alert', value=self.compare_scans())
-    return session_res
       
   def barcode_select_on_focus(self, **event_args):
     """This method is called when the TextBox gets focus"""

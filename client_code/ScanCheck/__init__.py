@@ -226,7 +226,8 @@ class ScanCheck(sc):
         'qr_s':scans,
         'pn':func.extract_pn(self, scans[0]),
         'shipment':globals.shipment,
-        'pallets':globals.pallets
+        'pallets':globals.pallets,
+        'current_pallet':globals.current_pallet
       }
       # will return either {'result': 'err', 'value': index} or result ok
       result = alert(
@@ -235,16 +236,24 @@ class ScanCheck(sc):
         buttons={('Done', 'done')},
         large=True
         )
+      # display msg
+      func.display_message(
+        self,
+        title='Result: ' + result['res'],
+        message=result['result'],
+        role='warning-popup' if result['res'] == 'ERR' else 'default',
+        bool_large=True
+      ) 
       print(f"result of newlabelscanpopup is {result}")      
       # ok if scans passed, and added to db and session
-      if result == None or result['result'] == 'ok' or result == 'done':
+      if result['res'] == 'OK':
         # user did not click 'ok' on above alert
         # clear textboxes and focus textbox 1 after popup close
         self.clear_text_boxes()
         self.refresh()
         
         # check if done (complete)
-        if result['value'] >= globals.pallets:
+        if result['count_pallets'] >= globals.pallets:
           func.display_message(
             self,
             title='Done Scanning',
