@@ -61,6 +61,7 @@ def export_to_excel(sid):
     # data = app_tables.session_scan.search(user=get_user())
     columns = ['index', 'valid_scans', 'result', 'qr_orig', 'qr_new', 'timestamp']
     data = app_tables.session_scan.client_readable(user=get_user()).search()
+    pd.set_option('display.max_columns', None)  
     df = pd.DataFrame(data, columns=columns)
     df = df.loc[:,['index', 'result', 'qr_orig', 'qr_new', 'timestamp']]
     df = df.rename(columns={
@@ -68,15 +69,15 @@ def export_to_excel(sid):
       'qr_orig':'original_qr',
       'qr_new':'overlay_qr'
     })
-    print(df.head())
-    pattern = "(?<=:P).+?(?=:Q)"
+    pattern = r':P(.+?):Q'
     df['original_pn'] = df['original_qr'].str.extract(pattern)
     df['new_pn'] = df['overlay_qr'].str.extract(pattern)
+    print(df.head())
     content = io.BytesIO()
     # df.to_excel(content, index=False)
     df.to_excel(content)
     content.seek(0, 0)
-    return BlobMedia(
+    return anvil.BlobMedia(
       content=content.read(), 
       content_type="application/vnd.ms-excel", 
       name=f"Shipment_{sid}.xlsx"
