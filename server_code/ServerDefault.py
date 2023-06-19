@@ -136,7 +136,7 @@ def add_scan(**properties):
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
   
 @anvil.server.callable
-def session_add_row(index, qr_s, pn_s, result):
+def session_add_row(index, sid, qr_s, pn_s, result):
   # check if session_db already has qr_s
   # TODO redo below to use is_in_db()
   find_old = app_tables.session_scan.search(qr_orig=qr_s[0])
@@ -148,9 +148,11 @@ def session_add_row(index, qr_s, pn_s, result):
     return {'result': 'err', 'value': index}
   else:
     print(f"New label scanned {qr_s}")    
+    shipment_row = app_tables.shipments.get(shipment=sid)
     app_tables.session_scan.add_row(
       index=index,
       result=result,
+      shipment_=shipment_row,
       pn_orig=pn_s[0],
       pn_new=pn_s[1],
       qr_orig=qr_s[0],
