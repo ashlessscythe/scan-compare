@@ -321,25 +321,3 @@ class ScanCheck(sc):
       anvil.server.call('send_pdf_email', **args)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-

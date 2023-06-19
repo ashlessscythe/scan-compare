@@ -31,9 +31,9 @@ def send_pdf_email(**args):
   anvil.email.send(
     from_address='no-reply',
     from_name="Tesla Scan", 
-    to=[user, 'cc@example.com', 'cc@example.com'],
+    to=[user],
     # to=[user, 'cc@example.com'],
-    cc=[],
+    cc=['cc@example.com', 'cc@example.com'],
     subject=f"Tesla Scan Shipment {args['sid']} Complete",
     text=f"Attached verification for Tesla Scan: Shipment {args['sid']} for {args['pallets']} pallets.",
     attachments=pdf
