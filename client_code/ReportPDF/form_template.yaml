@@ -40,8 +40,8 @@ components:
   properties:
     role: null
     columns:
-    - {id: UZVMCW, title: Index, data_key: index, $$hashKey: 'object:51203'}
-    - {id: JGJEVP, title: Result, data_key: result, $$hashKey: 'object:51205'}
+    - {id: UZVMCW, title: Index, data_key: index, $$hashKey: 'object:51203', expand: false}
+    - {id: JGJEVP, title: Result, data_key: result, $$hashKey: 'object:51205', expand: false}
     - {id: SPFKEX, title: User, data_key: user, $$hashKey: 'object:51206'}
     - {id: RDXRGP, title: Pn Orig, data_key: pn_orig, $$hashKey: 'object:51207'}
     - {id: ETOBNG, title: Pn New, data_key: pn_new, $$hashKey: 'object:51209'}
@@ -50,7 +50,7 @@ components:
     tooltip: ''
     border: ''
     foreground: ''
-    rows_per_page: 20
+    rows_per_page: 60
     visible: true
     wrap_on: never
     show_page_controls: true

@@ -39,6 +39,17 @@ def send_pdf_email(**args):
     attachments=pdf
   )
   return pdf
+
+@anvil.server.callable
+def close_shipment(sid):
+  r = app_tables.shipments.get(shipment=sid)
+  r['complete']= True
+  
+@anvil.server.callable
+def is_shipment_complete(sid):
+  r = app_tables.shipments.search(shipment=sid)
+  print(f"shipment {sid} is {r['complete']}")
+  return r
   
 @anvil.server.callable
 def shipment_exists(sid):
@@ -99,13 +110,18 @@ def get_user():
 @anvil.server.callable
 def add_scan(**properties):
   print(properties['scans'])
+  #shipment stuffs
+  sid = int(properties['shipment'])
+  shipment_row = app_tables.shipments.get(shipment=sid)['shipment']
+  # scans stuffs
   scan = [s for s in properties['scans']]
   scan_1 = scan[0]
   scan_2 = scan[1]
   scan_3 = scan[2]
   scan_4 = scan[3]
   app_tables.scans.add_row(
-    shipment=int(properties['shipment']),
+    shipment=sid,
+    shipment_=shipment_row,
     num_pallets=int(properties['count_pallets']),
     qr_orig=properties['qr_s'][0],
     qr_new=properties['qr_s'][1],

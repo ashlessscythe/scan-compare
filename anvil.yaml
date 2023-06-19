@@ -13,7 +13,7 @@ services:
   server_config: {file_table: files}
 - source: /runtime/services/anvil/users.yml
   client_config: {allow_signup: true, enable_automatically: false, use_email: true,
-    confirm_email: true, allow_remember_me: false, remember_me_days: 30, use_google: false}
+    confirm_email: true, allow_remember_me: false, remember_me_days: 30, use_google: true}
   server_config: {user_table: users}
 - source: /runtime/services/google.yml
   client_config: {}
@@ -73,6 +73,10 @@ db_schema:
     - name: user_unblock
       admin_ui: {width: 200}
       type: string
+    - name: shipment_
+      admin_ui: {order: -3, width: 200}
+      type: link_single
+      target: shipments
   files:
     title: Files
     client: none
@@ -150,5 +154,20 @@ db_schema:
     - name: pn_new
       admin_ui: {order: 3.75, width: 200}
       type: string
+    - name: shipment_
+      admin_ui: {order: 0.5, width: 200}
+      type: link_single
+      target: shipments
     title: session_scan
+  shipments:
+    client: none
+    server: full
+    columns:
+    - name: shipment
+      admin_ui: {order: 0, width: 200}
+      type: number
+    - name: complete
+      admin_ui: {order: 1, width: 200}
+      type: bool
+    title: shipments
 renamed: true
