@@ -44,13 +44,32 @@ def send_pdf_email(**args):
 def close_shipment(sid):
   r = app_tables.shipments.get(shipment=sid)
   r['complete']= True
-  
+
+@anvil.server.callable
+def get_shipment_status(sid):
+  r = app_tables.shipments.get(shipment=sid)
+  if r == None:
+    return 'none'
+  else:
+    return r['status']
+
+@anvil.server.callable
+def get_total_pallets(sid):
+  return app_tables.shipments.get(shipment=sid)['pallets']
+
 @anvil.server.callable
 def is_shipment_complete(sid):
-  r = app_tables.shipments.search(shipment=sid)
-  print(f"shipment {sid} is {r['complete']}")
-  return r
-  
+  r = app_tables.shipments.get(shipment=sid)
+  if r != None:
+    print(f"shipment {sid} is {r} with len {len(r)}")
+  if r == None:
+    return False
+  elif r['status'] == 'complete':
+    return True
+  else:
+    return False
+    
+    
 @anvil.server.callable
 def shipment_exists(sid):
   print(f"checking if shipment {sid} exists")
@@ -164,9 +183,15 @@ def session_add_row(index, sid, qr_s, pn_s, result):
     return {'result': 'ok', 'value': index}
 
 @anvil.server.callable
-def get_session():
+def get_session(sid):
   user = get_user()
-  rows = app_tables.session_scan.search(user=user)
+  print(f"sid is {sid}")
+  shipment_row = app_tables.shipments.get(shipment=sid)
+  print(f"shipment_row is {shipment_row}")
+  rows = app_tables.session_scan.search(q.all_of(
+    user=user,
+    shipment_=shipment_row
+  ))
   if rows:
     return rows
   else:

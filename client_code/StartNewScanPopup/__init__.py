@@ -52,7 +52,7 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
     print(self.fields_blank())
     # GOOD EXIT
     if not self.fields_blank():
-      self.raise_event('x-close-alert', value='OK')
+      self.raise_event('x-close-alert', value='start')
     else:
       self.message_pill_1.visible = True
       self.message_pill_1.level = 'warning'
@@ -69,19 +69,33 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     self.message_pill_1.visible = False
 
+  # this is the exit
   def text_box_shipment_lost_focus(self, **event_args):
     """This method is called when the TextBox loses focus"""
-    # check if shipment exists
+    # check if shipment is marked complete
     # skip if blank
     obj = event_args['sender']
     sid = obj.text
     if type(sid) != None:
-      if anvil.server.call('shipment_exists', sid):
+      if anvil.server.call('is_shipment_complete', sid):
         self.message_pill_1.visible = True
-        self.message_pill_1.message = f"Shipment {sid} already in Database"
+        self.message_pill_1.message = f"Shipment {sid} already completed in database"
         obj.focus()
         obj.select()
-
+      elif anvil.server.call('get_shipment_status', sid) == 'in_progress':
+        # TODO no popup on existing shipment fix...
+        # pill message and load previous skids, close dialog
+        self.message_pill_1.visible = True
+        self.message_pill_1.message = f"Shipment {sid} in progress"
+        self.message_pill_1.level = 'info'
+        Notification(
+          message='Shipment in progress, continue scanning',
+          title=f'Shipment {sid} in progress',
+          style='success',
+          timeout=3
+        )
+        self.raise_event('x-close-alert', value='continue')
+        
 
 
 

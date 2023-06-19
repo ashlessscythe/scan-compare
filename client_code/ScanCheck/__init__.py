@@ -29,7 +29,8 @@ class ScanCheck(sc):
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
       # self.link_1.url = anvil.server.call('get_link')
-      self.refresh()
+      # removed refresh prior to startup_with_can
+      # self.refresh()
       # ask if new scan on startup (dismissable)
       self.startup_with_scan()
       self.refresh()
@@ -42,13 +43,22 @@ class ScanCheck(sc):
   def startup_with_scan(self):
     r = self.new_scan()
     print(f"value from new_scan is {r}")
-    if r == 'OK':
+    if r == 'start':
       # TODO check if blanks (maybe in popup, before here)
       globals.reset_globals(self)
       self.text_box_original.focus()
       self.label_shipment.text = globals.shipment
       self.label_shipment.role = 'green-shadow-label'
       self.label_pallets.text = globals.pallets
+      self.label_pallets.role = 'green-shadow-label'
+      self.label_msg.text = ''
+    elif r == 'continue':
+      # continue started shipment
+      globals.reset_globals(self)
+      self.text_box_original.focus()
+      self.label_shipment.text = globals.shipment
+      self.label_shipment.role = 'green-shadow-label'
+      self.label_pallets.text = anvil.server.call('get_total_pallets', globals.shipment)
       self.label_pallets.role = 'green-shadow-label'
       self.label_msg.text = ''
     else:
@@ -84,7 +94,7 @@ class ScanCheck(sc):
     
   # refresh
   def refresh(self, **event_args):
-    self.repeating_panel_1.items = anvil.server.call('get_session')
+    self.repeating_panel_1.items = anvil.server.call('get_session', globals.shipment)
   
   def clear_scan_page(self):
     self.clear_text_boxes()

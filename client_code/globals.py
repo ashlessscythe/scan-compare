@@ -15,7 +15,7 @@ from anvil.tables import app_tables
 # // global
 idx = 0
 qr_s = []
-shipment = 'no_shipment'
+shipment = None
 pallets = 0
 current_pallet = 0
 pn = 'no_pn'
@@ -25,7 +25,7 @@ pin_number = '3333'
 def reset_globals(self):
   self.idx = 0
   self.current_pallet = 0
-  self.shipment = 'no_shipment'
+  self.shipment = None
   self.pallets = 0
   self.pn = 'no_pn'
   
