@@ -85,15 +85,17 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
       elif anvil.server.call('get_shipment_status', sid) == 'in_progress':
         # TODO no popup on existing shipment fix...
         # pill message and load previous skids, close dialog
-        self.message_pill_1.visible = True
-        self.message_pill_1.message = f"Shipment {sid} in progress"
-        self.message_pill_1.level = 'info'
-        Notification(
+        with Notification(
           message='Shipment in progress, continue scanning',
           title=f'Shipment {sid} in progress',
           style='success',
           timeout=3
         )
+        
+        self.message_pill_1.visible = True
+        self.message_pill_1.message = f"Shipment {sid} in progress"
+        self.message_pill_1.level = 'info'
+
         self.raise_event('x-close-alert', value='continue')
         
 
