@@ -23,8 +23,8 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
-    self.button_email.visible = True
-    self.button_download.visible = True
+    self.button_email.visible = False
+    self.button_download.visible = False
     
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
