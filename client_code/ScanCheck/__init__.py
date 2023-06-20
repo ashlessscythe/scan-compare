@@ -32,14 +32,16 @@ class ScanCheck(sc):
       # removed refresh prior to startup_with_can
       # self.refresh()
       # ask if new scan on startup (dismissable)
-      self.startup_with_scan()
-      self.refresh()
+      n = self.startup_with_scan()
+      if n == True:
+        self.refresh()
     else:
       print("testing mode....")
       self.startup_with_scan()
       self.button_next_click()
       
-  # new scan?
+  # Are we scanning?
+  # should return True (Yes, we're scanning) or False (no we're not)
   def startup_with_scan(self):
     r = self.new_scan()
     print(f"value from new_scan is {r}")
@@ -54,6 +56,7 @@ class ScanCheck(sc):
       self.label_pallets.text = globals.pallets
       self.label_pallets.role = 'green-shadow-label'
       self.label_msg.text = ''
+      return True
     elif r == 'continue':
       # continue started shipment
       globals.reset_globals(self)
@@ -67,6 +70,13 @@ class ScanCheck(sc):
       
       self.label_pallets.role = 'green-shadow-label'
       self.label_msg.text = ''
+      return True
+    elif r == 'complete':
+      # user asked to see completed shipment
+      r = anvil.server.call('get_shipment_row', globals.shipment)
+      args = {'sid':r['shipment'], 'pallets':r['total_pallets']}
+      open_form('DownLoadComplete', args)
+      return False
     else:
       # globals not changed by this
       # TODO - figure this out
@@ -76,6 +86,7 @@ class ScanCheck(sc):
       self.label_pallets.role = 'warning-label'
       self.label_msg.text = 'Please reset to start new scan.'
       self.label_msg.role = 'warning-label'
+      return True     # counter-intuitive, shouldn't get here under normal circumstances
       
   def new_scan(self):
   # if testing allow dismiss
@@ -283,6 +294,7 @@ class ScanCheck(sc):
             role='green-shadow-label',
             bool_large=True
           )
+          anvil.server.call('close_shipment', globals.shipment)
           self.button_download.visible = True
           self.button_email.visible = True
         self.clear_text_boxes()
@@ -324,7 +336,8 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     # result = anvil.server.call("export_to_excel", globals.shipment)
     # anvil.media.download(result)
-    args = {'sid':globals.shipment, 'pallets':globals.pallets}
+    r = anvil.server.call('get_shipment_row')
+    args = {'sid':r['shipment'], 'pallets':r['total_pallets']}
     print(f"button pressed: args is {args}")
     pdf = anvil.server.call('create_pdf', **args)
     print(f"pdf returned... attempting download")

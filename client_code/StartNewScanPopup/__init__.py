@@ -83,8 +83,18 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
       if sid_status == 'complete':
         self.message_pill_1.visible = True
         self.message_pill_1.message = f"Shipment {sid} already completed in database"
-        obj.focus()
-        obj.select()
+        # ask to view completed?
+        a = alert(
+          content='Shipment complete, view completed shipment?',
+          buttons=[("Yes", True), ("No", False)],
+          dismissible=True,
+          large=False
+        )
+        if a == True:
+          self.raise_event('x-close-alert', value='complete')
+        else:
+          obj.focus()
+          obj.select()
       # if in progress
       elif sid_status == 'in_progress':
         # TODO no popup on existing shipment fix...

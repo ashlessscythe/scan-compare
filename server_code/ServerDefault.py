@@ -44,7 +44,7 @@ def send_pdf_email(**args):
 def close_shipment(sid):
   r = app_tables.shipments.get(shipment=sid)
   # update row
-  r['complete']= True
+  r['status']= 'complete'
 
 @anvil.server.callable
 def add_shipment(sid, pallets):
