@@ -43,7 +43,7 @@ components:
     - {id: UZVMCW, title: Pallet Number, data_key: num_pallets, $$hashKey: 'object:51203',
       expand: false}
     - {id: JGJEVP, title: Result, data_key: result, $$hashKey: 'object:51205', expand: false}
-    - {id: SPFKEX, title: User, data_key: user_scan, $$hashKey: 'object:51206'}
+    - {id: SPFKEX, title: User, data_key: user_scan, $$hashKey: 'object:51206', expand: false}
     - {id: RDXRGP, title: Pn Orig, data_key: pn_orig, $$hashKey: 'object:51207'}
     - {id: ETOBNG, title: Pn New, data_key: pn_new, $$hashKey: 'object:51209'}
     - {id: TILMJS, title: Timestamp, data_key: created, $$hashKey: 'object:51211'}

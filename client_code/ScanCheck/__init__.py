@@ -336,7 +336,7 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     # result = anvil.server.call("export_to_excel", globals.shipment)
     # anvil.media.download(result)
-    r = anvil.server.call('get_shipment_row')
+    r = anvil.server.call('get_shipment_row', globals.shipment)
     args = {'sid':r['shipment'], 'pallets':r['total_pallets']}
     print(f"button pressed: args is {args}")
     pdf = anvil.server.call('create_pdf', **args)
