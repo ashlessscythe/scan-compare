@@ -50,7 +50,7 @@ components:
     tooltip: ''
     border: ''
     foreground: ''
-    rows_per_page: 20
+    rows_per_page: 60
     visible: true
     wrap_on: never
     show_page_controls: true
