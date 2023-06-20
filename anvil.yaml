@@ -77,6 +77,16 @@ db_schema:
       admin_ui: {order: -3, width: 200}
       type: link_single
       target: shipments
+    - name: pn_orig
+      admin_ui: {order: -0.125, width: 200}
+      type: string
+    - name: pn_new
+      admin_ui: {order: -0.0625, width: 200}
+      type: string
+    - name: user_
+      admin_ui: {order: -0.828125, width: 200}
+      type: link_single
+      target: users
   files:
     title: Files
     client: none
@@ -130,9 +140,6 @@ db_schema:
     - name: index
       admin_ui: {width: 200}
       type: number
-    - name: valid_scans
-      admin_ui: {width: 200}
-      type: number
     - name: result
       admin_ui: {width: 200}
       type: string
@@ -169,8 +176,11 @@ db_schema:
     - name: status
       admin_ui: {order: 1, width: 200}
       type: string
-    - name: pallets
+    - name: total_pallets
       admin_ui: {order: 0.5, width: 200}
+      type: number
+    - name: scanned_pallets
+      admin_ui: {order: 0.75, width: 200}
       type: number
     title: shipments
 renamed: true

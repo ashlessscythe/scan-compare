@@ -151,12 +151,12 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     anvil.server.call('add_scan', **data)
     # TODO, verify add session
     # current pallet is index from session_add_row
-    session_res = anvil.server.call('session_add_row',
-                      index=globals.current_pallet,
-                      sid = globals.shipment,
-                      pn_s = globals.pn_s,
-                      qr_s = globals.qr_s,
-                      result=data['result'])
+    # session_res = anvil.server.call('session_add_row',
+                      # index=globals.current_pallet,
+                      # sid = globals.shipment,
+                      # pn_s = globals.pn_s,
+                      # qr_s = globals.qr_s,
+                      # result=data['result'])
     # TODO VERIFY
     # close self(popup) on add
     self.raise_event('x-close-alert', value=self.compare_scans())

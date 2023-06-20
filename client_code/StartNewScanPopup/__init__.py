@@ -76,27 +76,33 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
     # skip if blank
     obj = event_args['sender']
     sid = obj.text
+    sid_status = anvil.server.call('get_shipment_status', sid)
+    
     if type(sid) != None:
-      if anvil.server.call('is_shipment_complete', sid):
+      # if complete
+      if sid_status == 'complete':
         self.message_pill_1.visible = True
         self.message_pill_1.message = f"Shipment {sid} already completed in database"
         obj.focus()
         obj.select()
-      elif anvil.server.call('get_shipment_status', sid) == 'in_progress':
+      # if in progress
+      elif sid_status == 'in_progress':
         # TODO no popup on existing shipment fix...
         # pill message and load previous skids, close dialog
-        with Notification(
-          message='Shipment in progress, continue scanning',
+        alert(
+          content='Shipment in progress, continue scanning',
           title=f'Shipment {sid} in progress',
-          style='success',
-          timeout=3
+          buttons=('OK', True),
+          dismissible=True,
+          large=True
         )
-        
         self.message_pill_1.visible = True
         self.message_pill_1.message = f"Shipment {sid} in progress"
         self.message_pill_1.level = 'info'
-
         self.raise_event('x-close-alert', value='continue')
+      # if exists but no status (might use this later)
+
+        
         
 
 

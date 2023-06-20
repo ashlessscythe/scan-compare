@@ -44,6 +44,8 @@ class ScanCheck(sc):
     r = self.new_scan()
     print(f"value from new_scan is {r}")
     if r == 'start':
+      # add new sid to sid db with pallets
+      anvil.server.call('add_shipment', globals.shipment, globals.pallets)
       # TODO check if blanks (maybe in popup, before here)
       globals.reset_globals(self)
       self.text_box_original.focus()
@@ -58,7 +60,11 @@ class ScanCheck(sc):
       self.text_box_original.focus()
       self.label_shipment.text = globals.shipment
       self.label_shipment.role = 'green-shadow-label'
-      self.label_pallets.text = anvil.server.call('get_total_pallets', globals.shipment)
+      
+      r = anvil.server.call('get_shipment_row', globals.shipment)
+      self.label_pallets.text = r['total_pallets']
+      globals.current_pallet = r['scanned_pallets']
+      
       self.label_pallets.role = 'green-shadow-label'
       self.label_msg.text = ''
     else:
@@ -94,7 +100,7 @@ class ScanCheck(sc):
     
   # refresh
   def refresh(self, **event_args):
-    self.repeating_panel_1.items = anvil.server.call('get_session', globals.shipment)
+    self.repeating_panel_1.items = anvil.server.call('get_shipment_rows', globals.shipment)
   
   def clear_scan_page(self):
     self.clear_text_boxes()
@@ -268,7 +274,8 @@ class ScanCheck(sc):
         self.refresh()
         
         # check if done (complete)
-        if result['count_pallets'] >= globals.pallets:
+        r = anvil.server.call('get_shipment_row', globals.shipment)
+        if r['scanned_pallets'] >= r['total_pallets']:
           func.display_message(
             self,
             title='Done Scanning',
@@ -329,5 +336,10 @@ class ScanCheck(sc):
       # anvil.server.call('send_email', globals.shipment)
       args = {'sid':globals.shipment, 'pallets':globals.pallets}
       anvil.server.call('send_pdf_email', **args)
+
+  def outlined_button_2_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.refresh()
+
 
 

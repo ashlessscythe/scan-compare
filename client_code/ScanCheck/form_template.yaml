@@ -29,6 +29,14 @@ components:
       icon: ''}
     name: label_pallets
     layout_properties: {grid_position: 'QAUFQT,EOGYJM'}
+  - type: Button
+    properties: {role: outlined-button, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: refresh, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: outlined_button_2
+    layout_properties: {grid_position: 'QAUFQT,LQUZCI'}
+    event_bindings: {click: outlined_button_2_click}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
       visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
@@ -109,13 +117,16 @@ components:
     properties:
       role: null
       columns:
-      - {id: FQKENQ, title: Pallet Number, data_key: index, $$hashKey: 'object:15863'}
-      - {id: ZUWQMV, title: Result, data_key: result, $$hashKey: 'object:15865'}
+      - {id: EOJIZE, title: Pallet Number, data_key: num_pallets, $$hashKey: 'object:29218'}
+      - {id: IICKYL, title: User, data_key: user_scan, $$hashKey: 'object:29246'}
+      - {id: XLEFRP, title: Original PN, data_key: pn_orig, $$hashKey: 'object:29242'}
+      - {id: DFMRVY, title: New PN, data_key: pn_new, $$hashKey: 'object:29244'}
+      - {id: QTOLFB, title: Result, data_key: result, $$hashKey: 'object:29225'}
       auto_header: true
       tooltip: ''
       border: ''
       foreground: ''
-      rows_per_page: 20
+      rows_per_page: 60
       visible: true
       wrap_on: never
       show_page_controls: true
@@ -129,6 +140,7 @@ components:
       properties: {spacing_above: none, spacing_below: none, item_template: ScanCheck.scancheckrow}
       name: repeating_panel_1
       layout_properties: {}
+    data_bindings: []
 - type: FlowPanel
   properties: {}
   name: navbar_links

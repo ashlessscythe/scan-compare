@@ -43,7 +43,22 @@ def send_pdf_email(**args):
 @anvil.server.callable
 def close_shipment(sid):
   r = app_tables.shipments.get(shipment=sid)
+  # update row
   r['complete']= True
+
+@anvil.server.callable
+def add_shipment(sid, pallets):
+  app_tables.shipments.add_row(
+    shipment=sid,
+    total_pallets=pallets,
+    scanned_pallets=0,   # default init
+    status='in_progress' # default init
+  )
+
+@anvil.server.callable
+def get_shipment_row(sid):
+  # returns liveObj
+  return app_tables.shipments.get(shipment=sid)
 
 @anvil.server.callable
 def get_shipment_status(sid):
@@ -55,7 +70,11 @@ def get_shipment_status(sid):
 
 @anvil.server.callable
 def get_total_pallets(sid):
-  return app_tables.shipments.get(shipment=sid)['pallets']
+  return app_tables.shipments.get(shipment=sid)['total_pallets']
+
+@anvil.server.callable
+def get_scanned_pallets(sid):
+  return app_tables.shipments.get(shipment=sid)['scanned_pallets']
 
 @anvil.server.callable
 def is_shipment_complete(sid):
@@ -119,6 +138,7 @@ def get_link():
 
 @anvil.server.callable
 def get_user():
+  # returns email or no_login
   u = anvil.users.get_user()
   if u:
     user = anvil.users.get_user()['email']
@@ -131,7 +151,8 @@ def add_scan(**properties):
   print(properties['scans'])
   #shipment stuffs
   sid = int(properties['shipment'])
-  shipment_row = app_tables.shipments.get(shipment=sid)['shipment']
+  shipment_row = app_tables.shipments.get(shipment=sid)
+  user_row = app_tables.users.get(email=get_user())
   # scans stuffs
   scan = [s for s in properties['scans']]
   scan_1 = scan[0]
@@ -139,33 +160,29 @@ def add_scan(**properties):
   scan_3 = scan[2]
   scan_4 = scan[3]
   app_tables.scans.add_row(
-    shipment=sid,
     shipment_=shipment_row,
     num_pallets=int(properties['count_pallets']),
     qr_orig=properties['qr_s'][0],
     qr_new=properties['qr_s'][1],
+    pn_orig=properties['pn_s'][0],
+    pn_new=properties['pn_s'][1],
     scan_1=scan_1,
     scan_2=scan_2,
     scan_3=scan_3,
     scan_4=scan_4,
     result=properties['result'],
     created=datetime.now(),
-    user_scan = get_user()
+    user_ = user_row,
+    user_scan=get_user()
   )
+
+  # increment pallets
+  shipment_row['scanned_pallets'] += 1
+
   print(f"added row to db shipment: ({properties['shipment']}) result ({properties['result']})")
   
 @anvil.server.callable
 def session_add_row(index, sid, qr_s, pn_s, result):
-  # check if session_db already has qr_s
-  # TODO redo below to use is_in_db()
-  find_old = app_tables.session_scan.search(qr_orig=qr_s[0])
-  print(f"find old is {find_old}")
-  find_new = app_tables.session_scan.search(qr_new=qr_s[1])
-  print(f"find new is {find_new}")
-  if len(find_old) > 0 or len(find_new) > 0:
-    print(f"qr codes {qr_s} already exist in session db")
-    return {'result': 'err', 'value': index}
-  else:
     print(f"New label scanned {qr_s}")    
     shipment_row = app_tables.shipments.get(shipment=sid)
     app_tables.session_scan.add_row(
@@ -181,6 +198,20 @@ def session_add_row(index, sid, qr_s, pn_s, result):
     )
     print(f'added row to session_db index {index} ')
     return {'result': 'ok', 'value': index}
+
+@anvil.server.callable
+def get_shipment_rows(sid):
+  user = get_user()
+  print(f"sid is {sid}")
+  shipment_row = app_tables.shipments.get(shipment=sid)
+  print(f"shipment_row is {shipment_row}")
+  rows = app_tables.scans.search(
+    shipment_=shipment_row
+  )
+  if rows:
+    return rows
+  else:
+    return None
 
 @anvil.server.callable
 def get_session(sid):
