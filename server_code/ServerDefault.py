@@ -52,7 +52,8 @@ def add_shipment(sid, pallets):
     shipment=sid,
     total_pallets=pallets,
     scanned_pallets=0,   # default init
-    status='in_progress' # default init
+    status='in_progress', # default init
+    timestamp=datetime.now()
   )
 
 @anvil.server.callable
