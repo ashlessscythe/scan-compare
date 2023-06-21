@@ -23,8 +23,8 @@ class ScanCheck(sc):
     self.init_components(**properties)
     # Any code you write here will run before the form opens.
     # globals?
-    self.button_email.visible = True
-    self.button_download.visible = True
+    self.button_email.visible = False
+    self.button_download.visible = False
     
     if not test.TESTING_MODE:
       self.logged_in_user.text = anvil.server.call('get_user')
@@ -75,7 +75,20 @@ class ScanCheck(sc):
       # user asked to see completed shipment
       r = anvil.server.call('get_shipment_row', globals.shipment)
       args = {'sid':r['shipment'], 'pallets':r['total_pallets']}
-      open_form('DownLoadComplete', args)
+      print(f"args is {args}")
+      self.text_box_original.enabled = False
+      self.text_box_new.enabled = False
+      # self.button_reset.visible = False
+      self.button_next.visible = False
+      self.label_2.text = 'Shipment Scan Complete'
+      self.label_pallets.text = r['total_pallets']
+      self.label_pallets.role = 'warning'
+      self.label_shipment.text = r['shipment']
+      self.label_shipment.role = 'warning'
+      self.label_msg.text = 'Viewing completed shipment'
+      self.button_email.visible = True
+      self.button_download.visible = True
+      self.refresh()
       return False
     else:
       # globals not changed by this
@@ -136,9 +149,12 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     c = confirm("Clear page?")
     if c:
-      self.clear_scan_page()
-      globals.reset_globals(self)
-      self.startup_with_scan()
+      open_form('ScanCheck')
+      # might be dangerous to reload same page....
+      # checked documentation, we're ok 
+      # self.clear_scan_page()
+      # globals.reset_globals(self)
+      # self.startup_with_scan()
 
   def check_valid(self, obj):
     r = func.is_valid(obj.text)
@@ -347,7 +363,8 @@ class ScanCheck(sc):
     """This method is called when the button is clicked"""
     with Notification("Sending email..."):
       # anvil.server.call('send_email', globals.shipment)
-      args = {'sid':globals.shipment, 'pallets':globals.pallets}
+      r = anvil.server.call('get_shipment_row', globals.shipment)
+      args = {'sid':r['shipment'], 'pallets':r['total_pallets']}
       anvil.server.call('send_pdf_email', **args)
 
   def outlined_button_2_click(self, **event_args):
