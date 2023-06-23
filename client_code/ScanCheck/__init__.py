@@ -66,6 +66,7 @@ class ScanCheck(sc):
       
       r = anvil.server.call('get_shipment_row', globals.shipment)
       self.label_pallets.text = r['total_pallets']
+      globals.pallets = r['total_pallets']
       globals.current_pallet = r['scanned_pallets']
       
       self.label_pallets.role = 'green-shadow-label'
@@ -174,14 +175,14 @@ class ScanCheck(sc):
           # no db check if testing
           with Notification(message="TESTING MODE, NO DB CHECK"):
             exists = False
-            print(f'TESTING: lic plate {func.extract_lic(self, obj.text)}')
-            print(f'TESTING: pn is {func.extract_pn(self, obj.text)}')
+            # print(f'TESTING: lic plate {func.extract_lic(self, obj.text)}')
+            # print(f'TESTING: pn is {func.extract_pn(self, obj.text)}')
         else:
           with Notification(message="Checking against DB..."):
             # TODO try async
             exists = anvil.server.call('is_in_db', obj.text) 
-            print(f'lic plate {func.extract_lic(self, obj.text)}')
-            print(f'pn is {func.extract_pn(self, obj.text)}')
+            # print(f'lic plate {func.extract_lic(self, obj.text)}')
+            # print(f'pn is {func.extract_pn(self, obj.text)}')
         if exists:
           # already in db
           alert(
@@ -206,7 +207,7 @@ class ScanCheck(sc):
     # 2 scans
     print(scans)
     b_missing = True in set([len(s) == 0 for s in scans])
-    print(f'b_missing is {b_missing}')
+    # print(f'b_missing is {b_missing}')
     if b_missing:
       func.display_message(
         self,
@@ -258,11 +259,11 @@ class ScanCheck(sc):
       scans = (
         test.qr_s
       )
-      print(f"test scans {scans}")
+      # print(f"test scans {scans}")
       scan_ok = self.check_if_valid(scans)
     else:
       scans = self.get_scans()
-      print(f"non-test scans {scans}")
+      # print(f"non-test scans {scans}")
       scan_ok = self.check_if_valid(scans)
     # ref
     if scan_ok:
@@ -302,6 +303,7 @@ class ScanCheck(sc):
         
         # check if done (complete)
         r = anvil.server.call('get_shipment_row', globals.shipment)
+        print(f"checking if done scanning scanned pallets {r['scanned_pallets']} total pallets {r['total_pallets']}")
         if r['scanned_pallets'] >= r['total_pallets']:
           func.display_message(
             self,
@@ -310,6 +312,7 @@ class ScanCheck(sc):
             role='green-shadow-label',
             bool_large=True
           )
+          print(f"Done scanning")
           anvil.server.call('close_shipment', globals.shipment)
           self.button_download.visible = True
           self.button_email.visible = True

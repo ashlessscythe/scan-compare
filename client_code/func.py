@@ -68,7 +68,7 @@ def is_populated(s):
   return not func.is_blank(s)
 
 def is_blank(s):
-  print(f" s is type {type(s)}")
+  # print(f" s is type {type(s)}")
   # type(s) is 'int' for number fields
   if s == None:
     return True

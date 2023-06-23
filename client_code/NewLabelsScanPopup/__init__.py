@@ -91,7 +91,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
       else:
         res = 'ERROR'
         role = 'warning-popup'
-      print(f'res is {res}')
+      # print(f'res is {res}')
       # build msg
       msg = ''
       if b_repeat:
@@ -108,13 +108,13 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
               msg = msg + 'License plates mismatch. '
             else:
               msg = msg + 'License plates on new labels match. '
-        print(f'Result is: {msg}')
+        # print(f'Result is: {msg}')
     
       # end with Notification()
     
     # TODO shorten this function, it's getting kinda long 
     # if ok, write to db?
-    print(f'pn is {globals.pn}')
+    # print(f'pn is {globals.pn}')
     # bundle args into obj
     data = {'shipment':globals.shipment, 
               'count_pallets':globals.current_pallet,
@@ -125,7 +125,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
               'result':msg,
               'res': res
               }
-    print(f"returning data. len data is {len(data)}")
+    # print(f"returning data. len data is {len(data)}")
     # display message on pill
     self.message_pill_1.visible = True
     self.message_pill_1.message = f"Result: {data['res']} with message {data['result']}"
@@ -133,7 +133,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
     
   def barcode_4_pressed_enter(self, **event_args):
     # start compare of lic and make sure pn matches pn
-    print(f'pn is {globals.pn}')
+    # print(f'pn is {globals.pn}')
     data = self.compare_scans()
     if data['res'] == 'OK':
       self.add_to_db(**data)
@@ -168,7 +168,7 @@ class NewLabelsScanPopup(NewLabelsScanPopupTemplate):
   # in case sessionres is closed or user dismissed without 'ok' button
   def form_hide(self, **event_args):
     """This method is called when the column panel is removed from the screen"""
-    print(f"returning on form hide")
+    # print(f"returning on form hide")
     # if scans ok compare_scans() maybe...
     self.raise_event('x-close-alert', value=self.compare_scans())
     

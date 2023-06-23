@@ -14,7 +14,7 @@ from anvil.pdf import PDFRenderer
 
 @anvil.server.callable
 def create_pdf(**args):
-    print(f"from server, args is {args}")
+    # print(f"from server, args is {args}")
     sid = args['sid']
     pallets = args['pallets']
     print(f"sid is {sid}, pallets is {pallets}")
@@ -45,9 +45,11 @@ def close_shipment(sid):
   r = app_tables.shipments.get(shipment=sid)
   # update row
   r['status']= 'complete'
+  print(f"shipment closed in db")
 
 @anvil.server.callable
 def add_shipment(sid, pallets):
+  print(f"adding shipment {sid} with pallets {pallets} to db")
   app_tables.shipments.add_row(
     shipment=sid,
     total_pallets=pallets,
@@ -101,7 +103,7 @@ def shipment_exists(sid):
 @anvil.server.callable
 def is_in_db(code):
   # col should be 0 or 1
-  print(f"checking if db has {code}")
+  # print(f"checking if db has {code}")
   r = app_tables.scans.search(
     q.any_of(
       qr_orig=code,
@@ -149,7 +151,7 @@ def get_user():
   
 @anvil.server.callable
 def add_scan(**properties):
-  print(properties['scans'])
+  # print(properties['scans'])
   #shipment stuffs
   sid = int(properties['shipment'])
   shipment_row = app_tables.shipments.get(shipment=sid)
@@ -184,7 +186,7 @@ def add_scan(**properties):
   
 @anvil.server.callable
 def session_add_row(index, sid, qr_s, pn_s, result):
-    print(f"New label scanned {qr_s}")    
+    # print(f"New label scanned {qr_s}")    
     shipment_row = app_tables.shipments.get(shipment=sid)
     app_tables.session_scan.add_row(
       index=index,
@@ -203,9 +205,9 @@ def session_add_row(index, sid, qr_s, pn_s, result):
 @anvil.server.callable
 def get_shipment_rows(sid):
   user = get_user()
-  print(f"sid is {sid}")
+  # print(f"sid is {sid}")
   shipment_row = app_tables.shipments.get(shipment=sid)
-  print(f"shipment_row is {shipment_row}")
+  # print(f"shipment_row is {shipment_row}")
   rows = app_tables.scans.search(
     shipment_=shipment_row
   )
@@ -217,9 +219,9 @@ def get_shipment_rows(sid):
 @anvil.server.callable
 def get_session(sid):
   user = get_user()
-  print(f"sid is {sid}")
+  # print(f"sid is {sid}")
   shipment_row = app_tables.shipments.get(shipment=sid)
-  print(f"shipment_row is {shipment_row}")
+  # print(f"shipment_row is {shipment_row}")
   rows = app_tables.session_scan.search(q.all_of(
     user=user,
     shipment_=shipment_row

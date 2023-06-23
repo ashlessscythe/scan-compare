@@ -49,7 +49,7 @@ class StartNewScanPopup(StartNewScanPopupTemplate):
   
   def text_box_pallets_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
-    print(self.fields_blank())
+    # print(self.fields_blank())
     # GOOD EXIT
     if not self.fields_blank():
       self.raise_event('x-close-alert', value='start')
