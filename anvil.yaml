@@ -1,189 +1,188 @@
-scheduled_tasks: []
+allow_embedding: false
+db_schema:
+  files:
+    client: none
+    columns:
+    - admin_ui: {width: 200}
+      name: path
+      type: string
+    - admin_ui: {width: 200}
+      name: file
+      type: media
+    - admin_ui: {width: 200}
+      name: file_version
+      type: string
+    server: full
+    title: Files
+  scans:
+    client: none
+    columns:
+    - admin_ui: {width: 200}
+      name: shipment
+      type: number
+    - admin_ui: {width: 200}
+      name: num_pallets
+      type: number
+    - admin_ui: {width: 200}
+      name: qr_orig
+      type: string
+    - admin_ui: {width: 200}
+      name: qr_new
+      type: string
+    - admin_ui: {width: 200}
+      name: scan_1
+      type: string
+    - admin_ui: {width: 200}
+      name: scan_2
+      type: string
+    - admin_ui: {width: 200}
+      name: scan_3
+      type: string
+    - admin_ui: {width: 200}
+      name: scan_4
+      type: string
+    - admin_ui: {width: 200}
+      name: result
+      type: string
+    - admin_ui: {width: 200}
+      name: created
+      type: datetime
+    - admin_ui: {width: 200}
+      name: user_scan
+      type: string
+    - admin_ui: {width: 200}
+      name: user_unblock
+      type: string
+    - admin_ui: {order: -3, width: 200}
+      name: shipment_
+      target: shipments
+      type: link_single
+    - admin_ui: {order: -0.125, width: 200}
+      name: pn_orig
+      type: string
+    - admin_ui: {order: -0.0625, width: 200}
+      name: pn_new
+      type: string
+    - admin_ui: {order: -0.828125, width: 200}
+      name: user_
+      target: users
+      type: link_single
+    server: full
+    title: scans
+  session_scan:
+    client: none
+    columns:
+    - admin_ui: {width: 200}
+      name: index
+      type: number
+    - admin_ui: {width: 200}
+      name: result
+      type: string
+    - admin_ui: {width: 200}
+      name: user
+      type: string
+    - admin_ui: {width: 200}
+      name: qr_orig
+      type: string
+    - admin_ui: {width: 200}
+      name: qr_new
+      type: string
+    - admin_ui: {order: 6, width: 200}
+      name: timestamp
+      type: datetime
+    - admin_ui: {order: 3.25, width: 200}
+      name: pn_orig
+      type: string
+    - admin_ui: {order: 3.75, width: 200}
+      name: pn_new
+      type: string
+    - admin_ui: {order: 0.5, width: 200}
+      name: shipment_
+      target: shipments
+      type: link_single
+    server: full
+    title: session_scan
+  shipments:
+    client: none
+    columns:
+    - admin_ui: {order: 0, width: 200}
+      name: shipment
+      type: number
+    - admin_ui: {order: 1, width: 200}
+      name: status
+      type: string
+    - admin_ui: {order: 0.5, width: 200}
+      name: total_pallets
+      type: number
+    - admin_ui: {order: 0.75, width: 200}
+      name: scanned_pallets
+      type: number
+    - admin_ui: {order: 4, width: 200}
+      name: timestamp
+      type: datetime
+    server: full
+    title: shipments
+  users:
+    client: none
+    columns:
+    - admin_ui: {width: 200}
+      name: email
+      type: string
+    - admin_ui: {width: 200}
+      name: enabled
+      type: bool
+    - admin_ui: {width: 200}
+      name: last_login
+      type: datetime
+    - admin_ui: {width: 200}
+      name: password_hash
+      type: string
+    - admin_ui: {width: 200}
+      name: n_password_failures
+      type: number
+    - admin_ui: {width: 200}
+      name: confirmed_email
+      type: bool
+    - admin_ui: {width: 200}
+      name: signed_up
+      type: datetime
+    - admin_ui: {width: 200}
+      name: remembered_logins
+      type: simpleObject
+    - admin_ui: {width: 200}
+      name: email_confirmation_key
+      type: string
+    server: full
+    title: Users
 dependencies:
 - app_id: 6DKL4IXCJRD375AA
   version: {dev: false}
 - app_id: V7HPR2AOTVC5IUEI
   version: {dev: true}
-services:
-- source: /runtime/services/tables.yml
-  client_config: {}
-  server_config: {}
-- source: /runtime/services/anvil/files.yml
-  client_config: {}
-  server_config: {file_table: files}
-- source: /runtime/services/anvil/users.yml
-  client_config: {allow_signup: true, enable_automatically: false, use_email: true,
-    confirm_email: true, allow_remember_me: false, remember_me_days: 30, use_google: true}
-  server_config: {user_table: users}
-- source: /runtime/services/google.yml
-  client_config: {}
-  server_config: {}
-- source: /runtime/services/anvil/email.yml
-  client_config: {}
-  server_config: {}
-startup: {type: form, module: Login}
-package_name: Scan_Compare
-allow_embedding: false
 name: ScanCompare
-runtime_options:
-  version: 2
-  client_version: '3'
-  server_version: python3-sandbox
-  server_spec: {base: python310-standard}
-startup_form: null
-db_schema:
-  scans:
-    title: scans
-    client: none
-    server: full
-    columns:
-    - name: shipment
-      admin_ui: {width: 200}
-      type: number
-    - name: num_pallets
-      admin_ui: {width: 200}
-      type: number
-    - name: qr_orig
-      admin_ui: {width: 200}
-      type: string
-    - name: qr_new
-      admin_ui: {width: 200}
-      type: string
-    - name: scan_1
-      admin_ui: {width: 200}
-      type: string
-    - name: scan_2
-      admin_ui: {width: 200}
-      type: string
-    - name: scan_3
-      admin_ui: {width: 200}
-      type: string
-    - name: scan_4
-      admin_ui: {width: 200}
-      type: string
-    - name: result
-      admin_ui: {width: 200}
-      type: string
-    - name: created
-      admin_ui: {width: 200}
-      type: datetime
-    - name: user_scan
-      admin_ui: {width: 200}
-      type: string
-    - name: user_unblock
-      admin_ui: {width: 200}
-      type: string
-    - name: shipment_
-      admin_ui: {order: -3, width: 200}
-      type: link_single
-      target: shipments
-    - name: pn_orig
-      admin_ui: {order: -0.125, width: 200}
-      type: string
-    - name: pn_new
-      admin_ui: {order: -0.0625, width: 200}
-      type: string
-    - name: user_
-      admin_ui: {order: -0.828125, width: 200}
-      type: link_single
-      target: users
-  files:
-    title: Files
-    client: none
-    server: full
-    columns:
-    - name: path
-      admin_ui: {width: 200}
-      type: string
-    - name: file
-      admin_ui: {width: 200}
-      type: media
-    - name: file_version
-      admin_ui: {width: 200}
-      type: string
-  users:
-    title: Users
-    client: none
-    server: full
-    columns:
-    - name: email
-      admin_ui: {width: 200}
-      type: string
-    - name: enabled
-      admin_ui: {width: 200}
-      type: bool
-    - name: last_login
-      admin_ui: {width: 200}
-      type: datetime
-    - name: password_hash
-      admin_ui: {width: 200}
-      type: string
-    - name: n_password_failures
-      admin_ui: {width: 200}
-      type: number
-    - name: confirmed_email
-      admin_ui: {width: 200}
-      type: bool
-    - name: signed_up
-      admin_ui: {width: 200}
-      type: datetime
-    - name: remembered_logins
-      admin_ui: {width: 200}
-      type: simpleObject
-    - name: email_confirmation_key
-      admin_ui: {width: 200}
-      type: string
-  session_scan:
-    client: none
-    server: full
-    columns:
-    - name: index
-      admin_ui: {width: 200}
-      type: number
-    - name: result
-      admin_ui: {width: 200}
-      type: string
-    - name: user
-      admin_ui: {width: 200}
-      type: string
-    - name: qr_orig
-      admin_ui: {width: 200}
-      type: string
-    - name: qr_new
-      admin_ui: {width: 200}
-      type: string
-    - name: timestamp
-      admin_ui: {order: 6, width: 200}
-      type: datetime
-    - name: pn_orig
-      admin_ui: {order: 3.25, width: 200}
-      type: string
-    - name: pn_new
-      admin_ui: {order: 3.75, width: 200}
-      type: string
-    - name: shipment_
-      admin_ui: {order: 0.5, width: 200}
-      type: link_single
-      target: shipments
-    title: session_scan
-  shipments:
-    client: none
-    server: full
-    columns:
-    - name: shipment
-      admin_ui: {order: 0, width: 200}
-      type: number
-    - name: status
-      admin_ui: {order: 1, width: 200}
-      type: string
-    - name: total_pallets
-      admin_ui: {order: 0.5, width: 200}
-      type: number
-    - name: scanned_pallets
-      admin_ui: {order: 0.75, width: 200}
-      type: number
-    - name: timestamp
-      admin_ui: {order: 4, width: 200}
-      type: datetime
-    title: shipments
+package_name: Scan_Compare
 renamed: true
+runtime_options:
+  client_version: '3'
+  server_spec: {base: python310-standard}
+  server_version: python3-sandbox
+  version: 2
+scheduled_tasks: []
+services:
+- client_config: {}
+  server_config: {}
+  source: /runtime/services/tables.yml
+- client_config: {}
+  server_config: {file_table: files}
+  source: /runtime/services/anvil/files.yml
+- client_config: {allow_remember_me: false, allow_signup: false, confirm_email: true, enable_automatically: false, remember_me_days: 30, use_email: true, use_google: true}
+  server_config: {user_table: users}
+  source: /runtime/services/anvil/users.yml
+- client_config: {}
+  server_config: {}
+  source: /runtime/services/google.yml
+- client_config: {}
+  server_config: {}
+  source: /runtime/services/anvil/email.yml
+startup: {module: Login, type: form}
+startup_form: null

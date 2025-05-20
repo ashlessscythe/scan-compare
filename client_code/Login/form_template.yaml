@@ -1,24 +1,18 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
 components:
-- type: Spacer
-  properties: {height: 93}
+- layout_properties: {grid_position: 'LHMLOT,RBZQCS'}
   name: spacer_1
-  layout_properties: {grid_position: 'LHMLOT,RBZQCS'}
-- type: Label
-  properties: {role: display, align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: Scan Verification, font_size: null, font: '', spacing_above: large,
-    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-    underline: false, icon: ''}
+  properties: {height: 93}
+  type: Spacer
+- layout_properties: {grid_position: 'VWWHJE,GEFXXE'}
   name: label_1
-  layout_properties: {grid_position: 'VWWHJE,GEFXXE'}
-- type: Button
-  properties: {role: outlined-button, align: center, tooltip: '', border: '', enabled: true,
-    foreground: '', visible: true, text: Log In, font_size: null, font: '', spacing_above: small,
-    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-    underline: false, icon: ''}
-  name: button_login
+  properties: {align: center, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: display, spacing_above: large, spacing_below: small, text: Scan Verification, tooltip: '', underline: false, visible: true}
+  type: Label
+- event_bindings: {click: button_login_click}
   layout_properties: {grid_position: 'FZOFQV,JPMYXS'}
-  event_bindings: {click: button_login_click}
+  name: button_login
+  properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: outlined-button, spacing_above: small, spacing_below: small, text: Log In, tooltip: '', underline: false, visible: true}
+  type: Button
+container:
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
 is_package: true
