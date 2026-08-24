@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
+import {
+  AppHeader,
+  HeaderLogoutButton,
+  HeaderNavLink,
+} from "@/components/app-header";
+import { ResponsiveTable } from "@/components/responsive-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -148,33 +153,30 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <h1 className="text-xl font-semibold">Admin Panel</h1>
-          <div className="flex gap-2">
-            <Link
-              href="/scan"
-              className="inline-flex h-8 items-center justify-center rounded-lg border border-border px-2.5 text-sm font-medium hover:bg-muted"
-            >
-              Scan App
-            </Link>
-            <Button variant="outline" onClick={() => signOut({ callbackUrl: "/login" })}>Logout</Button>
-          </div>
-        </div>
-      </header>
+    <div className="app-page">
+      <AppHeader
+        title="Admin Panel"
+        actions={
+          <>
+            <HeaderNavLink href="/scan">Scan App</HeaderNavLink>
+            <HeaderLogoutButton onClick={() => signOut({ callbackUrl: "/login" })} />
+          </>
+        }
+      />
 
-      <main className="mx-auto max-w-6xl p-4">
+      <main className="app-main">
         <Tabs defaultValue="dashboard">
-          <TabsList>
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-            <TabsTrigger value="locks">Locks</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto overscroll-x-contain pb-1">
+            <TabsList className="grid h-auto w-full min-w-[20rem] grid-cols-2 gap-1 sm:inline-flex sm:w-fit sm:grid-cols-none">
+              <TabsTrigger value="dashboard" className="px-3 py-2">Dashboard</TabsTrigger>
+              <TabsTrigger value="users" className="px-3 py-2">Users</TabsTrigger>
+              <TabsTrigger value="settings" className="px-3 py-2">Settings</TabsTrigger>
+              <TabsTrigger value="locks" className="px-3 py-2">Locks</TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="dashboard" className="space-y-4 mt-4">
-            <div className="grid gap-4 md:grid-cols-3">
+          <TabsContent value="dashboard" className="mt-4 space-y-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
               <Card>
                 <CardHeader className="pb-2"><CardDescription>Active Shipments</CardDescription></CardHeader>
                 <CardContent><p className="text-3xl font-bold">{dashboard?.stats.activeShipments ?? 0}</p></CardContent>
@@ -191,76 +193,80 @@ export default function AdminPage() {
             <Card>
               <CardHeader><CardTitle>Recent Scans</CardTitle></CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Shipment</TableHead>
-                      <TableHead>Pallet</TableHead>
-                      <TableHead>Operator</TableHead>
-                      <TableHead>Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {dashboard?.recentScans.map((s) => (
-                      <TableRow key={s.id}>
-                        <TableCell>{s.shipment.shipmentNumber}</TableCell>
-                        <TableCell>{s.palletIndex}</TableCell>
-                        <TableCell>{s.user.name ?? s.user.email}</TableCell>
-                        <TableCell>{new Date(s.createdAt).toLocaleString()}</TableCell>
+                <ResponsiveTable>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Shipment</TableHead>
+                        <TableHead>Pallet</TableHead>
+                        <TableHead>Operator</TableHead>
+                        <TableHead>Time</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {dashboard?.recentScans.map((s) => (
+                        <TableRow key={s.id}>
+                          <TableCell>{s.shipment.shipmentNumber}</TableCell>
+                          <TableCell>{s.palletIndex}</TableCell>
+                          <TableCell>{s.user.name ?? s.user.email}</TableCell>
+                          <TableCell>{new Date(s.createdAt).toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ResponsiveTable>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="users" className="space-y-4 mt-4">
+          <TabsContent value="users" className="mt-4 space-y-4">
             <Card>
               <CardHeader><CardTitle>Create User</CardTitle></CardHeader>
-              <CardContent className="grid gap-3 md:grid-cols-2">
-                <div><Label>Email</Label><Input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} /></div>
-                <div><Label>Name</Label><Input value={newName} onChange={(e) => setNewName(e.target.value)} /></div>
-                <div><Label>Password</Label><Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></div>
-                <div>
+              <CardContent className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1.5"><Label>Email</Label><Input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} className="h-11" /></div>
+                <div className="space-y-1.5"><Label>Name</Label><Input value={newName} onChange={(e) => setNewName(e.target.value)} className="h-11" /></div>
+                <div className="space-y-1.5"><Label>Password</Label><Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-11" /></div>
+                <div className="space-y-1.5">
                   <Label>Role</Label>
-                  <select className="flex h-9 w-full rounded-md border px-3" value={newRole} onChange={(e) => setNewRole(e.target.value as "OPERATOR" | "ADMIN")}>
+                  <select className="flex h-11 w-full rounded-md border border-input bg-background px-3" value={newRole} onChange={(e) => setNewRole(e.target.value as "OPERATOR" | "ADMIN")}>
                     <option value="OPERATOR">Operator</option>
                     <option value="ADMIN">Admin</option>
                   </select>
                 </div>
-                <Button onClick={createUser} className="md:col-span-2">Create User</Button>
+                <Button onClick={createUser} className="h-11 sm:col-span-2">Create User</Button>
               </CardContent>
             </Card>
             <Card>
               <CardHeader><CardTitle>Users</CardTitle></CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((u) => (
-                      <TableRow key={u.id}>
-                        <TableCell>{u.email}</TableCell>
-                        <TableCell>{u.name}</TableCell>
-                        <TableCell><Badge variant="outline">{u.role}</Badge></TableCell>
-                        <TableCell>{u.enabled ? "Enabled" : "Disabled"}</TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" onClick={() => toggleUser(u.id, u.enabled)}>
-                            {u.enabled ? "Disable" : "Enable"}
-                          </Button>
-                        </TableCell>
+                <ResponsiveTable>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((u) => (
+                        <TableRow key={u.id}>
+                          <TableCell>{u.email}</TableCell>
+                          <TableCell>{u.name}</TableCell>
+                          <TableCell><Badge variant="outline">{u.role}</Badge></TableCell>
+                          <TableCell>{u.enabled ? "Enabled" : "Disabled"}</TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" onClick={() => toggleUser(u.id, u.enabled)}>
+                              {u.enabled ? "Disable" : "Enable"}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ResponsiveTable>
               </CardContent>
             </Card>
           </TabsContent>
@@ -268,13 +274,13 @@ export default function AdminPage() {
           <TabsContent value="settings" className="mt-4">
             <Card>
               <CardHeader><CardTitle>App Settings</CardTitle></CardHeader>
-              <CardContent className="space-y-4 max-w-lg">
-                <div><Label>Admin Override PIN (leave blank to keep current)</Label><Input type="password" value={adminPin} onChange={(e) => setAdminPin(e.target.value)} /></div>
-                <div><Label>Email From Name</Label><Input value={emailFromName} onChange={(e) => setEmailFromName(e.target.value)} /></div>
-                <div><Label>Email From Address</Label><Input value={emailFromAddress} onChange={(e) => setEmailFromAddress(e.target.value)} /></div>
-                <div><Label>Email CC List (comma-separated)</Label><Input value={emailCcList} onChange={(e) => setEmailCcList(e.target.value)} /></div>
-                <div><Label>Lock Timeout (minutes)</Label><Input type="number" value={lockTimeout} onChange={(e) => setLockTimeout(e.target.value)} /></div>
-                <Button onClick={saveSettings}>Save Settings</Button>
+              <CardContent className="max-w-lg space-y-4">
+                <div className="space-y-1.5"><Label>Admin Override PIN (leave blank to keep current)</Label><Input type="password" value={adminPin} onChange={(e) => setAdminPin(e.target.value)} className="h-11" /></div>
+                <div className="space-y-1.5"><Label>Email From Name</Label><Input value={emailFromName} onChange={(e) => setEmailFromName(e.target.value)} className="h-11" /></div>
+                <div className="space-y-1.5"><Label>Email From Address</Label><Input value={emailFromAddress} onChange={(e) => setEmailFromAddress(e.target.value)} className="h-11" /></div>
+                <div className="space-y-1.5"><Label>Email CC List (comma-separated)</Label><Input value={emailCcList} onChange={(e) => setEmailCcList(e.target.value)} className="h-11" /></div>
+                <div className="space-y-1.5"><Label>Lock Timeout (minutes)</Label><Input type="number" value={lockTimeout} onChange={(e) => setLockTimeout(e.target.value)} className="h-11" /></div>
+                <Button onClick={saveSettings} className="h-11 w-full sm:w-auto">Save Settings</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -283,34 +289,36 @@ export default function AdminPage() {
             <Card>
               <CardHeader><CardTitle>Locked Shipments</CardTitle></CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Shipment</TableHead>
-                      <TableHead>Locked By</TableHead>
-                      <TableHead>Since</TableHead>
-                      <TableHead>Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {dashboard?.lockedShipments.length === 0 ? (
-                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No active locks</TableCell></TableRow>
-                    ) : (
-                      dashboard?.lockedShipments.map((s) => (
-                        <TableRow key={s.id}>
-                          <TableCell>{s.shipmentNumber}</TableCell>
-                          <TableCell>{s.lockedBy?.name ?? s.lockedBy?.email}</TableCell>
-                          <TableCell>{s.lockedAt ? new Date(s.lockedAt).toLocaleString() : "—"}</TableCell>
-                          <TableCell>
-                            <Button size="sm" variant="destructive" onClick={() => forceRelease(s.shipmentNumber)}>
-                              Force Release
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                <ResponsiveTable>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Shipment</TableHead>
+                        <TableHead>Locked By</TableHead>
+                        <TableHead>Since</TableHead>
+                        <TableHead>Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {dashboard?.lockedShipments.length === 0 ? (
+                        <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No active locks</TableCell></TableRow>
+                      ) : (
+                        dashboard?.lockedShipments.map((s) => (
+                          <TableRow key={s.id}>
+                            <TableCell>{s.shipmentNumber}</TableCell>
+                            <TableCell>{s.lockedBy?.name ?? s.lockedBy?.email}</TableCell>
+                            <TableCell>{s.lockedAt ? new Date(s.lockedAt).toLocaleString() : "—"}</TableCell>
+                            <TableCell>
+                              <Button size="sm" variant="destructive" onClick={() => forceRelease(s.shipmentNumber)}>
+                                Force Release
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </ResponsiveTable>
               </CardContent>
             </Card>
           </TabsContent>

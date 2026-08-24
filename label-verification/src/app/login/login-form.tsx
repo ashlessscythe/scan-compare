@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function LoginForm() {
   const router = useRouter();
@@ -42,10 +43,13 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <div className="relative flex min-h-dvh items-center justify-center p-4">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Tesla Scan Verification</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl">Tesla Scan Verification</CardTitle>
           <CardDescription>Sign in with your email and password</CardDescription>
         </CardHeader>
         <CardContent>
@@ -62,8 +66,9 @@ export function LoginForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="text-lg h-12"
+                className="h-12 text-base sm:text-lg"
                 autoFocus
+                autoComplete="email"
                 required
               />
             </div>
@@ -74,11 +79,12 @@ export function LoginForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="text-lg h-12"
+                className="h-12 text-base sm:text-lg"
+                autoComplete="current-password"
                 required
               />
             </div>
-            <Button type="submit" className="w-full h-12 text-lg" disabled={loading}>
+            <Button type="submit" className="h-12 w-full text-base sm:text-lg" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
