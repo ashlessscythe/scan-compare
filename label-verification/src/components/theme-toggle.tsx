@@ -2,14 +2,13 @@
 
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
-import { Monitor, Moon, Palette, Sun, Zap } from "lucide-react";
+import { Check, Monitor, Moon, Palette, Sun, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { APP_THEMES, THEME_LABELS, type AppTheme } from "@/lib/themes";
@@ -47,19 +46,20 @@ export function ThemeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-44">
         <DropdownMenuLabel>Theme</DropdownMenuLabel>
-        <DropdownMenuRadioGroup
-          value={current}
-          onValueChange={(value) => {
-            if (value) setTheme(value);
-          }}
-        >
-          {APP_THEMES.map((name) => (
-            <DropdownMenuRadioItem key={name} value={name} className="gap-2">
+        {APP_THEMES.map((name) => {
+          const selected = current === name;
+          return (
+            <DropdownMenuItem
+              key={name}
+              className="gap-2"
+              onClick={() => setTheme(name)}
+            >
               {THEME_ICONS[name]}
-              {THEME_LABELS[name]}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
+              <span className="flex-1">{THEME_LABELS[name]}</span>
+              {selected ? <Check className="size-4 opacity-100" /> : <span className="size-4" />}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );
