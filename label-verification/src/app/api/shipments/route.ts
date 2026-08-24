@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   const { shipmentNumber, totalPallets } = parsed.data;
 
   try {
-    let shipment = await getShipmentByNumber(shipmentNumber);
+    const shipment = await getShipmentByNumber(shipmentNumber);
 
     if (shipment?.status === "COMPLETE") {
       return Response.json({
