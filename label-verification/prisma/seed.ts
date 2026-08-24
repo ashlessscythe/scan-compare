@@ -2,6 +2,16 @@ import bcrypt from "bcryptjs";
 import { PrismaClient, Role } from "@prisma/client";
 
 const prisma = new PrismaClient();
+const clear = process.argv.includes("--clear");
+
+async function clearAll() {
+  // FK-safe order: scans → shipments → users → settings
+  await prisma.scan.deleteMany();
+  await prisma.shipment.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.appSettings.deleteMany();
+  console.log("Cleared all scans, shipments, users, and app settings.");
+}
 
 async function main() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
@@ -9,7 +19,13 @@ async function main() {
   const operatorEmail = process.env.SEED_OPERATOR_EMAIL ?? "operator@example.com";
   const operatorPassword = process.env.SEED_OPERATOR_PASSWORD ?? "Operator123!";
 
+  if (clear) {
+    await clearAll();
+  }
+
   const adminPinHash = await bcrypt.hash("3333", 12);
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
+  const operatorPasswordHash = await bcrypt.hash(operatorPassword, 12);
 
   await prisma.appSettings.upsert({
     where: { id: "singleton" },
@@ -31,7 +47,7 @@ async function main() {
       email: adminEmail,
       name: "Admin",
       role: Role.ADMIN,
-      passwordHash: await bcrypt.hash(adminPassword, 12),
+      passwordHash: adminPasswordHash,
       enabled: true,
     },
   });
@@ -43,12 +59,12 @@ async function main() {
       email: operatorEmail,
       name: "Sample Operator",
       role: Role.OPERATOR,
-      passwordHash: await bcrypt.hash(operatorPassword, 12),
+      passwordHash: operatorPasswordHash,
       enabled: true,
     },
   });
 
-  console.log("Seed complete:");
+  console.log(clear ? "Seed complete (after clear):" : "Seed complete:");
   console.log(`  Admin:    ${adminEmail} / ${adminPassword}`);
   console.log(`  Operator: ${operatorEmail} / ${operatorPassword}`);
   console.log("  Default admin PIN: 3333");
