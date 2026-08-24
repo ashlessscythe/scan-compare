@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   AppHeader,
   HeaderLogoutButton,
+  HeaderMenuButton,
   HeaderNavLink,
 } from "@/components/app-header";
 import { ResponsiveTable } from "@/components/responsive-table";
@@ -23,6 +24,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+
+const ADMIN_SECTIONS = [
+  { value: "dashboard", label: "Dashboard" },
+  { value: "users", label: "Users" },
+  { value: "settings", label: "Settings" },
+  { value: "locks", label: "Locks" },
+] as const;
+
+type AdminSection = (typeof ADMIN_SECTIONS)[number]["value"];
 
 type User = {
   id: string;
@@ -58,6 +68,7 @@ type Settings = {
 };
 
 export default function AdminPage() {
+  const [section, setSection] = useState<AdminSection>("dashboard");
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -165,18 +176,51 @@ export default function AdminPage() {
             <HeaderLogoutButton onClick={() => signOut({ callbackUrl: "/login" })} />
           </>
         }
+        mobileMenuExtras={
+          <div className="mb-2 flex flex-col gap-2 border-b pb-3">
+            <p className="px-1 text-xs font-medium text-muted-foreground">Sections</p>
+            {ADMIN_SECTIONS.map((item) => (
+              <HeaderMenuButton
+                key={item.value}
+                active={section === item.value}
+                onClick={() => setSection(item.value)}
+              >
+                {item.label}
+              </HeaderMenuButton>
+            ))}
+          </div>
+        }
       />
 
       <main className="app-main">
-        <Tabs defaultValue="dashboard">
-          <div className="overflow-x-auto overscroll-x-contain pb-1">
-            <TabsList className="grid h-auto w-full min-w-[20rem] grid-cols-2 gap-1 sm:inline-flex sm:w-fit sm:grid-cols-none">
-              <TabsTrigger value="dashboard" className="px-3 py-2">Dashboard</TabsTrigger>
-              <TabsTrigger value="users" className="px-3 py-2">Users</TabsTrigger>
-              <TabsTrigger value="settings" className="px-3 py-2">Settings</TabsTrigger>
-              <TabsTrigger value="locks" className="px-3 py-2">Locks</TabsTrigger>
+        <Tabs value={section} onValueChange={(value) => setSection(value as AdminSection)}>
+          {/* Desktop / tablet: single-row horizontal tabs */}
+          <div className="hidden overflow-x-auto overscroll-x-contain sm:block">
+            <TabsList className="inline-flex h-9 w-max min-w-full justify-start gap-1 sm:min-w-0">
+              {ADMIN_SECTIONS.map((item) => (
+                <TabsTrigger key={item.value} value={item.value} className="px-3">
+                  {item.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </div>
+
+          {/* Mobile: compact section picker (avoids the clipped 2×2 tab grid) */}
+          <label className="flex flex-col gap-1.5 sm:hidden">
+            <span className="text-xs font-medium text-muted-foreground">Section</span>
+            <select
+              className="flex h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
+              value={section}
+              onChange={(e) => setSection(e.target.value as AdminSection)}
+              aria-label="Admin section"
+            >
+              {ADMIN_SECTIONS.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <TabsContent value="dashboard" className="mt-4 space-y-4">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
