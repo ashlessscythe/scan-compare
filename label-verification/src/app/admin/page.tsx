@@ -87,7 +87,10 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    loadAll();
+    const timer = setTimeout(() => {
+      void loadAll();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   async function createUser() {
