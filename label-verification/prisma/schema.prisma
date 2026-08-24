@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  OPERATOR
+  ADMIN
+}
+
+enum ShipmentStatus {
+  IN_PROGRESS
+  COMPLETE
+}
+
+model User {
+  id               String     @id @default(cuid())
+  email            String     @unique
+  passwordHash     String
+  name             String?
+  role             Role       @default(OPERATOR)
+  enabled          Boolean    @default(true)
+  lastLogin        DateTime?
+  scans            Scan[]
+  lockedShipments  Shipment[] @relation("ShipmentLock")
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+model Shipment {
+  id              String         @id @default(cuid())
+  shipmentNumber  Int            @unique
+  status          ShipmentStatus @default(IN_PROGRESS)
+  totalPallets    Int
+  scannedPallets  Int            @default(0)
+  scans           Scan[]
+  lockedByUserId  String?
+  lockedBy        User?          @relation("ShipmentLock", fields: [lockedByUserId], references: [id], onDelete: SetNull)
+  lockedAt        DateTime?
+  lockExpiresAt   DateTime?
+  createdAt       DateTime       @default(now())
+  completedAt     DateTime?
+  createdByUserId String
+}
+
+model Scan {
+  id          String   @id @default(cuid())
+  shipmentId  String
+  shipment    Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  palletIndex Int
+  qrOrig      String
+  qrNew       String
+  pnOrig      String
+  pnNew       String
+  scan1       String
+  scan2       String
+  scan3       String
+  scan4       String
+  result      String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  userUnblock String?
+  createdAt   DateTime @default(now())
+
+  @@index([qrOrig])
+  @@index([qrNew])
+  @@index([shipmentId])
+}
+
+model AppSettings {
+  id                 String   @id @default("singleton")
+  adminPinHash       String
+  emailFromName      String   @default("Tesla Scan")
+  emailFromAddress   String   @default("no-reply@example.com")
+  emailCcList        String[]
+  lockTimeoutMinutes Int      @default(30)
+  updatedAt          DateTime @updatedAt
+  updatedByUserId    String?
+}

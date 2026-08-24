@@ -1,0 +1,383 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { toast } from "sonner";
+import { ShipmentDialog } from "@/components/scan/shipment-dialog";
+import { LargeQrDialog } from "@/components/scan/large-qr-dialog";
+import { AdminPinDialog } from "@/components/scan/admin-pin-dialog";
+import { useLockHeartbeat, useReleaseLockOnUnload } from "@/hooks/use-shipment-lock";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  validateSmallQrPair,
+  extractPartNumber,
+  normalizeScanInput,
+} from "@/lib/barcode";
+
+type ScanRecord = {
+  id: string;
+  palletIndex: number;
+  pnOrig: string;
+  pnNew: string;
+  result: string;
+  createdAt: string;
+  user: { email: string; name: string | null };
+};
+
+type ShipmentData = {
+  id: string;
+  shipmentNumber: number;
+  status: string;
+  totalPallets: number;
+  scannedPallets: number;
+  scans: ScanRecord[];
+  lockedBy?: { email: string; name: string | null } | null;
+};
+
+export default function ScanPage() {
+  const { data: session } = useSession();
+  const [dialogOpen, setDialogOpen] = useState(true);
+  const [shipment, setShipment] = useState<ShipmentData | null>(null);
+  const [viewOnly, setViewOnly] = useState(false);
+  const [qrOrig, setQrOrig] = useState("");
+  const [qrNew, setQrNew] = useState("");
+  const [largeQrOpen, setLargeQrOpen] = useState(false);
+  const [pendingScans, setPendingScans] = useState<{ orig: string; new: string; pn: string } | null>(null);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [pendingLargeScans, setPendingLargeScans] = useState<[string, string, string, string] | null>(null);
+  const [pendingMessage, setPendingMessage] = useState("");
+
+  const origRef = useRef<HTMLInputElement>(null);
+  const newRef = useRef<HTMLInputElement>(null);
+
+  const lockEnabled = !!shipment && shipment.status === "IN_PROGRESS" && !viewOnly;
+  useLockHeartbeat(shipment?.shipmentNumber ?? null, lockEnabled);
+  useReleaseLockOnUnload(shipment?.shipmentNumber ?? null, lockEnabled);
+
+  const refreshShipment = useCallback(async (num: number) => {
+    const res = await fetch(`/api/shipments/${num}`);
+    if (res.ok) {
+      const data = await res.json();
+      setShipment(data.shipment);
+    }
+  }, []);
+
+  function handleStart(shipmentNumber: number, totalPallets: number, mode: string) {
+    fetch(`/api/shipments/${shipmentNumber}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.shipment) {
+          setShipment(data.shipment);
+          setViewOnly(mode === "complete" || data.shipment.status === "COMPLETE");
+          setDialogOpen(false);
+          if (mode !== "complete" && data.shipment.status !== "COMPLETE") {
+            setTimeout(() => origRef.current?.focus(), 100);
+          }
+        }
+      });
+  }
+
+  useEffect(() => {
+    if (shipment && !viewOnly) {
+      origRef.current?.focus();
+    }
+  }, [shipment, viewOnly]);
+
+  async function checkDuplicate(code: string) {
+    const res = await fetch(`/api/scans?code=${encodeURIComponent(code)}`);
+    const data = await res.json();
+    return data.exists as boolean;
+  }
+
+  async function handleOrigBlur() {
+    const code = normalizeScanInput(qrOrig);
+    if (!code) return;
+    const exists = await checkDuplicate(code);
+    if (exists) {
+      toast.error("Scan already in database");
+      setQrOrig("");
+      origRef.current?.focus();
+    }
+  }
+
+  async function handleNewBlur() {
+    const code = normalizeScanInput(qrNew);
+    if (!code) return;
+    const exists = await checkDuplicate(code);
+    if (exists) {
+      toast.error("Scan already in database");
+      setQrNew("");
+      newRef.current?.focus();
+    }
+  }
+
+  function handleNext() {
+    const orig = normalizeScanInput(qrOrig);
+    const portal = normalizeScanInput(qrNew);
+    const result = validateSmallQrPair(orig, portal);
+
+    if (!result.valid) {
+      toast.error(result.message);
+      origRef.current?.focus();
+      return;
+    }
+
+    const pn = extractPartNumber(orig)!;
+    setPendingScans({ orig, new: portal, pn });
+    setLargeQrOpen(true);
+  }
+
+  async function submitScan(
+    largeScans: [string, string, string, string],
+    message: string,
+    userUnblock?: string,
+  ) {
+    if (!shipment || !pendingScans) return;
+
+    const res = await fetch("/api/scans", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        shipmentNumber: shipment.shipmentNumber,
+        qrOrig: pendingScans.orig,
+        qrNew: pendingScans.new,
+        scan1: largeScans[0],
+        scan2: largeScans[1],
+        scan3: largeScans[2],
+        scan4: largeScans[3],
+        userUnblock,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.status === 409) {
+      setPendingLargeScans(largeScans);
+      setPendingMessage(message);
+      setPinOpen(true);
+      setLargeQrOpen(false);
+      return;
+    }
+
+    if (!res.ok) {
+      toast.error(data.error ?? "Failed to save scan");
+      return;
+    }
+
+    toast.success(message);
+    setQrOrig("");
+    setQrNew("");
+    setPendingScans(null);
+    setLargeQrOpen(false);
+    setShipment(data.shipment);
+
+    if (data.complete) {
+      toast.success("Scanning complete! You can download or email the report.");
+      setViewOnly(true);
+    } else {
+      origRef.current?.focus();
+    }
+  }
+
+  function handlePinApproved(adminEmail: string) {
+    if (pendingLargeScans && pendingMessage) {
+      submitScan(pendingLargeScans, pendingMessage, adminEmail);
+      setPendingLargeScans(null);
+      setPendingMessage("");
+    }
+  }
+
+  async function downloadPdf() {
+    if (!shipment) return;
+    window.open(`/api/reports/${shipment.shipmentNumber}/pdf`, "_blank");
+  }
+
+  async function emailPdf() {
+    if (!shipment) return;
+    const res = await fetch(`/api/reports/${shipment.shipmentNumber}/email`, { method: "POST" });
+    if (res.ok) {
+      toast.success("Email sent");
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Failed to send email");
+    }
+  }
+
+  async function handleLogout() {
+    if (shipment && lockEnabled) {
+      await fetch(`/api/shipments/${shipment.shipmentNumber}/lock`, { method: "DELETE" });
+    }
+    signOut({ callbackUrl: "/login" });
+  }
+
+  const progress = shipment
+    ? Math.round((shipment.scannedPallets / shipment.totalPallets) * 100)
+    : 0;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b bg-card">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+          <div>
+            <h1 className="text-xl font-semibold">Tesla Scan Verification</h1>
+            <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
+          </div>
+          <div className="flex gap-2">
+            {session?.user?.role === "ADMIN" && (
+              <Link
+                href="/admin"
+                className="inline-flex h-8 items-center justify-center rounded-lg border border-border px-2.5 text-sm font-medium hover:bg-muted"
+              >
+                Admin
+              </Link>
+            )}
+            <Button variant="outline" onClick={handleLogout}>Logout</Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-5xl space-y-6 p-4">
+        {shipment && (
+          <>
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">
+                    Shipment {shipment.shipmentNumber}
+                  </CardTitle>
+                  <Badge variant={shipment.status === "COMPLETE" ? "default" : "secondary"}>
+                    {shipment.status === "COMPLETE" ? "Complete" : "In Progress"}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span>Pallets: {shipment.scannedPallets} / {shipment.totalPallets}</span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress value={progress} className="h-3" />
+              </CardContent>
+            </Card>
+
+            {!viewOnly && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Scan Small QR Codes</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Original Label (small QR)</Label>
+                    <Input
+                      ref={origRef}
+                      value={qrOrig}
+                      onChange={(e) => setQrOrig(e.target.value)}
+                      onBlur={handleOrigBlur}
+                      onFocus={(e) => e.target.select()}
+                      onKeyDown={(e) => e.key === "Enter" && newRef.current?.focus()}
+                      className="text-lg h-12 font-mono"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Portal Label (small QR)</Label>
+                    <Input
+                      ref={newRef}
+                      value={qrNew}
+                      onChange={(e) => setQrNew(e.target.value)}
+                      onBlur={handleNewBlur}
+                      onFocus={(e) => e.target.select()}
+                      onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                      className="text-lg h-12 font-mono"
+                    />
+                  </div>
+                  <Button onClick={handleNext} className="w-full h-12 text-lg">
+                    Next — Scan Large Labels
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {(viewOnly || shipment.status === "COMPLETE") && (
+              <Card>
+                <CardContent className="flex gap-3 pt-6">
+                  <Button onClick={downloadPdf} className="flex-1 h-12">Download PDF</Button>
+                  <Button onClick={emailPdf} variant="outline" className="flex-1 h-12">Email PDF</Button>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Scan History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>#</TableHead>
+                      <TableHead>PN Orig</TableHead>
+                      <TableHead>PN New</TableHead>
+                      <TableHead>Result</TableHead>
+                      <TableHead>Operator</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {shipment.scans.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground">
+                          No scans yet
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      shipment.scans.map((scan) => (
+                        <TableRow key={scan.id}>
+                          <TableCell>{scan.palletIndex}</TableCell>
+                          <TableCell className="font-mono text-xs">{scan.pnOrig}</TableCell>
+                          <TableCell className="font-mono text-xs">{scan.pnNew}</TableCell>
+                          <TableCell className="text-xs">{scan.result}</TableCell>
+                          <TableCell className="text-xs">{scan.user.name ?? scan.user.email}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </main>
+
+      <ShipmentDialog
+        open={dialogOpen && !shipment}
+        onOpenChange={setDialogOpen}
+        onStart={handleStart}
+      />
+
+      <LargeQrDialog
+        open={largeQrOpen}
+        partNumber={pendingScans?.pn ?? ""}
+        onClose={() => setLargeQrOpen(false)}
+        onSuccess={(scans, message) => submitScan(scans, message)}
+      />
+
+      <AdminPinDialog
+        open={pinOpen}
+        onOpenChange={setPinOpen}
+        onApproved={handlePinApproved}
+      />
+    </div>
+  );
+}

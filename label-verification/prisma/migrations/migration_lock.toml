@@ -1,0 +1,13 @@
+# Prisma migrations
+
+This directory contains database migrations. Apply with:
+
+```bash
+npx prisma migrate deploy
+```
+
+For local development:
+
+```bash
+npx prisma migrate dev
+```
