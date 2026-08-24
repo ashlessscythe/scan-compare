@@ -2,11 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import Link from "next/link";
 import { toast } from "sonner";
 import { ShipmentDialog } from "@/components/scan/shipment-dialog";
 import { LargeQrDialog } from "@/components/scan/large-qr-dialog";
 import { AdminPinDialog } from "@/components/scan/admin-pin-dialog";
+import {
+  AppHeader,
+  HeaderLogoutButton,
+  HeaderNavLink,
+} from "@/components/app-header";
+import { ResponsiveTable } from "@/components/responsive-table";
 import { useLockHeartbeat, useReleaseLockOnUnload } from "@/hooks/use-shipment-lock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -229,34 +234,27 @@ export default function ScanPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div>
-            <h1 className="text-xl font-semibold">Tesla Scan Verification</h1>
-            <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
-          </div>
-          <div className="flex gap-2">
+    <div className="app-page">
+      <AppHeader
+        title="Tesla Scan Verification"
+        subtitle={session?.user?.email}
+        actions={
+          <>
             {session?.user?.role === "ADMIN" && (
-              <Link
-                href="/admin"
-                className="inline-flex h-8 items-center justify-center rounded-lg border border-border px-2.5 text-sm font-medium hover:bg-muted"
-              >
-                Admin
-              </Link>
+              <HeaderNavLink href="/admin">Admin</HeaderNavLink>
             )}
-            <Button variant="outline" onClick={handleLogout}>Logout</Button>
-          </div>
-        </div>
-      </header>
+            <HeaderLogoutButton onClick={handleLogout} />
+          </>
+        }
+      />
 
-      <main className="mx-auto max-w-5xl space-y-6 p-4">
+      <main className="app-main max-w-5xl">
         {shipment && (
           <>
             <Card>
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <CardTitle className="text-base sm:text-lg">
                     Shipment {shipment.shipmentNumber}
                   </CardTitle>
                   <Badge variant={shipment.status === "COMPLETE" ? "default" : "secondary"}>
@@ -276,7 +274,7 @@ export default function ScanPage() {
             {!viewOnly && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Scan Small QR Codes</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">Scan Small QR Codes</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -288,7 +286,11 @@ export default function ScanPage() {
                       onBlur={handleOrigBlur}
                       onFocus={(e) => e.target.select()}
                       onKeyDown={(e) => e.key === "Enter" && newRef.current?.focus()}
-                      className="text-lg h-12 font-mono"
+                      inputMode="text"
+                      autoComplete="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      className="h-12 text-base font-mono sm:text-lg"
                     />
                   </div>
                   <div className="space-y-2">
@@ -300,10 +302,14 @@ export default function ScanPage() {
                       onBlur={handleNewBlur}
                       onFocus={(e) => e.target.select()}
                       onKeyDown={(e) => e.key === "Enter" && handleNext()}
-                      className="text-lg h-12 font-mono"
+                      inputMode="text"
+                      autoComplete="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      className="h-12 text-base font-mono sm:text-lg"
                     />
                   </div>
-                  <Button onClick={handleNext} className="w-full h-12 text-lg">
+                  <Button onClick={handleNext} className="h-12 w-full text-base sm:text-lg">
                     Next — Scan Large Labels
                   </Button>
                 </CardContent>
@@ -312,48 +318,50 @@ export default function ScanPage() {
 
             {(viewOnly || shipment.status === "COMPLETE") && (
               <Card>
-                <CardContent className="flex gap-3 pt-6">
-                  <Button onClick={downloadPdf} className="flex-1 h-12">Download PDF</Button>
-                  <Button onClick={emailPdf} variant="outline" className="flex-1 h-12">Email PDF</Button>
+                <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row">
+                  <Button onClick={downloadPdf} className="h-12 flex-1">Download PDF</Button>
+                  <Button onClick={emailPdf} variant="outline" className="h-12 flex-1">Email PDF</Button>
                 </CardContent>
               </Card>
             )}
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Scan History</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Scan History</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>#</TableHead>
-                      <TableHead>PN Orig</TableHead>
-                      <TableHead>PN New</TableHead>
-                      <TableHead>Result</TableHead>
-                      <TableHead>Operator</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {shipment.scans.length === 0 ? (
+                <ResponsiveTable>
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground">
-                          No scans yet
-                        </TableCell>
+                        <TableHead>#</TableHead>
+                        <TableHead>PN Orig</TableHead>
+                        <TableHead>PN New</TableHead>
+                        <TableHead>Result</TableHead>
+                        <TableHead>Operator</TableHead>
                       </TableRow>
-                    ) : (
-                      shipment.scans.map((scan) => (
-                        <TableRow key={scan.id}>
-                          <TableCell>{scan.palletIndex}</TableCell>
-                          <TableCell className="font-mono text-xs">{scan.pnOrig}</TableCell>
-                          <TableCell className="font-mono text-xs">{scan.pnNew}</TableCell>
-                          <TableCell className="text-xs">{scan.result}</TableCell>
-                          <TableCell className="text-xs">{scan.user.name ?? scan.user.email}</TableCell>
+                    </TableHeader>
+                    <TableBody>
+                      {shipment.scans.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center text-muted-foreground">
+                            No scans yet
+                          </TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                      ) : (
+                        shipment.scans.map((scan) => (
+                          <TableRow key={scan.id}>
+                            <TableCell>{scan.palletIndex}</TableCell>
+                            <TableCell className="font-mono text-xs">{scan.pnOrig}</TableCell>
+                            <TableCell className="font-mono text-xs">{scan.pnNew}</TableCell>
+                            <TableCell className="text-xs">{scan.result}</TableCell>
+                            <TableCell className="text-xs">{scan.user.name ?? scan.user.email}</TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </ResponsiveTable>
               </CardContent>
             </Card>
           </>

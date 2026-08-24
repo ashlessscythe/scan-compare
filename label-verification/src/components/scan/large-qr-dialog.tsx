@@ -85,8 +85,12 @@ export function LargeQrDialog({ open, partNumber, onClose, onSuccess }: LargeQrD
                 onChange={(e) => updateScan(i, e.target.value)}
                 onFocus={handleFocus}
                 onKeyDown={(e) => handleKeyDown(i, e)}
-                className="text-lg h-12 font-mono"
+                className="h-12 font-mono text-base sm:text-lg"
                 autoFocus={i === 0}
+                inputMode="text"
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck={false}
               />
             </div>
           ))}
@@ -96,9 +100,9 @@ export function LargeQrDialog({ open, partNumber, onClose, onSuccess }: LargeQrD
             </Alert>
           )}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={validateAndSubmit}>Verify Labels</Button>
+        <DialogFooter className="flex-col gap-2 sm:flex-row">
+          <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">Cancel</Button>
+          <Button onClick={validateAndSubmit} className="h-11 w-full sm:w-auto">Verify Labels</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
