@@ -115,7 +115,7 @@ export default function AdminPage() {
       void loadAll();
     }, 0);
     return () => clearTimeout(timer);
-  }, []);
+  }, [session?.user?.activeSiteId]);
 
   async function createUser() {
     const res = await fetch("/api/admin/users", {
