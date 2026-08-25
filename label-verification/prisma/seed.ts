@@ -1,7 +1,15 @@
+import dotenv from "dotenv";
+dotenv.config({ quiet: true });
+
 import bcrypt from "bcryptjs";
 import { PrismaClient, Role } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// Prefer direct (non-pooled) URL for CLI seed — same as Prisma Migrate.
+const prisma = new PrismaClient({
+  datasources: {
+    db: { url: process.env.DIRECT_URL ?? process.env.DATABASE_URL },
+  },
+});
 const clear = process.argv.includes("--clear");
 
 async function clearAll() {
