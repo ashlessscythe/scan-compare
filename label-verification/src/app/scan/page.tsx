@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
@@ -73,14 +73,6 @@ export default function ScanPage() {
   const lockEnabled = !!shipment && shipment.status === "IN_PROGRESS" && !viewOnly;
   useLockHeartbeat(shipment?.shipmentNumber ?? null, lockEnabled);
   useReleaseLockOnUnload(shipment?.shipmentNumber ?? null, lockEnabled);
-
-  const refreshShipment = useCallback(async (num: number) => {
-    const res = await fetch(`/api/shipments/${num}`);
-    if (res.ok) {
-      const data = await res.json();
-      setShipment(data.shipment);
-    }
-  }, []);
 
   function handleStart(shipmentNumber: number, _totalPallets: number, mode: string) {
     fetch(`/api/shipments/${shipmentNumber}`)

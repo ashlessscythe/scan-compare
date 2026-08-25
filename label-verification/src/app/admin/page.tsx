@@ -79,7 +79,6 @@ export default function AdminPage() {
   const [section, setSection] = useState<AdminSection>("dashboard");
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [users, setUsers] = useState<User[]>([]);
-  const [settings, setSettings] = useState<Settings | null>(null);
 
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
@@ -102,12 +101,13 @@ export default function AdminPage() {
     const usersData = await usersRes.json();
     setUsers(usersData.users ?? []);
     const settingsData = await settingsRes.json();
-    const s = settingsData.settings;
-    setSettings(s);
-    setEmailFromName(s.emailFromName);
-    setEmailFromAddress(s.emailFromAddress);
-    setEmailCcList(s.emailCcList.join(", "));
-    setLockTimeout(String(s.lockTimeoutMinutes));
+    const s = settingsData.settings as Settings | undefined;
+    if (s) {
+      setEmailFromName(s.emailFromName);
+      setEmailFromAddress(s.emailFromAddress);
+      setEmailCcList(s.emailCcList.join(", "));
+      setLockTimeout(String(s.lockTimeoutMinutes));
+    }
   }
 
   useEffect(() => {
