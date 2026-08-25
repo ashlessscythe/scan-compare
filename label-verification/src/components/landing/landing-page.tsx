@@ -9,8 +9,9 @@ type LandingPageProps = {
 };
 
 export function LandingPage({ isAuthenticated }: LandingPageProps) {
-  const primaryHref = isAuthenticated ? "/scan" : "/login";
-  const primaryLabel = isAuthenticated ? "Go to app" : "Log in";
+  const primaryHref = isAuthenticated ? "/scan" : "/register";
+  const primaryLabel = isAuthenticated ? "Go to app" : "Get Started";
+  const secondaryHref = "/login";
 
   return (
     <div className="landing-page relative flex min-h-dvh flex-col overflow-x-hidden">
@@ -18,6 +19,14 @@ export function LandingPage({ isAuthenticated }: LandingPageProps) {
 
       <header className="relative z-20 flex items-center justify-end gap-2 px-4 py-3 sm:px-6 sm:py-4">
         <ThemeToggle />
+        {!isAuthenticated && (
+          <Link
+            href={secondaryHref}
+            className={cn(buttonVariants({ variant: "ghost" }), "h-10 px-4 text-sm sm:h-9")}
+          >
+            Log in
+          </Link>
+        )}
         <Link
           href={primaryHref}
           className={cn(
