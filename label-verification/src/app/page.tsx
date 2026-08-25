@@ -1,5 +1,7 @@
-import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { LandingPage } from "@/components/landing/landing-page";
 
-export default function Home() {
-  redirect("/scan");
+export default async function Home() {
+  const session = await auth();
+  return <LandingPage isAuthenticated={Boolean(session?.user)} />;
 }

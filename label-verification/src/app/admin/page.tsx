@@ -173,7 +173,7 @@ export default function AdminPage() {
         actions={
           <>
             <HeaderNavLink href="/scan">Scan App</HeaderNavLink>
-            <HeaderLogoutButton onClick={() => signOut({ callbackUrl: "/login" })} />
+            <HeaderLogoutButton onClick={() => signOut({ callbackUrl: "/" })} />
           </>
         }
         mobileMenuExtras={
