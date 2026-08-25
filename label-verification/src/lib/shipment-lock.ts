@@ -12,8 +12,8 @@ export class ShipmentLockError extends Error {
   }
 }
 
-async function getLockTimeoutMinutes(): Promise<number> {
-  const settings = await prisma.appSettings.findUnique({ where: { id: "singleton" } });
+async function getLockTimeoutMinutes(siteId: string): Promise<number> {
+  const settings = await prisma.appSettings.findUnique({ where: { siteId } });
   return settings?.lockTimeoutMinutes ?? 30;
 }
 
@@ -36,14 +36,14 @@ export async function clearStaleLock(shipment: Shipment): Promise<Shipment> {
 }
 
 export async function acquireLock(shipmentId: string, userId: string) {
-  const timeoutMinutes = await getLockTimeoutMinutes();
-  const expiresAt = new Date(Date.now() + timeoutMinutes * 60 * 1000);
-
   return prisma.$transaction(async (tx) => {
     let shipment = await tx.shipment.findUniqueOrThrow({
       where: { id: shipmentId },
       include: { lockedBy: { select: { id: true, email: true, name: true } } },
     });
+
+    const timeoutMinutes = await getLockTimeoutMinutes(shipment.siteId);
+    const expiresAt = new Date(Date.now() + timeoutMinutes * 60 * 1000);
 
     if (shipment.status === "COMPLETE") {
       return shipment;
@@ -82,13 +82,13 @@ export async function acquireLock(shipmentId: string, userId: string) {
 }
 
 export async function extendLock(shipmentId: string, userId: string) {
-  const timeoutMinutes = await getLockTimeoutMinutes();
-  const expiresAt = new Date(Date.now() + timeoutMinutes * 60 * 1000);
-
   const shipment = await prisma.shipment.findUniqueOrThrow({
     where: { id: shipmentId },
     include: { lockedBy: { select: { id: true, email: true, name: true } } },
   });
+
+  const timeoutMinutes = await getLockTimeoutMinutes(shipment.siteId);
+  const expiresAt = new Date(Date.now() + timeoutMinutes * 60 * 1000);
 
   if (shipment.status === "COMPLETE") {
     return shipment;
@@ -173,9 +173,9 @@ export const shipmentInclude = {
   },
 };
 
-export async function getShipmentByNumber(shipmentNumber: number) {
+export async function getShipmentByNumber(siteId: string, shipmentNumber: number) {
   const shipment = await prisma.shipment.findUnique({
-    where: { shipmentNumber },
+    where: { siteId_shipmentNumber: { siteId, shipmentNumber } },
     include: shipmentInclude,
   });
 
@@ -184,7 +184,13 @@ export async function getShipmentByNumber(shipmentNumber: number) {
   await clearStaleLock(shipment);
 
   return prisma.shipment.findUnique({
-    where: { shipmentNumber },
+    where: { siteId_shipmentNumber: { siteId, shipmentNumber } },
     include: shipmentInclude,
+  });
+}
+
+export async function findShipmentByNumber(siteId: string, shipmentNumber: number) {
+  return prisma.shipment.findUnique({
+    where: { siteId_shipmentNumber: { siteId, shipmentNumber } },
   });
 }

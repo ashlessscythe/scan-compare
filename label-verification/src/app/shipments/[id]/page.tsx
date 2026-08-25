@@ -66,7 +66,8 @@ function ShipmentDetailContent() {
   const [error, setError] = useState<string | null>(null);
   const [emailSending, setEmailSending] = useState(false);
 
-  const isAdmin = session?.user?.role === "ADMIN";
+  const isAdmin =
+    session?.user?.role === "SITE_ADMIN" || session?.user?.role === "SUPERADMIN";
   const shipmentNumber = Number(params.id);
 
   const load = useCallback(async () => {

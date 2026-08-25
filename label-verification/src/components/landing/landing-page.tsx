@@ -6,11 +6,16 @@ import { cn } from "@/lib/utils";
 
 type LandingPageProps = {
   isAuthenticated: boolean;
+  isPending?: boolean;
 };
 
-export function LandingPage({ isAuthenticated }: LandingPageProps) {
-  const primaryHref = isAuthenticated ? "/scan" : "/register";
-  const primaryLabel = isAuthenticated ? "Go to app" : "Get Started";
+export function LandingPage({ isAuthenticated, isPending }: LandingPageProps) {
+  const primaryHref = isAuthenticated ? (isPending ? "/pending" : "/scan") : "/register";
+  const primaryLabel = isAuthenticated
+    ? isPending
+      ? "Check status"
+      : "Go to app"
+    : "Get Started";
   const secondaryHref = "/login";
 
   return (

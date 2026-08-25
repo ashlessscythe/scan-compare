@@ -1,16 +1,17 @@
-import { requireAuth, jsonError } from "@/lib/api-auth";
+import { requireActiveOperator, activeSiteId, jsonError } from "@/lib/api-auth";
+import { findShipmentByNumber } from "@/lib/shipment-lock";
 import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(_request: Request, { params }: RouteParams) {
-  const user = await requireAuth();
+  const user = await requireActiveOperator();
   if (user instanceof Response) return user;
 
   const { id } = await params;
   const shipmentNumber = Number(id);
 
-  const shipment = await prisma.shipment.findUnique({ where: { shipmentNumber } });
+  const shipment = await findShipmentByNumber(activeSiteId(user), shipmentNumber);
   if (!shipment) return jsonError("Shipment not found", 404);
 
   if (shipment.lockedByUserId && shipment.lockedByUserId !== user.id) {

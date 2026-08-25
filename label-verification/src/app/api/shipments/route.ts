@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, jsonError } from "@/lib/api-auth";
+import { requireActiveOperator, activeSiteId, jsonError } from "@/lib/api-auth";
 import {
   acquireLock,
   getShipmentByNumber,
@@ -14,9 +14,10 @@ const createSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const user = await requireAuth();
+  const user = await requireActiveOperator();
   if (user instanceof Response) return user;
 
+  const siteId = activeSiteId(user);
   const body = await request.json();
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
   const { shipmentNumber, totalPallets } = parsed.data;
 
   try {
-    const shipment = await getShipmentByNumber(shipmentNumber);
+    const shipment = await getShipmentByNumber(siteId, shipmentNumber);
 
     if (shipment) {
       return Response.json(
@@ -43,11 +44,12 @@ export async function POST(request: NextRequest) {
         shipmentNumber,
         totalPallets,
         createdByUserId: user.id,
+        siteId,
       },
     });
 
     const locked = await acquireLock(created.id, user.id);
-    const full = await getShipmentByNumber(shipmentNumber);
+    const full = await getShipmentByNumber(siteId, shipmentNumber);
 
     return Response.json({
       shipment: full ?? locked,
@@ -65,15 +67,16 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const user = await requireAuth();
+  const user = await requireActiveOperator();
   if (user instanceof Response) return user;
 
+  const siteId = activeSiteId(user);
   const shipmentNumber = Number(request.nextUrl.searchParams.get("shipmentNumber"));
   if (!shipmentNumber) {
     return jsonError("shipmentNumber is required", 400);
   }
 
-  const shipment = await getShipmentByNumber(shipmentNumber);
+  const shipment = await getShipmentByNumber(siteId, shipmentNumber);
   if (!shipment) {
     return Response.json({ shipment: null, status: "none" });
   }

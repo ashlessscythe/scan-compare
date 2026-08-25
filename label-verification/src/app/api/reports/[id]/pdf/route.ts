@@ -1,4 +1,4 @@
-import { requireAuth, jsonError } from "@/lib/api-auth";
+import { requireActiveOperator, activeSiteId, jsonError } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { generateReportPdf } from "@/lib/pdf";
 import type { ReportData } from "@/lib/pdf-document";
@@ -7,9 +7,9 @@ export const runtime = "nodejs";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-async function getReportData(shipmentNumber: number): Promise<ReportData | null> {
+async function getReportData(siteId: string, shipmentNumber: number): Promise<ReportData | null> {
   const shipment = await prisma.shipment.findUnique({
-    where: { shipmentNumber },
+    where: { siteId_shipmentNumber: { siteId, shipmentNumber } },
     include: {
       scans: {
         orderBy: { palletIndex: "asc" },
@@ -36,12 +36,12 @@ async function getReportData(shipmentNumber: number): Promise<ReportData | null>
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
-  const user = await requireAuth();
+  const user = await requireActiveOperator();
   if (user instanceof Response) return user;
 
   const { id } = await params;
   const shipmentNumber = Number(id);
-  const data = await getReportData(shipmentNumber);
+  const data = await getReportData(activeSiteId(user), shipmentNumber);
   if (!data) return jsonError("Shipment not found", 404);
 
   const pdf = await generateReportPdf(data);

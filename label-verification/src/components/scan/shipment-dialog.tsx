@@ -25,7 +25,8 @@ type ConfirmStep = null | "redo" | "warn";
 
 export function ShipmentDialog({ open, onOpenChange, onStart }: ShipmentDialogProps) {
   const { data: session } = useSession();
-  const isAdmin = session?.user?.role === "ADMIN";
+  const isAdmin =
+    session?.user?.role === "SITE_ADMIN" || session?.user?.role === "SUPERADMIN";
 
   const [shipmentNumber, setShipmentNumber] = useState("");
   const [totalPallets, setTotalPallets] = useState("");

@@ -278,7 +278,7 @@ export default function ScanPage() {
         subtitle={session?.user?.email}
         actions={
           <>
-            {session?.user?.role === "ADMIN" && (
+            {(session?.user?.role === "SITE_ADMIN" || session?.user?.role === "SUPERADMIN") && (
               <HeaderNavLink href="/admin">Admin</HeaderNavLink>
             )}
             <HeaderLogoutButton onClick={handleLogout} />
