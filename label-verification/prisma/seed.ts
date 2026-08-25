@@ -13,12 +13,13 @@ const prisma = new PrismaClient({
 const clear = process.argv.includes("--clear");
 
 async function clearAll() {
-  // FK-safe order: scans → shipments → users → settings
+  // FK-safe order: scans → shipments → settings → users → sites
   await prisma.scan.deleteMany();
   await prisma.shipment.deleteMany();
-  await prisma.user.deleteMany();
   await prisma.appSettings.deleteMany();
-  console.log("Cleared all scans, shipments, users, and app settings.");
+  await prisma.user.deleteMany();
+  await prisma.site.deleteMany();
+  console.log("Cleared all scans, shipments, settings, users, and sites.");
 }
 
 async function main() {
@@ -35,11 +36,45 @@ async function main() {
   const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
   const operatorPasswordHash = await bcrypt.hash(operatorPassword, 12);
 
+  const defaultSite = await prisma.site.upsert({
+    where: { slug: "default" },
+    update: { name: "Default" },
+    create: {
+      id: "default_site_seed",
+      name: "Default",
+      slug: "default",
+    },
+  });
+
+  // Optional second site for superadmin switcher testing
+  await prisma.site.upsert({
+    where: { slug: "warehouse-b" },
+    update: { name: "Warehouse B" },
+    create: {
+      name: "Warehouse B",
+      slug: "warehouse-b",
+    },
+  });
+
   await prisma.appSettings.upsert({
-    where: { id: "singleton" },
+    where: { siteId: defaultSite.id },
     update: {},
     create: {
-      id: "singleton",
+      siteId: defaultSite.id,
+      adminPinHash,
+      emailFromName: "Tesla Scan",
+      emailFromAddress: "no-reply@example.com",
+      emailCcList: ["cc@example.com"],
+      lockTimeoutMinutes: 30,
+    },
+  });
+
+  const warehouseB = await prisma.site.findUniqueOrThrow({ where: { slug: "warehouse-b" } });
+  await prisma.appSettings.upsert({
+    where: { siteId: warehouseB.id },
+    update: {},
+    create: {
+      siteId: warehouseB.id,
       adminPinHash,
       emailFromName: "Tesla Scan",
       emailFromAddress: "no-reply@example.com",
@@ -50,31 +85,40 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: {
+      role: Role.SUPERADMIN,
+      siteId: defaultSite.id,
+    },
     create: {
       email: adminEmail,
       name: "Admin",
-      role: Role.ADMIN,
+      role: Role.SUPERADMIN,
       passwordHash: adminPasswordHash,
       enabled: true,
+      siteId: defaultSite.id,
     },
   });
 
   await prisma.user.upsert({
     where: { email: operatorEmail },
-    update: {},
+    update: {
+      role: Role.OPERATOR,
+      siteId: defaultSite.id,
+    },
     create: {
       email: operatorEmail,
       name: "Sample Operator",
       role: Role.OPERATOR,
       passwordHash: operatorPasswordHash,
       enabled: true,
+      siteId: defaultSite.id,
     },
   });
 
   console.log(clear ? "Seed complete (after clear):" : "Seed complete:");
-  console.log(`  Admin:    ${adminEmail} / ${adminPassword}`);
-  console.log(`  Operator: ${operatorEmail} / ${operatorPassword}`);
+  console.log(`  Superadmin: ${adminEmail} / ${adminPassword}`);
+  console.log(`  Operator:   ${operatorEmail} / ${operatorPassword}`);
+  console.log(`  Sites:      ${defaultSite.slug}, warehouse-b`);
   console.log("  Default admin PIN: 3333");
 }
 
