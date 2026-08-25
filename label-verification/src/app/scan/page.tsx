@@ -133,7 +133,7 @@ export default function ScanPage() {
     }
   }
 
-  function handleNext() {
+  async function handleNext() {
     const orig = normalizeScanInput(qrOrig);
     const portal = normalizeScanInput(qrNew);
     const result = validateSmallQrPair(orig, portal);
@@ -141,6 +141,25 @@ export default function ScanPage() {
     if (!result.valid) {
       toast.error(result.message);
       origRef.current?.focus();
+      return;
+    }
+
+    const [origExists, portalExists] = await Promise.all([
+      checkDuplicate(orig),
+      checkDuplicate(portal),
+    ]);
+
+    if (origExists) {
+      toast.error("Scan already in database");
+      setQrOrig("");
+      origRef.current?.focus();
+      return;
+    }
+
+    if (portalExists) {
+      toast.error("Scan already in database");
+      setQrNew("");
+      newRef.current?.focus();
       return;
     }
 
@@ -232,6 +251,22 @@ export default function ScanPage() {
     signOut({ callbackUrl: "/" });
   }
 
+  async function handleCancelScan() {
+    if (shipment && lockEnabled) {
+      await fetch(`/api/shipments/${shipment.shipmentNumber}/lock`, { method: "DELETE" });
+    }
+    setShipment(null);
+    setViewOnly(false);
+    setQrOrig("");
+    setQrNew("");
+    setPendingScans(null);
+    setLargeQrOpen(false);
+    setPinOpen(false);
+    setPendingLargeScans(null);
+    setPendingMessage("");
+    setDialogOpen(true);
+  }
+
   const progress = shipment
     ? Math.round((shipment.scannedPallets / shipment.totalPallets) * 100)
     : 0;
@@ -252,6 +287,19 @@ export default function ScanPage() {
       />
 
       <main className="app-main max-w-5xl">
+        {!shipment && !dialogOpen && (
+          <Card>
+            <CardContent className="flex flex-col items-center gap-4 py-12">
+              <p className="text-center text-muted-foreground">
+                Enter a shipment number to begin scanning.
+              </p>
+              <Button className="h-12 w-full max-w-xs text-base" onClick={() => setDialogOpen(true)}>
+                Start Scan
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {shipment && (
           <>
             <Card>
@@ -315,15 +363,29 @@ export default function ScanPage() {
                   <Button onClick={handleNext} className="h-12 w-full text-base sm:text-lg">
                     Next — Scan Large Labels
                   </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelScan}
+                    className="h-12 w-full text-base"
+                  >
+                    Cancel Current Scan
+                  </Button>
                 </CardContent>
               </Card>
             )}
 
             {(viewOnly || shipment.status === "COMPLETE") && (
               <Card>
-                <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row">
+                <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:flex-wrap">
                   <Button onClick={downloadPdf} className="h-12 flex-1">Download PDF</Button>
                   <Button onClick={emailPdf} variant="outline" className="h-12 flex-1">Email PDF</Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCancelScan}
+                    className="h-12 w-full sm:w-auto sm:flex-none"
+                  >
+                    Start New Scan
+                  </Button>
                 </CardContent>
               </Card>
             )}
