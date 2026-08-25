@@ -8,6 +8,7 @@ import { authConfig } from "@/auth.config";
 declare module "next-auth" {
   interface User {
     role: Role;
+    siteId: string;
   }
 
   interface Session {
@@ -16,6 +17,8 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       role: Role;
+      siteId: string;
+      activeSiteId: string;
     };
   }
 }
@@ -24,6 +27,8 @@ declare module "@auth/core/jwt" {
   interface JWT {
     id: string;
     role: Role;
+    siteId: string;
+    activeSiteId: string;
   }
 }
 
@@ -67,6 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
+          siteId: user.siteId,
         };
       },
     }),
