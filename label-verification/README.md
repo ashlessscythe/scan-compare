@@ -76,7 +76,15 @@ Default admin override PIN: **3333** (configurable in Admin → Settings)
    - `DATABASE_URL` (Neon pooled)
    - `DIRECT_URL` (Neon direct — for migrations)
    - `RESEND_API_KEY`
-4. Build command: `prisma generate && prisma migrate deploy && next build`
+4. **Koyeb:** set build method to **Dockerfile** (auto-detected). No custom build/run command needed.
+5. **Vercel / buildpack hosts:** build command: `prisma generate && prisma migrate deploy && next build`
+
+### Local Docker
+
+```bash
+docker build -t label-verification .
+docker run --env-file .env -p 3000:3000 label-verification
+```
 
 ## Features
 
