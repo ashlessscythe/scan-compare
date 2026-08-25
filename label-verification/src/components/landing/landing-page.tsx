@@ -36,11 +36,11 @@ export function LandingPage({ isAuthenticated }: LandingPageProps) {
             className="landing-hero-visual-plane pointer-events-none absolute inset-0 overflow-hidden"
             aria-hidden
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/35 to-transparent sm:from-background/55 sm:via-background/20" />
-            <div className="absolute inset-x-[-8%] bottom-[-12%] top-[36%] opacity-50 sm:inset-x-[-4%] sm:top-[28%] sm:opacity-65 lg:left-[38%] lg:right-[-10%] lg:top-[8%] lg:bottom-[-18%] lg:opacity-90">
+            <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/25 to-transparent sm:from-background/50 sm:via-background/15" />
+            <div className="absolute inset-x-[-6%] bottom-[-6%] top-[48%] opacity-45 sm:inset-x-[-4%] sm:top-[30%] sm:opacity-65 lg:left-[38%] lg:right-[-10%] lg:top-[8%] lg:bottom-[-18%] lg:opacity-90">
               <ScanCompareVisual />
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/70 to-transparent sm:h-32" />
+            <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background/80 to-transparent sm:h-32" />
           </div>
 
           <div className="relative mx-auto w-full max-w-6xl">
