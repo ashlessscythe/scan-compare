@@ -355,7 +355,7 @@ export default function ScanPage() {
                             <TableCell className="font-mono text-xs">{scan.pnOrig}</TableCell>
                             <TableCell className="font-mono text-xs">{scan.pnNew}</TableCell>
                             <TableCell className="text-xs">{scan.result}</TableCell>
-                            <TableCell className="text-xs">{scan.user.name ?? scan.user.email}</TableCell>
+                            <TableCell className="text-xs">{scan.user?.name ?? scan.user?.email ?? "—"}</TableCell>
                           </TableRow>
                         ))
                       )}

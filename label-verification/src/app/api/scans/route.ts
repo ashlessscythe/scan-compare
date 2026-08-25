@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, jsonError } from "@/lib/api-auth";
-import { extendLock, requireLockOwner } from "@/lib/shipment-lock";
+import { extendLock, requireLockOwner, shipmentInclude } from "@/lib/shipment-lock";
 import {
   validateLargeQrScans,
   validateSmallQrPair,
@@ -92,10 +92,7 @@ export async function POST(request: NextRequest) {
     const updatedShipment = await tx.shipment.update({
       where: { id: shipment.id },
       data: { scannedPallets: { increment: 1 } },
-      include: {
-        scans: { orderBy: { palletIndex: "asc" } },
-        lockedBy: { select: { id: true, email: true, name: true } },
-      },
+      include: shipmentInclude,
     });
 
     if (updatedShipment.scannedPallets >= updatedShipment.totalPallets) {
@@ -118,10 +115,7 @@ export async function POST(request: NextRequest) {
 
   const finalShipment = await prisma.shipment.findUnique({
     where: { id: shipment.id },
-    include: {
-      scans: { orderBy: { palletIndex: "asc" } },
-      lockedBy: { select: { id: true, email: true, name: true } },
-    },
+    include: shipmentInclude,
   });
 
   return Response.json({

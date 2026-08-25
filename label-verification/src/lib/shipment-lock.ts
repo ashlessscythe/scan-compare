@@ -165,7 +165,7 @@ export async function requireLockOwner(shipmentId: string, userId: string) {
   return shipment;
 }
 
-const shipmentInclude = {
+export const shipmentInclude = {
   lockedBy: { select: { id: true, email: true, name: true } },
   scans: {
     orderBy: { palletIndex: "asc" as const },
