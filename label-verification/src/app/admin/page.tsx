@@ -122,18 +122,14 @@ export default function AdminPage() {
     }
   }
 
+  const defaultNewSiteId = session?.user?.activeSiteId ?? "";
+
   useEffect(() => {
     const timer = setTimeout(() => {
       void loadAll();
     }, 0);
     return () => clearTimeout(timer);
   }, [session?.user?.activeSiteId, isSuperAdmin]);
-
-  useEffect(() => {
-    if (session?.user?.activeSiteId) {
-      setNewSiteId(session.user.activeSiteId);
-    }
-  }, [session?.user?.activeSiteId]);
 
   async function createUser() {
     const res = await fetch("/api/admin/users", {
@@ -144,7 +140,9 @@ export default function AdminPage() {
         name: newName,
         password: newPassword,
         role: newRole,
-        ...(isSuperAdmin && newSiteId ? { siteId: newSiteId } : {}),
+        ...(isSuperAdmin && (newSiteId || defaultNewSiteId)
+          ? { siteId: newSiteId || defaultNewSiteId }
+          : {}),
       }),
     });
     if (res.ok) {
@@ -385,7 +383,7 @@ export default function AdminPage() {
                     <Label>Site</Label>
                     <select
                       className="flex h-11 w-full rounded-md border border-input bg-background px-3"
-                      value={newSiteId}
+                      value={newSiteId || defaultNewSiteId}
                       onChange={(e) => setNewSiteId(e.target.value)}
                     >
                       {sites.map((site) => (

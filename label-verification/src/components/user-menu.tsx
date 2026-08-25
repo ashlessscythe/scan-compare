@@ -50,26 +50,25 @@ type UserMenuProps = {
 
 export function UserMenu({ onLogout, className }: UserMenuProps) {
   const { data: session, status } = useSession();
-  const [profile, setProfile] = useState<MeProfile | null>(null);
+  const [fetchedProfile, setFetchedProfile] = useState<MeProfile | null>(null);
 
   useEffect(() => {
-    if (status !== "authenticated") {
-      setProfile(null);
-      return;
-    }
+    if (status !== "authenticated") return;
 
     let cancelled = false;
     (async () => {
       const res = await fetch("/api/me");
       if (!res.ok || cancelled) return;
       const data = await res.json();
-      if (!cancelled) setProfile(data.user ?? null);
+      if (!cancelled) setFetchedProfile(data.user ?? null);
     })();
 
     return () => {
       cancelled = true;
     };
   }, [status, session?.user?.id, session?.user?.activeSiteId]);
+
+  const profile = status === "authenticated" ? fetchedProfile : null;
 
   if (status !== "authenticated" || !session?.user?.email) return null;
 
