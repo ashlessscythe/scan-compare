@@ -6,9 +6,9 @@ import { prisma } from "@/lib/prisma";
 import {
   requireSiteAdmin,
   activeSiteId,
-  isSuperAdminRole,
   jsonError,
 } from "@/lib/api-auth";
+import { canAssignRole } from "@/lib/roles";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -45,7 +45,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return jsonError("User not found", 404);
   }
 
-  if (parsed.data.role === "SUPERADMIN" && !isSuperAdminRole(admin.role)) {
+  if (parsed.data.role !== undefined && !canAssignRole(admin.role, parsed.data.role)) {
     return jsonError("Only superadmins can assign superadmin role", 403);
   }
 

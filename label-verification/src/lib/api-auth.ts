@@ -1,6 +1,11 @@
 import { auth } from "@/auth";
 import { Role } from "@prisma/client";
 import { NextResponse } from "next/server";
+import {
+  canOperate,
+  isSiteAdminRole,
+  isSuperAdminRole,
+} from "@/lib/roles";
 
 export type SessionUser = {
   id: string;
@@ -11,17 +16,7 @@ export type SessionUser = {
   activeSiteId: string;
 };
 
-export function isSiteAdminRole(role: Role): boolean {
-  return role === Role.SITE_ADMIN || role === Role.SUPERADMIN;
-}
-
-export function isSuperAdminRole(role: Role): boolean {
-  return role === Role.SUPERADMIN;
-}
-
-export function canOperate(role: Role): boolean {
-  return role === Role.OPERATOR || isSiteAdminRole(role);
-}
+export { canOperate, isSiteAdminRole, isSuperAdminRole };
 
 export function activeSiteId(user: SessionUser): string {
   return user.activeSiteId;

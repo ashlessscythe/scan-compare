@@ -6,9 +6,9 @@ import { prisma } from "@/lib/prisma";
 import {
   requireSiteAdmin,
   activeSiteId,
-  isSuperAdminRole,
   jsonError,
 } from "@/lib/api-auth";
+import { canAssignRole } from "@/lib/roles";
 
 const userSelect = {
   id: true,
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   const parsed = createUserSchema.safeParse(body);
   if (!parsed.success) return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
 
-  if (parsed.data.role === "SUPERADMIN" && !isSuperAdminRole(user.role)) {
+  if (!canAssignRole(user.role, parsed.data.role)) {
     return jsonError("Only superadmins can create superadmin users", 403);
   }
 

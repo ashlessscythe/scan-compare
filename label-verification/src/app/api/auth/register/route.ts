@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { z } from "zod";
 import { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { jsonError } from "@/lib/api-auth";
-
-const registerSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1).max(120).optional(),
-  password: z.string().min(8),
-});
+import { normalizeRegisterEmail, registerSchema } from "@/lib/register";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -18,7 +12,7 @@ export async function POST(request: NextRequest) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const email = parsed.data.email.toLowerCase();
+  const email = normalizeRegisterEmail(parsed.data.email);
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return jsonError("An account with this email already exists", 409);
