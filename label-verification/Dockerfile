@@ -3,13 +3,18 @@ ARG NODE_VERSION=22-slim
 FROM node:${NODE_VERSION} AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# Skip postinstall (prisma generate) — schema is not copied yet
+RUN npm ci --ignore-scripts
 
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /app
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# prisma generate runs as part of npm run build
 RUN npm run build
 
 FROM node:${NODE_VERSION} AS runner
