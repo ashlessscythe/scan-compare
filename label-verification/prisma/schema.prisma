@@ -9,13 +9,26 @@ datasource db {
 }
 
 enum Role {
+  PENDING
   OPERATOR
-  ADMIN
+  SITE_ADMIN
+  SUPERADMIN
 }
 
 enum ShipmentStatus {
   IN_PROGRESS
   COMPLETE
+}
+
+model Site {
+  id         String       @id @default(cuid())
+  name       String
+  slug       String       @unique
+  users      User[]
+  shipments  Shipment[]
+  settings   AppSettings?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
 
 model User {
@@ -26,18 +39,24 @@ model User {
   role             Role       @default(OPERATOR)
   enabled          Boolean    @default(true)
   lastLogin        DateTime?
+  siteId           String
+  site             Site       @relation(fields: [siteId], references: [id])
   scans            Scan[]
   lockedShipments  Shipment[] @relation("ShipmentLock")
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
+
+  @@index([siteId])
 }
 
 model Shipment {
   id              String         @id @default(cuid())
-  shipmentNumber  Int            @unique
+  shipmentNumber  Int
   status          ShipmentStatus @default(IN_PROGRESS)
   totalPallets    Int
   scannedPallets  Int            @default(0)
+  siteId          String
+  site            Site           @relation(fields: [siteId], references: [id])
   scans           Scan[]
   lockedByUserId  String?
   lockedBy        User?          @relation("ShipmentLock", fields: [lockedByUserId], references: [id], onDelete: SetNull)
@@ -46,6 +65,9 @@ model Shipment {
   createdAt       DateTime       @default(now())
   completedAt     DateTime?
   createdByUserId String
+
+  @@unique([siteId, shipmentNumber])
+  @@index([siteId])
 }
 
 model Scan {
@@ -73,7 +95,9 @@ model Scan {
 }
 
 model AppSettings {
-  id                 String   @id @default("singleton")
+  id                 String   @id @default(cuid())
+  siteId             String   @unique
+  site               Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
   adminPinHash       String
   emailFromName      String   @default("Tesla Scan")
   emailFromAddress   String   @default("no-reply@example.com")

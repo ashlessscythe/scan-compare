@@ -40,7 +40,13 @@ export function LoginForm() {
       return;
     }
 
-    router.push(callbackUrl);
+    const sessionRes = await fetch("/api/auth/session");
+    const session = await sessionRes.json();
+    if (session?.user?.role === "PENDING") {
+      router.push("/pending");
+    } else {
+      router.push(callbackUrl.startsWith("/") ? callbackUrl : "/scan");
+    }
     router.refresh();
   }
 
@@ -95,6 +101,12 @@ export function LoginForm() {
             <Button type="submit" className="h-12 w-full text-base sm:text-lg" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              Need an account?{" "}
+              <Link href="/register" className="underline underline-offset-2">
+                Get started
+              </Link>
+            </p>
           </form>
         </CardContent>
       </Card>

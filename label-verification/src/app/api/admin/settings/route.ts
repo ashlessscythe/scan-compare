@@ -2,13 +2,15 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, jsonError } from "@/lib/api-auth";
+import { requireSiteAdmin, activeSiteId, jsonError } from "@/lib/api-auth";
 
 export async function GET() {
-  const user = await requireAdmin();
+  const user = await requireSiteAdmin();
   if (user instanceof Response) return user;
 
-  const settings = await prisma.appSettings.findUnique({ where: { id: "singleton" } });
+  const settings = await prisma.appSettings.findUnique({
+    where: { siteId: activeSiteId(user) },
+  });
   if (!settings) return jsonError("Settings not found", 404);
 
   return Response.json({
@@ -31,7 +33,7 @@ const updateSchema = z.object({
 });
 
 export async function PATCH(request: NextRequest) {
-  const user = await requireAdmin();
+  const user = await requireSiteAdmin();
   if (user instanceof Response) return user;
 
   const body = await request.json();
@@ -46,7 +48,7 @@ export async function PATCH(request: NextRequest) {
   if (parsed.data.lockTimeoutMinutes) data.lockTimeoutMinutes = parsed.data.lockTimeoutMinutes;
 
   const settings = await prisma.appSettings.update({
-    where: { id: "singleton" },
+    where: { siteId: activeSiteId(user) },
     data,
   });
 

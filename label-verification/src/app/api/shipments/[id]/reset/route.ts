@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, jsonError } from "@/lib/api-auth";
+import { requireSiteAdmin, activeSiteId, jsonError } from "@/lib/api-auth";
 import {
   acquireLock,
+  findShipmentByNumber,
   getShipmentByNumber,
   ShipmentLockError,
 } from "@/lib/shipment-lock";
@@ -15,9 +16,10 @@ const resetSchema = z.object({
 });
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
-  const user = await requireAdmin();
+  const user = await requireSiteAdmin();
   if (user instanceof Response) return user;
 
+  const siteId = activeSiteId(user);
   const { id } = await params;
   const shipmentNumber = Number(id);
   if (!shipmentNumber) return jsonError("Invalid shipment number", 400);
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const shipment = await prisma.shipment.findUnique({ where: { shipmentNumber } });
+  const shipment = await findShipmentByNumber(siteId, shipmentNumber);
   if (!shipment) return jsonError("Shipment not found", 404);
 
   try {
@@ -51,7 +53,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     await acquireLock(shipment.id, user.id);
-    const full = await getShipmentByNumber(shipmentNumber);
+    const full = await getShipmentByNumber(siteId, shipmentNumber);
 
     return Response.json({
       shipment: full,

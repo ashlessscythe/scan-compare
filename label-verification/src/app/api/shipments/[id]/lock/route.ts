@@ -1,23 +1,22 @@
-import { requireAuth, jsonError } from "@/lib/api-auth";
-import { releaseLock, ShipmentLockError } from "@/lib/shipment-lock";
-import { prisma } from "@/lib/prisma";
+import { requireActiveOperator, activeSiteId, isSiteAdminRole, jsonError } from "@/lib/api-auth";
+import { findShipmentByNumber, releaseLock, ShipmentLockError } from "@/lib/shipment-lock";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function DELETE(_request: Request, { params }: RouteParams) {
-  const user = await requireAuth();
+  const user = await requireActiveOperator();
   if (user instanceof Response) return user;
 
   const { id } = await params;
   const shipmentNumber = Number(id);
 
-  const shipment = await prisma.shipment.findUnique({ where: { shipmentNumber } });
+  const shipment = await findShipmentByNumber(activeSiteId(user), shipmentNumber);
   if (!shipment) return jsonError("Shipment not found", 404);
 
   try {
     const updated = await releaseLock(shipment.id, user.id, {
       force: false,
-      isAdmin: user.role === "ADMIN",
+      isAdmin: isSiteAdminRole(user.role),
     });
     return Response.json({ shipment: updated });
   } catch (error) {

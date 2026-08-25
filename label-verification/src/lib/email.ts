@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { generateReportPdf } from "@/lib/pdf";
 import type { ReportData } from "@/lib/pdf-document";
 
-export async function sendReportEmail(data: ReportData, toEmail: string) {
-  const settings = await prisma.appSettings.findUnique({ where: { id: "singleton" } });
+export async function sendReportEmail(data: ReportData, toEmail: string, siteId: string) {
+  const settings = await prisma.appSettings.findUnique({ where: { siteId } });
   if (!settings) throw new Error("App settings not configured");
 
   const pdfBuffer = await generateReportPdf(data);

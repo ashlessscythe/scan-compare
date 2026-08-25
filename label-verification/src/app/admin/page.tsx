@@ -26,6 +26,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useSession } from "next-auth/react";
+import { isSuperAdminRole } from "@/lib/roles";
 
 const ADMIN_SECTIONS = [
   { value: "dashboard", label: "Dashboard" },
@@ -35,6 +37,7 @@ const ADMIN_SECTIONS = [
 ] as const;
 
 type AdminSection = (typeof ADMIN_SECTIONS)[number]["value"];
+type AssignableRole = "PENDING" | "OPERATOR" | "SITE_ADMIN" | "SUPERADMIN";
 
 type User = {
   id: string;
@@ -71,15 +74,16 @@ type Settings = {
 
 export default function AdminPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const isSuperAdmin = isSuperAdminRole(session?.user?.role);
   const [section, setSection] = useState<AdminSection>("dashboard");
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [users, setUsers] = useState<User[]>([]);
-  const [settings, setSettings] = useState<Settings | null>(null);
 
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [newRole, setNewRole] = useState<"OPERATOR" | "ADMIN">("OPERATOR");
+  const [newRole, setNewRole] = useState<AssignableRole>("OPERATOR");
 
   const [adminPin, setAdminPin] = useState("");
   const [emailFromName, setEmailFromName] = useState("");
@@ -97,12 +101,13 @@ export default function AdminPage() {
     const usersData = await usersRes.json();
     setUsers(usersData.users ?? []);
     const settingsData = await settingsRes.json();
-    const s = settingsData.settings;
-    setSettings(s);
-    setEmailFromName(s.emailFromName);
-    setEmailFromAddress(s.emailFromAddress);
-    setEmailCcList(s.emailCcList.join(", "));
-    setLockTimeout(String(s.lockTimeoutMinutes));
+    const s = settingsData.settings as Settings | undefined;
+    if (s) {
+      setEmailFromName(s.emailFromName);
+      setEmailFromAddress(s.emailFromAddress);
+      setEmailCcList(s.emailCcList.join(", "));
+      setLockTimeout(String(s.lockTimeoutMinutes));
+    }
   }
 
   useEffect(() => {
@@ -110,7 +115,7 @@ export default function AdminPage() {
       void loadAll();
     }, 0);
     return () => clearTimeout(timer);
-  }, []);
+  }, [session?.user?.activeSiteId]);
 
   async function createUser() {
     const res = await fetch("/api/admin/users", {
@@ -137,6 +142,36 @@ export default function AdminPage() {
       body: JSON.stringify({ enabled: !enabled }),
     });
     loadAll();
+  }
+
+  async function approveUser(id: string) {
+    const res = await fetch(`/api/admin/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: "OPERATOR" }),
+    });
+    if (res.ok) {
+      toast.success("User approved as operator");
+      loadAll();
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Could not approve user");
+    }
+  }
+
+  async function setUserRole(id: string, role: AssignableRole) {
+    const res = await fetch(`/api/admin/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role }),
+    });
+    if (res.ok) {
+      toast.success("Role updated");
+      loadAll();
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Could not update role");
+    }
   }
 
   async function saveSettings() {
@@ -296,9 +331,15 @@ export default function AdminPage() {
                 <div className="space-y-1.5"><Label>Password</Label><Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-11" /></div>
                 <div className="space-y-1.5">
                   <Label>Role</Label>
-                  <select className="flex h-11 w-full rounded-md border border-input bg-background px-3" value={newRole} onChange={(e) => setNewRole(e.target.value as "OPERATOR" | "ADMIN")}>
+                  <select
+                    className="flex h-11 w-full rounded-md border border-input bg-background px-3"
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value as AssignableRole)}
+                  >
                     <option value="OPERATOR">Operator</option>
-                    <option value="ADMIN">Admin</option>
+                    <option value="SITE_ADMIN">Site admin</option>
+                    {isSuperAdmin && <option value="SUPERADMIN">Superadmin</option>}
+                    <option value="PENDING">Pending</option>
                   </select>
                 </div>
                 <Button onClick={createUser} className="h-11 sm:col-span-2">Create User</Button>
@@ -326,9 +367,29 @@ export default function AdminPage() {
                           <TableCell><Badge variant="outline">{u.role}</Badge></TableCell>
                           <TableCell>{u.enabled ? "Enabled" : "Disabled"}</TableCell>
                           <TableCell>
-                            <Button size="sm" variant="outline" onClick={() => toggleUser(u.id, u.enabled)}>
-                              {u.enabled ? "Disable" : "Enable"}
-                            </Button>
+                            <div className="flex flex-wrap gap-2">
+                              {u.role === "PENDING" && (
+                                <Button size="sm" onClick={() => approveUser(u.id)}>
+                                  Approve
+                                </Button>
+                              )}
+                              <select
+                                className="flex h-8 rounded-md border border-input bg-background px-2 text-xs"
+                                value={u.role}
+                                onChange={(e) => setUserRole(u.id, e.target.value as AssignableRole)}
+                                aria-label={`Role for ${u.email}`}
+                              >
+                                <option value="PENDING">Pending</option>
+                                <option value="OPERATOR">Operator</option>
+                                <option value="SITE_ADMIN">Site admin</option>
+                                {(isSuperAdmin || u.role === "SUPERADMIN") && (
+                                  <option value="SUPERADMIN">Superadmin</option>
+                                )}
+                              </select>
+                              <Button size="sm" variant="outline" onClick={() => toggleUser(u.id, u.enabled)}>
+                                {u.enabled ? "Disable" : "Enable"}
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

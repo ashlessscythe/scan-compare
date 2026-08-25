@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SiteSwitcher } from "@/components/site-switcher";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -48,14 +49,16 @@ export function AppHeader({
           ) : null}
         </div>
 
-        {/* Desktop: inline actions */}
+        {/* Desktop: site switcher + inline actions */}
         <div className="hidden items-center gap-2 sm:flex">
+          <SiteSwitcher />
           {actions}
           <ThemeToggle />
         </div>
 
         {/* Mobile: theme + sandwich menu */}
         <div className="flex shrink-0 items-center gap-2 sm:hidden">
+          <SiteSwitcher className="flex items-center" />
           <ThemeToggle />
           {hasMenuContent ? (
             <Sheet open={open} onOpenChange={setOpen}>

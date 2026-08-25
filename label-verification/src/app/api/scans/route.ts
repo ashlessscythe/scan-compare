@@ -1,8 +1,13 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, jsonError } from "@/lib/api-auth";
-import { extendLock, requireLockOwner, shipmentInclude } from "@/lib/shipment-lock";
+import { requireActiveOperator, activeSiteId, jsonError } from "@/lib/api-auth";
+import {
+  extendLock,
+  findShipmentByNumber,
+  requireLockOwner,
+  shipmentInclude,
+} from "@/lib/shipment-lock";
 import {
   validateLargeQrScans,
   validateSmallQrPair,
@@ -22,9 +27,10 @@ const scanSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const user = await requireAuth();
+  const user = await requireActiveOperator();
   if (user instanceof Response) return user;
 
+  const siteId = activeSiteId(user);
   const body = await request.json();
   const parsed = scanSchema.safeParse(body);
   if (!parsed.success) {
@@ -51,16 +57,17 @@ export async function POST(request: NextRequest) {
     return jsonError(largeResult.message, 400);
   }
 
-  const shipment = await prisma.shipment.findUnique({
-    where: { shipmentNumber: data.shipmentNumber },
-  });
+  const shipment = await findShipmentByNumber(siteId, data.shipmentNumber);
   if (!shipment) return jsonError("Shipment not found", 404);
   if (shipment.status === "COMPLETE") return jsonError("Shipment already complete", 400);
 
   await requireLockOwner(shipment.id, user.id);
 
   const duplicate = await prisma.scan.findFirst({
-    where: { OR: [{ qrOrig }, { qrNew }] },
+    where: {
+      OR: [{ qrOrig }, { qrNew }],
+      shipment: { siteId },
+    },
   });
   if (duplicate && !data.userUnblock) {
     return jsonError("Scan already in database", 409);
@@ -126,15 +133,19 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const user = await requireAuth();
+  const user = await requireActiveOperator();
   if (user instanceof Response) return user;
 
+  const siteId = activeSiteId(user);
   const code = request.nextUrl.searchParams.get("code");
   if (!code) return jsonError("code is required", 400);
 
   const normalized = normalizeScanInput(code);
   const duplicate = await prisma.scan.findFirst({
-    where: { OR: [{ qrOrig: normalized }, { qrNew: normalized }] },
+    where: {
+      OR: [{ qrOrig: normalized }, { qrNew: normalized }],
+      shipment: { siteId },
+    },
   });
 
   return Response.json({ exists: !!duplicate });
