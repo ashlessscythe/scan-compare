@@ -3,11 +3,10 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import {
   AppHeader,
-  HeaderLogoutButton,
   HeaderNavLink,
 } from "@/components/app-header";
 import { Badge } from "@/components/ui/badge";
@@ -136,7 +135,6 @@ function ShipmentDetailContent() {
           <>
             <HeaderNavLink href="/scan">Scan</HeaderNavLink>
             {isAdmin && <HeaderNavLink href="/admin">Admin</HeaderNavLink>}
-            <HeaderLogoutButton onClick={() => signOut({ callbackUrl: "/" })} />
           </>
         }
       />

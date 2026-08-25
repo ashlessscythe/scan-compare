@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SiteSwitcher } from "@/components/site-switcher";
+import { UserMenu } from "@/components/user-menu";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -21,6 +22,8 @@ type AppHeaderProps = {
   actions?: React.ReactNode;
   /** Extra items shown only inside the mobile sandwich menu (e.g. section links). */
   mobileMenuExtras?: React.ReactNode;
+  /** Custom logout handler (e.g. release shipment lock before sign-out). */
+  onLogout?: () => void | Promise<void>;
   className?: string;
 };
 
@@ -29,6 +32,7 @@ export function AppHeader({
   subtitle,
   actions,
   mobileMenuExtras,
+  onLogout,
   className,
 }: AppHeaderProps) {
   const [open, setOpen] = useState(false);
@@ -53,12 +57,14 @@ export function AppHeader({
         <div className="hidden items-center gap-2 sm:flex">
           <SiteSwitcher />
           {actions}
+          <UserMenu onLogout={onLogout} />
           <ThemeToggle />
         </div>
 
-        {/* Mobile: theme + sandwich menu */}
+        {/* Mobile: site switcher + account + theme + sandwich menu */}
         <div className="flex shrink-0 items-center gap-2 sm:hidden">
           <SiteSwitcher className="flex items-center" />
+          <UserMenu onLogout={onLogout} />
           <ThemeToggle />
           {hasMenuContent ? (
             <Sheet open={open} onOpenChange={setOpen}>
@@ -114,15 +120,6 @@ export function HeaderNavLink({ href, children, className }: HeaderNavLinkProps)
   );
 }
 
-export function HeaderLogoutButton({ onClick }: { onClick: () => void }) {
-  return (
-    <Button variant="outline" className="h-9 w-full sm:w-auto" onClick={onClick}>
-      Logout
-    </Button>
-  );
-}
-
-/** Full-width menu button used for section switching inside the mobile sheet. */
 export function HeaderMenuButton({
   children,
   active,

@@ -3,11 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 import {
   AppHeader,
-  HeaderLogoutButton,
   HeaderMenuButton,
   HeaderNavLink,
 } from "@/components/app-header";
@@ -46,6 +44,13 @@ type User = {
   role: string;
   enabled: boolean;
   lastLogin: string | null;
+  siteId: string;
+};
+
+type Site = {
+  id: string;
+  name: string;
+  slug: string;
 };
 
 type Dashboard = {
@@ -79,11 +84,13 @@ export default function AdminPage() {
   const [section, setSection] = useState<AdminSection>("dashboard");
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [sites, setSites] = useState<Site[]>([]);
 
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState<AssignableRole>("OPERATOR");
+  const [newSiteId, setNewSiteId] = useState("");
 
   const [adminPin, setAdminPin] = useState("");
   const [emailFromName, setEmailFromName] = useState("");
@@ -92,14 +99,19 @@ export default function AdminPage() {
   const [lockTimeout, setLockTimeout] = useState("30");
 
   async function loadAll() {
-    const [dashRes, usersRes, settingsRes] = await Promise.all([
+    const [dashRes, usersRes, settingsRes, sitesRes] = await Promise.all([
       fetch("/api/admin/dashboard"),
       fetch("/api/admin/users"),
       fetch("/api/admin/settings"),
+      isSuperAdmin ? fetch("/api/sites") : Promise.resolve(null),
     ]);
     setDashboard(await dashRes.json());
     const usersData = await usersRes.json();
     setUsers(usersData.users ?? []);
+    if (sitesRes) {
+      const sitesData = await sitesRes.json();
+      setSites(sitesData.sites ?? []);
+    }
     const settingsData = await settingsRes.json();
     const s = settingsData.settings as Settings | undefined;
     if (s) {
@@ -115,13 +127,25 @@ export default function AdminPage() {
       void loadAll();
     }, 0);
     return () => clearTimeout(timer);
+  }, [session?.user?.activeSiteId, isSuperAdmin]);
+
+  useEffect(() => {
+    if (session?.user?.activeSiteId) {
+      setNewSiteId(session.user.activeSiteId);
+    }
   }, [session?.user?.activeSiteId]);
 
   async function createUser() {
     const res = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: newEmail, name: newName, password: newPassword, role: newRole }),
+      body: JSON.stringify({
+        email: newEmail,
+        name: newName,
+        password: newPassword,
+        role: newRole,
+        ...(isSuperAdmin && newSiteId ? { siteId: newSiteId } : {}),
+      }),
     });
     if (res.ok) {
       toast.success("User created");
@@ -174,6 +198,21 @@ export default function AdminPage() {
     }
   }
 
+  async function setUserSite(id: string, siteId: string) {
+    const res = await fetch(`/api/admin/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ siteId }),
+    });
+    if (res.ok) {
+      toast.success("Site updated");
+      loadAll();
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Could not update site");
+    }
+  }
+
   async function saveSettings() {
     const res = await fetch("/api/admin/settings", {
       method: "PATCH",
@@ -211,7 +250,6 @@ export default function AdminPage() {
         actions={
           <>
             <HeaderNavLink href="/scan">Scan App</HeaderNavLink>
-            <HeaderLogoutButton onClick={() => signOut({ callbackUrl: "/" })} />
           </>
         }
         mobileMenuExtras={
@@ -342,6 +380,22 @@ export default function AdminPage() {
                     <option value="PENDING">Pending</option>
                   </select>
                 </div>
+                {isSuperAdmin && sites.length > 0 && (
+                  <div className="space-y-1.5">
+                    <Label>Site</Label>
+                    <select
+                      className="flex h-11 w-full rounded-md border border-input bg-background px-3"
+                      value={newSiteId}
+                      onChange={(e) => setNewSiteId(e.target.value)}
+                    >
+                      {sites.map((site) => (
+                        <option key={site.id} value={site.id}>
+                          {site.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <Button onClick={createUser} className="h-11 sm:col-span-2">Create User</Button>
               </CardContent>
             </Card>
@@ -355,6 +409,7 @@ export default function AdminPage() {
                         <TableHead>Email</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Role</TableHead>
+                        {isSuperAdmin && <TableHead>Site</TableHead>}
                         <TableHead>Status</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -365,6 +420,22 @@ export default function AdminPage() {
                           <TableCell>{u.email}</TableCell>
                           <TableCell>{u.name}</TableCell>
                           <TableCell><Badge variant="outline">{u.role}</Badge></TableCell>
+                          {isSuperAdmin && (
+                            <TableCell>
+                              <select
+                                className="flex h-8 rounded-md border border-input bg-background px-2 text-xs"
+                                value={u.siteId}
+                                onChange={(e) => setUserSite(u.id, e.target.value)}
+                                aria-label={`Site for ${u.email}`}
+                              >
+                                {sites.map((site) => (
+                                  <option key={site.id} value={site.id}>
+                                    {site.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </TableCell>
+                          )}
                           <TableCell>{u.enabled ? "Enabled" : "Disabled"}</TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-2">

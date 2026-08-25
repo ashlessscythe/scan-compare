@@ -9,7 +9,6 @@ import { LargeQrDialog } from "@/components/scan/large-qr-dialog";
 import { AdminPinDialog } from "@/components/scan/admin-pin-dialog";
 import {
   AppHeader,
-  HeaderLogoutButton,
   HeaderNavLink,
 } from "@/components/app-header";
 import { ResponsiveTable } from "@/components/responsive-table";
@@ -268,12 +267,12 @@ export default function ScanPage() {
       <AppHeader
         title="Scan Compare"
         subtitle={session?.user?.email}
+        onLogout={handleLogout}
         actions={
           <>
             {(session?.user?.role === "SITE_ADMIN" || session?.user?.role === "SUPERADMIN") && (
               <HeaderNavLink href="/admin">Admin</HeaderNavLink>
             )}
-            <HeaderLogoutButton onClick={handleLogout} />
           </>
         }
       />

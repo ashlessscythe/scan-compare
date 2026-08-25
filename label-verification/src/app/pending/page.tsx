@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "next-auth/react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { cn } from "@/lib/utils";
 
 export default function PendingPage() {
@@ -17,6 +17,7 @@ export default function PendingPage() {
         >
           Home
         </Link>
+        <UserMenu />
         <ThemeToggle />
       </div>
       <Card className="w-full max-w-md">
@@ -27,15 +28,6 @@ export default function PendingPage() {
             before you can start scanning.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <Button
-            variant="outline"
-            className="h-12 w-full text-base"
-            onClick={() => signOut({ callbackUrl: "/" })}
-          >
-            Sign out
-          </Button>
-        </CardContent>
       </Card>
     </div>
   );

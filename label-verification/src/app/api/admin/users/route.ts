@@ -7,6 +7,7 @@ import {
   requireSiteAdmin,
   activeSiteId,
   jsonError,
+  isSuperAdminRole,
 } from "@/lib/api-auth";
 import { canAssignRole } from "@/lib/roles";
 
@@ -39,6 +40,7 @@ const createUserSchema = z.object({
   name: z.string().optional(),
   password: z.string().min(8),
   role: z.enum(["PENDING", "OPERATOR", "SITE_ADMIN", "SUPERADMIN"]).default("OPERATOR"),
+  siteId: z.string().min(1).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -58,13 +60,23 @@ export async function POST(request: NextRequest) {
   });
   if (existing) return jsonError("User already exists", 409);
 
+  let targetSiteId = activeSiteId(user);
+  if (parsed.data.siteId !== undefined) {
+    if (!isSuperAdminRole(user.role)) {
+      return jsonError("Only superadmins can assign users to a specific site", 403);
+    }
+    const site = await prisma.site.findUnique({ where: { id: parsed.data.siteId } });
+    if (!site) return jsonError("Site not found", 404);
+    targetSiteId = site.id;
+  }
+
   const created = await prisma.user.create({
     data: {
       email: parsed.data.email.toLowerCase(),
       name: parsed.data.name,
       role: parsed.data.role as Role,
       passwordHash: await bcrypt.hash(parsed.data.password, 12),
-      siteId: activeSiteId(user),
+      siteId: targetSiteId,
     },
     select: userSelect,
   });

@@ -7,6 +7,7 @@ import {
   requireSiteAdmin,
   activeSiteId,
   jsonError,
+  isSuperAdminRole,
 } from "@/lib/api-auth";
 import { canAssignRole } from "@/lib/roles";
 
@@ -28,6 +29,7 @@ const updateSchema = z.object({
   enabled: z.boolean().optional(),
   role: z.enum(["PENDING", "OPERATOR", "SITE_ADMIN", "SUPERADMIN"]).optional(),
   password: z.string().min(8).optional(),
+  siteId: z.string().min(1).optional(),
 });
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
@@ -49,11 +51,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return jsonError("Only superadmins can assign superadmin role", 403);
   }
 
+  if (parsed.data.siteId !== undefined) {
+    if (!isSuperAdminRole(admin.role)) {
+      return jsonError("Only superadmins can assign users to a specific site", 403);
+    }
+    const site = await prisma.site.findUnique({ where: { id: parsed.data.siteId } });
+    if (!site) return jsonError("Site not found", 404);
+  }
+
   const data: Record<string, unknown> = {};
   if (parsed.data.name !== undefined) data.name = parsed.data.name;
   if (parsed.data.enabled !== undefined) data.enabled = parsed.data.enabled;
   if (parsed.data.role !== undefined) data.role = parsed.data.role as Role;
   if (parsed.data.password) data.passwordHash = await bcrypt.hash(parsed.data.password, 12);
+  if (parsed.data.siteId !== undefined) data.siteId = parsed.data.siteId;
 
   const user = await prisma.user.update({
     where: { id },
