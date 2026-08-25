@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { ShipmentDialog } from "@/components/scan/shipment-dialog";
@@ -339,12 +340,13 @@ export default function ScanPage() {
                         <TableHead>PN New</TableHead>
                         <TableHead>Result</TableHead>
                         <TableHead>Operator</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {shipment.scans.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center text-muted-foreground">
+                          <TableCell colSpan={6} className="text-center text-muted-foreground">
                             No scans yet
                           </TableCell>
                         </TableRow>
@@ -356,6 +358,20 @@ export default function ScanPage() {
                             <TableCell className="font-mono text-xs">{scan.pnNew}</TableCell>
                             <TableCell className="text-xs">{scan.result}</TableCell>
                             <TableCell className="text-xs">{scan.user?.name ?? scan.user?.email ?? "—"}</TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                nativeButton={false}
+                                render={
+                                  <Link
+                                    href={`/shipments/${shipment.shipmentNumber}?pallet=${scan.palletIndex}`}
+                                  />
+                                }
+                              >
+                                View details
+                              </Button>
+                            </TableCell>
                           </TableRow>
                         ))
                       )}

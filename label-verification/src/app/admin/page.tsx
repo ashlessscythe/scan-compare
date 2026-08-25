@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 import {
@@ -68,6 +70,7 @@ type Settings = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const [section, setSection] = useState<AdminSection>("dashboard");
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -248,17 +251,35 @@ export default function AdminPage() {
                         <TableHead>Pallet</TableHead>
                         <TableHead>Operator</TableHead>
                         <TableHead>Time</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {dashboard?.recentScans.map((s) => (
-                        <TableRow key={s.id}>
-                          <TableCell>{s.shipment.shipmentNumber}</TableCell>
-                          <TableCell>{s.palletIndex}</TableCell>
-                          <TableCell>{s.user.name ?? s.user.email}</TableCell>
-                          <TableCell>{new Date(s.createdAt).toLocaleString()}</TableCell>
-                        </TableRow>
-                      ))}
+                      {dashboard?.recentScans.map((s) => {
+                        const href = `/shipments/${s.shipment.shipmentNumber}?pallet=${s.palletIndex}`;
+                        return (
+                          <TableRow
+                            key={s.id}
+                            className="cursor-pointer"
+                            onClick={() => router.push(href)}
+                          >
+                            <TableCell>{s.shipment.shipmentNumber}</TableCell>
+                            <TableCell>{s.palletIndex}</TableCell>
+                            <TableCell>{s.user.name ?? s.user.email}</TableCell>
+                            <TableCell>{new Date(s.createdAt).toLocaleString()}</TableCell>
+                            <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                nativeButton={false}
+                                render={<Link href={href} />}
+                              >
+                                View details
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </ResponsiveTable>
