@@ -14,11 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tesla Scan Verification",
-  description: "Tesla/Aptiv pallet label verification system",
+  title: "Scan Compare",
+  description:
+    "Corporate scan verification tool for warehouse label compare and shipment checks",
   appleWebApp: {
     capable: true,
-    title: "Scan Verify",
+    title: "Scan Compare",
   },
 };
 

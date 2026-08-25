@@ -11,10 +11,12 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const pathname = request.nextUrl.pathname;
       const isLoginPage = pathname.startsWith("/login");
+      const isLandingPage = pathname === "/";
       const isPublicApi = pathname.startsWith("/api/auth");
 
       if (isPublicApi) return true;
       if (pathname.startsWith("/api/")) return true;
+      if (isLandingPage) return true;
 
       if (!isLoggedIn && !isLoginPage) return false;
       if (isLoggedIn && isLoginPage) {

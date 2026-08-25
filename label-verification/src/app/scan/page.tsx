@@ -226,7 +226,7 @@ export default function ScanPage() {
     if (shipment && lockEnabled) {
       await fetch(`/api/shipments/${shipment.shipmentNumber}/lock`, { method: "DELETE" });
     }
-    signOut({ callbackUrl: "/login" });
+    signOut({ callbackUrl: "/" });
   }
 
   const progress = shipment
@@ -236,7 +236,7 @@ export default function ScanPage() {
   return (
     <div className="app-page">
       <AppHeader
-        title="Tesla Scan Verification"
+        title="Scan Compare"
         subtitle={session?.user?.email}
         actions={
           <>
