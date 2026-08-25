@@ -28,20 +28,14 @@ export async function POST(request: NextRequest) {
   try {
     const shipment = await getShipmentByNumber(shipmentNumber);
 
-    if (shipment?.status === "COMPLETE") {
-      return Response.json({
-        shipment,
-        mode: "complete" as const,
-      });
-    }
-
     if (shipment) {
-      const locked = await acquireLock(shipment.id, user.id);
-      const full = await getShipmentByNumber(shipmentNumber);
-      return Response.json({
-        shipment: full ?? locked,
-        mode: "continue" as const,
-      });
+      return Response.json(
+        {
+          error: `Shipment ${shipmentNumber} already exists`,
+          status: shipment.status,
+        },
+        { status: 409 },
+      );
     }
 
     const created = await prisma.shipment.create({

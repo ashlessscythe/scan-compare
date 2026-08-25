@@ -82,15 +82,17 @@ export default function ScanPage() {
     }
   }, []);
 
-  function handleStart(shipmentNumber: number, totalPallets: number, mode: string) {
+  function handleStart(shipmentNumber: number, _totalPallets: number, mode: string) {
     fetch(`/api/shipments/${shipmentNumber}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.shipment) {
           setShipment(data.shipment);
-          setViewOnly(mode === "complete" || data.shipment.status === "COMPLETE");
+          const readOnly =
+            mode === "complete" || data.shipment.status === "COMPLETE";
+          setViewOnly(readOnly);
           setDialogOpen(false);
-          if (mode !== "complete" && data.shipment.status !== "COMPLETE") {
+          if (!readOnly) {
             setTimeout(() => origRef.current?.focus(), 100);
           }
         }
