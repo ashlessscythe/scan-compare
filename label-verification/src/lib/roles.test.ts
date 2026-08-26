@@ -50,6 +50,12 @@ describe("resolveAuthRedirect", () => {
       resolveAuthRedirect({ pathname: "/api/auth/session", isLoggedIn: false }),
     ).toBeNull();
     expect(resolveAuthRedirect({ pathname: "/register", isLoggedIn: false })).toBeNull();
+    expect(
+      resolveAuthRedirect({ pathname: "/forgot-password", isLoggedIn: false }),
+    ).toBeNull();
+    expect(
+      resolveAuthRedirect({ pathname: "/reset-password", isLoggedIn: false }),
+    ).toBeNull();
   });
 
   it("sends guests to register for protected pages", () => {
@@ -87,7 +93,7 @@ describe("resolveAuthRedirect", () => {
     ).toBeNull();
   });
 
-  it("redirects logged-in users off login/register", () => {
+  it("redirects logged-in users off login/register/password-reset pages", () => {
     expect(
       resolveAuthRedirect({ pathname: "/login", isLoggedIn: true, role: "OPERATOR" }),
     ).toBe("/scan");
@@ -97,6 +103,20 @@ describe("resolveAuthRedirect", () => {
     expect(
       resolveAuthRedirect({ pathname: "/register", isLoggedIn: true, role: "PENDING" }),
     ).toBe("/pending");
+    expect(
+      resolveAuthRedirect({
+        pathname: "/forgot-password",
+        isLoggedIn: true,
+        role: "OPERATOR",
+      }),
+    ).toBe("/scan");
+    expect(
+      resolveAuthRedirect({
+        pathname: "/reset-password",
+        isLoggedIn: true,
+        role: "OPERATOR",
+      }),
+    ).toBe("/scan");
   });
 
   it("sends guests from /login to the unified register page", () => {

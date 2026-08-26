@@ -179,7 +179,17 @@ export function RegisterForm() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="password">Password</Label>
+                {mode === "login" && (
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-muted-foreground underline underline-offset-2"
+                  >
+                    Forgot password?
+                  </Link>
+                )}
+              </div>
               <Input
                 id="password"
                 type="password"
