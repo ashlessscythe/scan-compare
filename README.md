@@ -9,16 +9,21 @@ This repository contains two applications:
 
 ## Label Verification (Next.js)
 
-Tesla Scan Verification — warehouse pallet label scanning app rebuilt with:
+**Scan Compare** — warehouse pallet label scanning and verification for operators on phone or desktop. Built with:
 
-- **Next.js 15** + TypeScript
+- **Next.js 16** + React 19 + TypeScript
 - **PostgreSQL** + Prisma
 - **Auth.js** (email/password)
 - **shadcn/ui**
-- Enterprise shipment locking (one operator per in-progress shipment)
-- Admin panel for users, PIN, and email settings
 
-See [`label-verification/README.md`](label-verification/README.md) for setup instructions.
+Highlights:
+
+- Multi-site tenancy with least-privilege RBAC (`PENDING` → `OPERATOR` → `SITE_ADMIN` / `SUPERADMIN`)
+- Mobile-first scan UI designed for controlled warehouse floors
+- Authenticated access only — pending approval before operators can scan
+- Docker / standalone deploy (Koyeb-ready), or customer-managed Postgres
+
+See [`label-verification/README.md`](label-verification/README.md) for setup, features, and security notes for IT.
 
 ## Git Workflow
 

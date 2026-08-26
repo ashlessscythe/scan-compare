@@ -27,14 +27,23 @@ import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
 import { isSuperAdminRole } from "@/lib/roles";
 
-const ADMIN_SECTIONS = [
+const BASE_ADMIN_SECTIONS = [
   { value: "dashboard", label: "Dashboard" },
   { value: "users", label: "Users" },
   { value: "settings", label: "Settings" },
   { value: "locks", label: "Locks" },
 ] as const;
 
-type AdminSection = (typeof ADMIN_SECTIONS)[number]["value"];
+type BaseAdminSection = (typeof BASE_ADMIN_SECTIONS)[number]["value"];
+type AdminSection = BaseAdminSection | "sites";
+
+function getAdminSections(isSuperAdmin: boolean) {
+  const sections: Array<{ value: AdminSection; label: string }> = [...BASE_ADMIN_SECTIONS];
+  if (isSuperAdmin) {
+    sections.splice(2, 0, { value: "sites", label: "Sites" });
+  }
+  return sections;
+}
 type AssignableRole = "PENDING" | "OPERATOR" | "SITE_ADMIN" | "SUPERADMIN";
 
 type User = {
@@ -51,6 +60,7 @@ type Site = {
   id: string;
   name: string;
   slug: string;
+  _count?: { users: number; shipments: number };
 };
 
 type Dashboard = {
@@ -91,6 +101,9 @@ export default function AdminPage() {
   const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState<AssignableRole>("OPERATOR");
   const [newSiteId, setNewSiteId] = useState("");
+  const [newSiteName, setNewSiteName] = useState("");
+  const [newSiteSlug, setNewSiteSlug] = useState("");
+  const [siteEdits, setSiteEdits] = useState<Record<string, { name: string; slug: string }>>({});
 
   const [adminPin, setAdminPin] = useState("");
   const [emailFromName, setEmailFromName] = useState("");
@@ -110,7 +123,11 @@ export default function AdminPage() {
     setUsers(usersData.users ?? []);
     if (sitesRes) {
       const sitesData = await sitesRes.json();
-      setSites(sitesData.sites ?? []);
+      const nextSites = sitesData.sites ?? [];
+      setSites(nextSites);
+      setSiteEdits(
+        Object.fromEntries(nextSites.map((site: Site) => [site.id, { name: site.name, slug: site.slug }])),
+      );
     }
     const settingsData = await settingsRes.json();
     const s = settingsData.settings as Settings | undefined;
@@ -122,18 +139,14 @@ export default function AdminPage() {
     }
   }
 
+  const defaultNewSiteId = session?.user?.activeSiteId ?? "";
+
   useEffect(() => {
     const timer = setTimeout(() => {
       void loadAll();
     }, 0);
     return () => clearTimeout(timer);
   }, [session?.user?.activeSiteId, isSuperAdmin]);
-
-  useEffect(() => {
-    if (session?.user?.activeSiteId) {
-      setNewSiteId(session.user.activeSiteId);
-    }
-  }, [session?.user?.activeSiteId]);
 
   async function createUser() {
     const res = await fetch("/api/admin/users", {
@@ -144,7 +157,9 @@ export default function AdminPage() {
         name: newName,
         password: newPassword,
         role: newRole,
-        ...(isSuperAdmin && newSiteId ? { siteId: newSiteId } : {}),
+        ...(isSuperAdmin && (newSiteId || defaultNewSiteId)
+          ? { siteId: newSiteId || defaultNewSiteId }
+          : {}),
       }),
     });
     if (res.ok) {
@@ -243,6 +258,68 @@ export default function AdminPage() {
     }
   }
 
+  function notifySitesUpdated() {
+    window.dispatchEvent(new Event("sites-updated"));
+    router.refresh();
+  }
+
+  async function createSite() {
+    const res = await fetch("/api/sites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newSiteName, slug: newSiteSlug }),
+    });
+    if (res.ok) {
+      toast.success("Site created");
+      setNewSiteName("");
+      setNewSiteSlug("");
+      await loadAll();
+      notifySitesUpdated();
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Could not create site");
+    }
+  }
+
+  async function updateSite(id: string) {
+    const edit = siteEdits[id];
+    if (!edit) return;
+    const res = await fetch(`/api/sites/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: edit.name, slug: edit.slug }),
+    });
+    if (res.ok) {
+      toast.success("Site updated");
+      await loadAll();
+      notifySitesUpdated();
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Could not update site");
+    }
+  }
+
+  async function deleteSite(id: string) {
+    const res = await fetch(`/api/sites/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      toast.success("Site deleted");
+      await loadAll();
+      notifySitesUpdated();
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Could not delete site");
+    }
+  }
+
+  function canDeleteSite(site: Site): boolean {
+    if (site.slug === "default") return false;
+    const users = site._count?.users ?? 0;
+    const shipments = site._count?.shipments ?? 0;
+    return users === 0 && shipments === 0;
+  }
+
+  const adminSections = getAdminSections(isSuperAdmin);
+
   return (
     <div className="app-page">
       <AppHeader
@@ -255,7 +332,7 @@ export default function AdminPage() {
         mobileMenuExtras={
           <div className="mb-2 flex flex-col gap-2 border-b pb-3">
             <p className="px-1 text-xs font-medium text-muted-foreground">Sections</p>
-            {ADMIN_SECTIONS.map((item) => (
+            {adminSections.map((item) => (
               <HeaderMenuButton
                 key={item.value}
                 active={section === item.value}
@@ -273,7 +350,7 @@ export default function AdminPage() {
           {/* Desktop / tablet: single-row horizontal tabs */}
           <div className="hidden overflow-x-auto overscroll-x-contain sm:block">
             <TabsList className="inline-flex h-9 w-max min-w-full justify-start gap-1 sm:min-w-0">
-              {ADMIN_SECTIONS.map((item) => (
+              {adminSections.map((item) => (
                 <TabsTrigger key={item.value} value={item.value} className="px-3">
                   {item.label}
                 </TabsTrigger>
@@ -290,7 +367,7 @@ export default function AdminPage() {
               onChange={(e) => setSection(e.target.value as AdminSection)}
               aria-label="Admin section"
             >
-              {ADMIN_SECTIONS.map((item) => (
+              {adminSections.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
                 </option>
@@ -385,7 +462,7 @@ export default function AdminPage() {
                     <Label>Site</Label>
                     <select
                       className="flex h-11 w-full rounded-md border border-input bg-background px-3"
-                      value={newSiteId}
+                      value={newSiteId || defaultNewSiteId}
                       onChange={(e) => setNewSiteId(e.target.value)}
                     >
                       {sites.map((site) => (
@@ -470,6 +547,114 @@ export default function AdminPage() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {isSuperAdmin && (
+            <TabsContent value="sites" className="mt-4 space-y-4">
+              <Card>
+                <CardHeader><CardTitle>Create Site</CardTitle></CardHeader>
+                <CardContent className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>Name</Label>
+                    <Input
+                      value={newSiteName}
+                      onChange={(e) => setNewSiteName(e.target.value)}
+                      className="h-11"
+                      placeholder="Warehouse C"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Slug</Label>
+                    <Input
+                      value={newSiteSlug}
+                      onChange={(e) => setNewSiteSlug(e.target.value)}
+                      className="h-11"
+                      placeholder="warehouse-c"
+                    />
+                  </div>
+                  <Button onClick={createSite} className="h-11 sm:col-span-2">Create Site</Button>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader><CardTitle>Sites</CardTitle></CardHeader>
+                <CardContent>
+                  <ResponsiveTable>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Slug</TableHead>
+                          <TableHead>Users</TableHead>
+                          <TableHead>Shipments</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {sites.map((site) => {
+                          const edit = siteEdits[site.id] ?? { name: site.name, slug: site.slug };
+                          const deletable = canDeleteSite(site);
+                          return (
+                            <TableRow key={site.id}>
+                              <TableCell>
+                                <Input
+                                  value={edit.name}
+                                  onChange={(e) =>
+                                    setSiteEdits((prev) => ({
+                                      ...prev,
+                                      [site.id]: { ...edit, name: e.target.value },
+                                    }))
+                                  }
+                                  className="h-9"
+                                  aria-label={`Name for ${site.slug}`}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Input
+                                  value={edit.slug}
+                                  onChange={(e) =>
+                                    setSiteEdits((prev) => ({
+                                      ...prev,
+                                      [site.id]: { ...edit, slug: e.target.value },
+                                    }))
+                                  }
+                                  className="h-9"
+                                  disabled={site.slug === "default"}
+                                  aria-label={`Slug for ${site.name}`}
+                                />
+                              </TableCell>
+                              <TableCell>{site._count?.users ?? 0}</TableCell>
+                              <TableCell>{site._count?.shipments ?? 0}</TableCell>
+                              <TableCell>
+                                <div className="flex flex-wrap gap-2">
+                                  <Button size="sm" variant="outline" onClick={() => updateSite(site.id)}>
+                                    Save
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    disabled={!deletable}
+                                    title={
+                                      deletable
+                                        ? "Delete site"
+                                        : site.slug === "default"
+                                          ? "Cannot delete the default site"
+                                          : "Remove all users and shipments before deleting"
+                                    }
+                                    onClick={() => deleteSite(site.id)}
+                                  >
+                                    Delete
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </ResponsiveTable>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           <TabsContent value="settings" className="mt-4">
             <Card>

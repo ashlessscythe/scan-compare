@@ -1,11 +1,47 @@
-# Tesla Scan Verification
+# Tesla Scan Verification (Scan Compare)
 
-Next.js fullstack label verification app for Tesla/Aptiv warehouse pallet scanning.
+Scan Compare is a Next.js fullstack label verification app for warehouse pallet scanning. Operators check shipment labels on phone or desktop before freight leaves the dock — designed for controlled warehouse environments with authenticated, least-privilege access.
+
+## Mobile-first
+
+The UI is built for handheld use on the floor, not a shrunk desktop layout:
+
+- Responsive layout with touch-sized controls and sticky header / sandwich nav on small screens
+- Site switcher and theme controls reachable from the mobile chrome
+- `ResponsiveTable` for admin lists that stay usable on narrow viewports
+- Themes: Light, Dark, Corporate, Neon, Cyberpunk
+
+| Landing | Scan | Admin |
+|:-------:|:----:|:-----:|
+| ![Mobile landing](docs/screenshots/mobile-landing.png) | ![Mobile scan](docs/screenshots/mobile-scan.png) | ![Mobile admin](docs/screenshots/mobile-admin.png) |
+
+## What’s included
+
+- **Scan workflow**: Small QR (original + portal) → 4 large QR labels (A–D); session start / cancel
+- **Duplicate detection** with admin PIN override
+- **Shipment locking**: one operator per in-progress shipment; operators cannot reopen completed shipments; admin reset with confirmation
+- **Shipments**: read-only detail view; PDF report download and optional email
+- **Multi-site tenancy**: roles `PENDING` / `OPERATOR` / `SITE_ADMIN` / `SUPERADMIN`; site switcher; Sites admin CRUD
+- **Corporate landing** and themed UI for operators and admins
+- **Docker / standalone** deploy (Koyeb-ready Dockerfile)
+
+## Security & IT confidence
+
+Built for environments where IT needs clear ownership of auth, roles, and data location — without overclaiming compliance badges the app does not provide.
+
+- **Auth**: Auth.js email/password sessions. Passwords and the admin override PIN are hashed with bcrypt (cost 12).
+- **Access control**: Role-based access with `PENDING` approval before a user can operate or administer. Operators and site admins are site-scoped; superadmins can work across sites.
+- **Admin controls**: Disable users, reset credentials, manage settings (PIN, email CC), and force-release shipment locks.
+- **Containers**: Docker image runs as non-root (`nextjs`); `NEXT_TELEMETRY_DISABLED=1` in the image. The app does not embed third-party product analytics SDKs.
+- **Data you control**: Point `DATABASE_URL` / `DIRECT_URL` at customer-managed Postgres (e.g. Docker Compose) or a managed provider with TLS (`sslmode=require` as in `.env.example`). Resend is optional and only used when email is configured.
+- **CI**: lint, typecheck, and unit tests run on `dev`.
+
+Not claimed: SSO/MFA, SOC 2 / HIPAA certifications, encryption-at-rest beyond what your database provider supplies, or air-gapped operation under default Neon/SaaS hosting.
 
 ## Prerequisites
 
 - Node.js 20+
-- PostgreSQL (Neon recommended, or local via Docker)
+- PostgreSQL (Neon recommended, or local via Docker / system install)
 
 ## Quick Start (Local)
 
@@ -63,7 +99,8 @@ Default admin override PIN: **3333** (configurable in Admin → Settings)
 |---------|-------------|
 | `npm run dev` | Start development server |
 | `npm run build` | Production build |
-| `npm run test` | Run unit tests (barcode validation) |
+| `npm run test` | Run unit tests |
+| `npm run ci` | Lint + typecheck + tests |
 | `npx prisma studio` | Open database GUI |
 | `npx prisma db seed` | Re-seed database |
 
@@ -75,30 +112,36 @@ Default admin override PIN: **3333** (configurable in Admin → Settings)
    - `AUTH_SECRET`, `AUTH_URL`
    - `DATABASE_URL` (Neon pooled)
    - `DIRECT_URL` (Neon direct — for migrations)
-   - `RESEND_API_KEY`
-4. Build command: `prisma generate && prisma migrate deploy && next build`
+   - `RESEND_API_KEY` (optional, for email)
+4. **Koyeb:** set build method to **Dockerfile** (auto-detected). No custom build/run command needed.
+5. **Vercel / buildpack hosts:** build command: `prisma generate && prisma migrate deploy && next build`
 
-## Features
+### Local Docker
 
-- **Scan workflow**: Small QR (original + portal) → 4 large QR labels (A–D)
-- **Duplicate detection** with admin PIN override
-- **Shipment locking**: Only one operator per in-progress shipment
-- **PDF report** download and email
-- **Admin panel**: User management, PIN, email CC list, force-release locks
+```bash
+docker build -t label-verification .
+docker run --env-file .env -p 3000:3000 label-verification
+```
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── api/          # REST API routes
+│   ├── api/          # REST API routes (auth, scans, shipments, sites, admin)
 │   ├── admin/        # Admin panel
-│   ├── login/        # Login page
-│   └── scan/         # Main scanning UI
-├── components/       # UI components
+│   ├── login/        # Login
+│   ├── register/     # Self-registration → PENDING
+│   ├── pending/      # Awaiting approval
+│   ├── scan/         # Main scanning UI
+│   └── shipments/    # Shipment detail (read-only)
+├── components/       # UI (landing, scan, responsive table, themes)
 ├── hooks/            # React hooks (lock heartbeat)
-└── lib/              # Business logic (barcode, locks, PDF, email)
+└── lib/              # Business logic (barcode, roles, locks, PDF, email)
 prisma/
 ├── schema.prisma
+├── migrations/
 └── seed.ts
+docs/
+└── screenshots/      # Mobile viewport captures for docs
 ```

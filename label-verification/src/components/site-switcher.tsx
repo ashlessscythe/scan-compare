@@ -23,14 +23,19 @@ export function SiteSwitcher({ className }: { className?: string }) {
   useEffect(() => {
     if (!isSuperAdmin) return;
     let cancelled = false;
-    (async () => {
+
+    async function loadSites() {
       const res = await fetch("/api/sites");
       if (!res.ok || cancelled) return;
       const data = await res.json();
       if (!cancelled) setSites(data.sites ?? []);
-    })();
+    }
+
+    void loadSites();
+    window.addEventListener("sites-updated", loadSites);
     return () => {
       cancelled = true;
+      window.removeEventListener("sites-updated", loadSites);
     };
   }, [isSuperAdmin]);
 

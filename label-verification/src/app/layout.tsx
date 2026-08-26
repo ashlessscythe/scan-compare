@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   title: "Scan Compare",
   description:
     "Corporate scan verification tool for warehouse label compare and shipment checks",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+  },
   appleWebApp: {
     capable: true,
     title: "Scan Compare",
