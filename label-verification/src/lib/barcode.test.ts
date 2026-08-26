@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  extractLargeQrSuffix,
   extractLicensePlateShort,
   extractPartNumber,
   isValidLargeQr,
@@ -65,6 +66,11 @@ describe("large QR validation", () => {
     expect(extractLicensePlateShort(LIC_PLATES[0])).toBe("J0001153522305290204228337");
   });
 
+  it("extracts large QR suffix", () => {
+    expect(extractLargeQrSuffix(LIC_PLATES[0])).toBe("A");
+    expect(extractLargeQrSuffix(LIC_PLATES[3])).toBe("D");
+  });
+
   it("validates four unique matching scans", () => {
     const result = validateLargeQrScans(LIC_PLATES);
     expect(result.valid).toBe(true);
@@ -78,5 +84,37 @@ describe("large QR validation", () => {
       LIC_PLATES[3],
     ]);
     expect(result.valid).toBe(false);
+  });
+
+  it("allows any suffix order", () => {
+    const result = validateLargeQrScans([
+      LIC_PLATES[1],
+      LIC_PLATES[3],
+      LIC_PLATES[2],
+      LIC_PLATES[0],
+    ]);
+    expect(result.valid).toBe(true);
+  });
+
+  it("rejects missing suffix letter", () => {
+    const result = validateLargeQrScans([
+      LIC_PLATES[0],
+      LIC_PLATES[1],
+      LIC_PLATES[2],
+      "6J0001153522305290204228337:ZE",
+    ]);
+    expect(result.valid).toBe(false);
+    expect(result.message).toMatch(/Need suffixes A, B, C, and D/);
+  });
+
+  it("rejects mismatched license plates", () => {
+    const result = validateLargeQrScans([
+      LIC_PLATES[0],
+      LIC_PLATES[1],
+      LIC_PLATES[2],
+      "6J9999999999999999999999999:ZD",
+    ]);
+    expect(result.valid).toBe(false);
+    expect(result.message).toMatch(/License plates mismatch/);
   });
 });

@@ -35,6 +35,13 @@ export function extractLicensePlateShort(barcode: string): string | null {
   return match?.[0] ?? null;
 }
 
+/** Suffix letter after `:Z` on a large QR (expected A–D). */
+export function extractLargeQrSuffix(barcode: string): string | null {
+  const normalized = normalizeScanInput(barcode);
+  const match = normalized.match(/:Z([A-D])(?:[^A-Za-z0-9]|$)/i);
+  return match?.[1]?.toUpperCase() ?? null;
+}
+
 export function validateSmallQrPair(orig: string, portal: string): ValidationResult {
   const o = normalizeScanInput(orig);
   const p = normalizeScanInput(portal);
@@ -65,18 +72,20 @@ export function validateSmallQrPair(orig: string, portal: string): ValidationRes
   };
 }
 
+const LARGE_QR_SUFFIXES = ["A", "B", "C", "D"] as const;
+
 export function validateLargeQrScans(
   scans: [string, string, string, string],
 ): ValidationResult {
   const normalized = scans.map(normalizeScanInput) as [string, string, string, string];
   const unique = new Set(normalized);
 
-  if (unique.size !== 4) {
-    return { valid: false, code: "ERROR", message: "Repeat barcodes. Need 4 different labels." };
-  }
-
   if (normalized.some((s) => !s)) {
     return { valid: false, code: "ERROR", message: "Need 4 valid scans." };
+  }
+
+  if (unique.size !== 4) {
+    return { valid: false, code: "ERROR", message: "Repeat barcodes. Need 4 different labels." };
   }
 
   const valid = normalized.filter(isValidLargeQr);
@@ -87,6 +96,20 @@ export function validateLargeQrScans(
   const licenses = valid.map(extractLicensePlateShort).filter(Boolean) as string[];
   if (licenses.length !== 4 || new Set(licenses).size !== 1) {
     return { valid: false, code: "ERROR", message: "License plates mismatch." };
+  }
+
+  const suffixes = normalized.map(extractLargeQrSuffix);
+  const suffixSet = new Set(suffixes);
+  if (
+    suffixes.some((s) => !s) ||
+    suffixSet.size !== 4 ||
+    !LARGE_QR_SUFFIXES.every((s) => suffixSet.has(s))
+  ) {
+    return {
+      valid: false,
+      code: "ERROR",
+      message: "Need suffixes A, B, C, and D — one of each (any order).",
+    };
   }
 
   return {

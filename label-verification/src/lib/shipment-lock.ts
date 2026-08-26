@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import type { Shipment, User } from "@prisma/client";
+import type { Prisma, Shipment, User } from "@prisma/client";
+
+type DbClient = Prisma.TransactionClient | typeof prisma;
 
 export class ShipmentLockError extends Error {
   constructor(
@@ -81,8 +83,12 @@ export async function acquireLock(shipmentId: string, userId: string) {
   });
 }
 
-export async function extendLock(shipmentId: string, userId: string) {
-  const shipment = await prisma.shipment.findUniqueOrThrow({
+export async function extendLock(
+  shipmentId: string,
+  userId: string,
+  db: DbClient = prisma,
+) {
+  const shipment = await db.shipment.findUniqueOrThrow({
     where: { id: shipmentId },
     include: { lockedBy: { select: { id: true, email: true, name: true } } },
   });
@@ -102,7 +108,7 @@ export async function extendLock(shipmentId: string, userId: string) {
     );
   }
 
-  return prisma.shipment.update({
+  return db.shipment.update({
     where: { id: shipmentId },
     data: { lockExpiresAt: expiresAt, lockedAt: shipment.lockedAt ?? new Date() },
     include: { lockedBy: { select: { id: true, email: true, name: true } } },

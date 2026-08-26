@@ -244,7 +244,15 @@ export default function ScanPage() {
 
   async function handleCancelScan() {
     if (shipment && lockEnabled) {
-      await fetch(`/api/shipments/${shipment.shipmentNumber}/lock`, { method: "DELETE" });
+      // Abandon in-progress work so partial pallets don't linger in recent scans
+      // and the next start with the same number is a clean create (no false re-do).
+      const abandonRes = await fetch(`/api/shipments/${shipment.shipmentNumber}/abandon`, {
+        method: "POST",
+      });
+      if (!abandonRes.ok) {
+        // Fall back to releasing the lock if abandon fails (e.g. already complete).
+        await fetch(`/api/shipments/${shipment.shipmentNumber}/lock`, { method: "DELETE" });
+      }
     }
     setShipment(null);
     setViewOnly(false);
@@ -446,8 +454,11 @@ export default function ScanPage() {
       />
 
       <LargeQrDialog
+        key={`${shipment?.id ?? "none"}-${shipment?.scannedPallets ?? 0}`}
         open={largeQrOpen}
         partNumber={pendingScans?.pn ?? ""}
+        scannedPallets={shipment?.scannedPallets ?? 0}
+        totalPallets={shipment?.totalPallets ?? 0}
         onClose={() => setLargeQrOpen(false)}
         onSuccess={(scans, message) => submitScan(scans, message)}
       />

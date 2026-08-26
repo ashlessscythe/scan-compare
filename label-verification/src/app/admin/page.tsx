@@ -73,9 +73,11 @@ type Dashboard = {
   }>;
   recentScans: Array<{
     id: string;
-    palletIndex: number;
+    shipmentNumber: number;
+    scannedPallets: number;
+    totalPallets: number;
+    status: string;
     createdAt: string;
-    shipment: { shipmentNumber: number };
     user: { email: string; name: string | null };
   }>;
 };
@@ -398,7 +400,7 @@ export default function AdminPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Shipment</TableHead>
-                        <TableHead>Pallet</TableHead>
+                        <TableHead>Pallets</TableHead>
                         <TableHead>Operator</TableHead>
                         <TableHead>Time</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -406,15 +408,17 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                       {dashboard?.recentScans.map((s) => {
-                        const href = `/shipments/${s.shipment.shipmentNumber}?pallet=${s.palletIndex}`;
+                        const href = `/shipments/${s.shipmentNumber}`;
                         return (
                           <TableRow
                             key={s.id}
                             className="cursor-pointer"
                             onClick={() => router.push(href)}
                           >
-                            <TableCell>{s.shipment.shipmentNumber}</TableCell>
-                            <TableCell>{s.palletIndex}</TableCell>
+                            <TableCell>{s.shipmentNumber}</TableCell>
+                            <TableCell>
+                              {s.scannedPallets} / {s.totalPallets}
+                            </TableCell>
                             <TableCell>{s.user.name ?? s.user.email}</TableCell>
                             <TableCell>{new Date(s.createdAt).toLocaleString()}</TableCell>
                             <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
