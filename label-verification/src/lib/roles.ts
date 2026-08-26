@@ -29,15 +29,19 @@ export function resolveAuthRedirect(options: {
   const { pathname, isLoggedIn, role } = options;
   const isLoginPage = pathname.startsWith("/login");
   const isRegisterPage = pathname.startsWith("/register");
+  const isForgotPasswordPage = pathname.startsWith("/forgot-password");
+  const isResetPasswordPage = pathname.startsWith("/reset-password");
   const isPendingPage = pathname.startsWith("/pending");
   const isLandingPage = pathname === "/";
   const isPublicApi = pathname.startsWith("/api/auth");
+  const isAuthFormPage =
+    isRegisterPage || isLoginPage || isForgotPasswordPage || isResetPasswordPage;
 
   if (isPublicApi || pathname.startsWith("/api/") || isLandingPage) {
     return null;
   }
 
-  if (isRegisterPage || isLoginPage) {
+  if (isAuthFormPage) {
     if (!isLoggedIn) {
       // Unified auth UI lives on /register (signup + login).
       return isLoginPage ? "/register?mode=login" : null;

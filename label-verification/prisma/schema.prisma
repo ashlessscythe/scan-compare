@@ -32,21 +32,24 @@ model Site {
 }
 
 model User {
-  id               String     @id @default(cuid())
-  email            String     @unique
-  passwordHash     String
-  name             String?
-  role             Role       @default(OPERATOR)
-  enabled          Boolean    @default(true)
-  lastLogin        DateTime?
-  siteId           String
-  site             Site       @relation(fields: [siteId], references: [id])
-  scans            Scan[]
-  lockedShipments  Shipment[] @relation("ShipmentLock")
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  id                     String    @id @default(cuid())
+  email                  String    @unique
+  passwordHash           String
+  name                   String?
+  role                   Role      @default(OPERATOR)
+  enabled                Boolean   @default(true)
+  lastLogin              DateTime?
+  passwordResetTokenHash String?
+  passwordResetExpires   DateTime?
+  siteId                 String
+  site                   Site      @relation(fields: [siteId], references: [id])
+  scans                  Scan[]
+  lockedShipments        Shipment[] @relation("ShipmentLock")
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   @@index([siteId])
+  @@index([passwordResetTokenHash])
 }
 
 model Shipment {
