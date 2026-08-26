@@ -4,7 +4,7 @@ import { applyActiveSiteUpdate, resolveAuthRedirect } from "@/lib/roles";
 
 export const authConfig = {
   pages: {
-    signIn: "/login",
+    signIn: "/register",
   },
   session: { strategy: "jwt" },
   providers: [],
@@ -15,7 +15,8 @@ export const authConfig = {
       const role = auth?.user?.role as Role | undefined;
 
       const redirectTo = resolveAuthRedirect({ pathname, isLoggedIn, role });
-      if (redirectTo === "/login") return false;
+      // Let NextAuth send guests to pages.signIn (preserves callbackUrl).
+      if (redirectTo === "/register" && !pathname.startsWith("/register")) return false;
       if (redirectTo) {
         return Response.redirect(new URL(redirectTo, request.nextUrl));
       }

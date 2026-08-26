@@ -52,9 +52,9 @@ describe("resolveAuthRedirect", () => {
     expect(resolveAuthRedirect({ pathname: "/register", isLoggedIn: false })).toBeNull();
   });
 
-  it("sends guests to login for protected pages", () => {
-    expect(resolveAuthRedirect({ pathname: "/scan", isLoggedIn: false })).toBe("/login");
-    expect(resolveAuthRedirect({ pathname: "/admin", isLoggedIn: false })).toBe("/login");
+  it("sends guests to register for protected pages", () => {
+    expect(resolveAuthRedirect({ pathname: "/scan", isLoggedIn: false })).toBe("/register");
+    expect(resolveAuthRedirect({ pathname: "/admin", isLoggedIn: false })).toBe("/register");
   });
 
   it("keeps PENDING users on /pending", () => {
@@ -97,6 +97,12 @@ describe("resolveAuthRedirect", () => {
     expect(
       resolveAuthRedirect({ pathname: "/register", isLoggedIn: true, role: "PENDING" }),
     ).toBe("/pending");
+  });
+
+  it("sends guests from /login to the unified register page", () => {
+    expect(resolveAuthRedirect({ pathname: "/login", isLoggedIn: false })).toBe(
+      "/register?mode=login",
+    );
   });
 });
 

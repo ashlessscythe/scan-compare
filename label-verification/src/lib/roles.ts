@@ -37,17 +37,16 @@ export function resolveAuthRedirect(options: {
     return null;
   }
 
-  if (isRegisterPage) {
-    if (!isLoggedIn) return null;
+  if (isRegisterPage || isLoginPage) {
+    if (!isLoggedIn) {
+      // Unified auth UI lives on /register (signup + login).
+      return isLoginPage ? "/register?mode=login" : null;
+    }
     return role === Role.PENDING ? "/pending" : "/scan";
   }
 
   if (!isLoggedIn) {
-    return isLoginPage ? null : "/login";
-  }
-
-  if (isLoginPage) {
-    return role === Role.PENDING ? "/pending" : "/scan";
+    return "/register";
   }
 
   if (role === Role.PENDING && !isPendingPage) {

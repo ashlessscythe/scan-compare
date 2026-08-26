@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,10 @@ type Mode = "signup" | "login";
 
 export function RegisterForm() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("signup");
+  const searchParams = useSearchParams();
+  const [mode, setMode] = useState<Mode>(
+    searchParams.get("mode") === "login" ? "login" : "signup",
+  );
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,7 +44,10 @@ export function RegisterForm() {
     if (session?.user?.role === "PENDING") {
       router.push("/pending");
     } else {
-      router.push("/scan");
+      const callbackUrl = searchParams.get("callbackUrl");
+      router.push(
+        callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/scan",
+      );
     }
     router.refresh();
   }
