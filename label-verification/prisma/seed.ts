@@ -11,6 +11,7 @@ const prisma = new PrismaClient({
   },
 });
 const clear = process.argv.includes("--clear");
+const clearData = process.argv.includes("--clear-data");
 
 async function clearAll() {
   // FK-safe order: scans → shipments → settings → users → sites
@@ -22,14 +23,26 @@ async function clearAll() {
   console.log("Cleared all scans, shipments, settings, users, and sites.");
 }
 
+async function clearScanData() {
+  // Leaves sites, users, and settings intact
+  await prisma.scan.deleteMany();
+  await prisma.shipment.deleteMany();
+  console.log("Cleared all scans and shipments (sites and users left intact).");
+}
+
 async function main() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "Admin123!";
   const operatorEmail = process.env.SEED_OPERATOR_EMAIL ?? "operator@example.com";
   const operatorPassword = process.env.SEED_OPERATOR_PASSWORD ?? "Operator123!";
 
+  if (clear && clearData) {
+    throw new Error("Use either --clear or --clear-data, not both.");
+  }
   if (clear) {
     await clearAll();
+  } else if (clearData) {
+    await clearScanData();
   }
 
   const adminPinHash = await bcrypt.hash("3333", 12);
@@ -115,7 +128,13 @@ async function main() {
     },
   });
 
-  console.log(clear ? "Seed complete (after clear):" : "Seed complete:");
+  console.log(
+    clear
+      ? "Seed complete (after clear):"
+      : clearData
+        ? "Seed complete (after clear-data):"
+        : "Seed complete:"
+  );
   console.log(`  Superadmin: ${adminEmail} / ${adminPassword}`);
   console.log(`  Operator:   ${operatorEmail} / ${operatorPassword}`);
   console.log(`  Sites:      ${defaultSite.slug}, warehouse-b`);
