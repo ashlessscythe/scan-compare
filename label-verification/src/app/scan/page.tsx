@@ -454,7 +454,7 @@ export default function ScanPage() {
       />
 
       <LargeQrDialog
-        key={`${shipment?.id ?? "none"}-${shipment?.scannedPallets ?? 0}`}
+        key={`${shipment?.id ?? "none"}-${shipment?.scannedPallets ?? 0}-${largeQrOpen}`}
         open={largeQrOpen}
         partNumber={pendingScans?.pn ?? ""}
         scannedPallets={shipment?.scannedPallets ?? 0}

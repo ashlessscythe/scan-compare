@@ -40,12 +40,11 @@ export function LargeQrDialog({
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
   const [duplicateWarn, setDuplicateWarn] = useState("");
-  const refs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
+  const ref0 = useRef<HTMLInputElement>(null);
+  const ref1 = useRef<HTMLInputElement>(null);
+  const ref2 = useRef<HTMLInputElement>(null);
+  const ref3 = useRef<HTMLInputElement>(null);
+  const refs = [ref0, ref1, ref2, ref3];
 
   const remaining = Math.max(totalPallets - scannedPallets, 0);
   const progress =
@@ -53,13 +52,9 @@ export function LargeQrDialog({
 
   useEffect(() => {
     if (!open) return;
-    setScans(["", "", "", ""]);
-    setMessage("");
-    setError(false);
-    setDuplicateWarn("");
-    const t = setTimeout(() => refs[0].current?.focus(), 50);
+    const t = setTimeout(() => ref0.current?.focus(), 50);
     return () => clearTimeout(t);
-  }, [open]);
+  }, [open, ref0]);
 
   function updateScan(index: number, value: string) {
     const next = [...scans];
