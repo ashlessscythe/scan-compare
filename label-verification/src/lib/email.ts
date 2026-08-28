@@ -6,7 +6,11 @@ import {
   passwordResetEmailHtml,
   passwordResetEmailSubject,
   passwordResetEmailText,
+  welcomeEmailHtml,
+  welcomeEmailSubject,
+  welcomeEmailText,
 } from "@/lib/email-templates";
+import { buildLoginUrl } from "@/lib/app-url";
 import { PASSWORD_RESET_TOKEN_TTL_MS } from "@/lib/password-reset";
 
 function getResendClient(): Resend {
@@ -79,5 +83,31 @@ export async function sendPasswordResetEmail(options: {
     subject: passwordResetEmailSubject(appName),
     text: passwordResetEmailText(templateInput),
     html: passwordResetEmailHtml(templateInput),
+  });
+}
+
+export async function sendWelcomeEmail(options: {
+  toEmail: string;
+  siteId: string;
+  siteName: string;
+  recipientName?: string | null;
+}) {
+  const appName = appDisplayName();
+  const templateInput = {
+    appName,
+    siteName: options.siteName,
+    loginUrl: buildLoginUrl(),
+    recipientName: options.recipientName,
+  };
+
+  const resend = getResendClient();
+  const from = await resolveFromAddress(options.siteId);
+
+  await resend.emails.send({
+    from,
+    to: [options.toEmail],
+    subject: welcomeEmailSubject(appName),
+    text: welcomeEmailText(templateInput),
+    html: welcomeEmailHtml(templateInput),
   });
 }

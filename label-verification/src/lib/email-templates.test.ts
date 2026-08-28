@@ -3,6 +3,9 @@ import {
   passwordResetEmailHtml,
   passwordResetEmailSubject,
   passwordResetEmailText,
+  welcomeEmailHtml,
+  welcomeEmailSubject,
+  welcomeEmailText,
 } from "./email-templates";
 
 const sample = {
@@ -38,6 +41,43 @@ describe("password reset email templates", () => {
 
   it("falls back to a generic greeting without a name", () => {
     const text = passwordResetEmailText({ ...sample, recipientName: null });
+    expect(text.startsWith("Hi,")).toBe(true);
+  });
+});
+
+const welcomeSample = {
+  appName: "Tesla Scan",
+  siteName: "Plant A <West>",
+  loginUrl: "https://example.com/register?mode=login",
+  recipientName: "Jordan",
+};
+
+describe("welcome email templates", () => {
+  it("builds a clear subject line", () => {
+    expect(welcomeEmailSubject("Tesla Scan")).toBe(
+      "Your Tesla Scan account has been approved",
+    );
+  });
+
+  it("includes site name and login URL in plain text", () => {
+    const text = welcomeEmailText(welcomeSample);
+    expect(text).toContain("Hi Jordan,");
+    expect(text).toContain("approved for Plant A <West>");
+    expect(text).toContain(welcomeSample.loginUrl);
+    expect(text).toContain("Sign in to get started");
+    expect(text).not.toContain("log out");
+  });
+
+  it("escapes HTML in the rich template and embeds the CTA", () => {
+    const html = welcomeEmailHtml(welcomeSample);
+    expect(html).toContain("Plant A &lt;West&gt;");
+    expect(html).not.toContain("Plant A <West>");
+    expect(html).toContain(`href="${welcomeSample.loginUrl}"`);
+    expect(html).toContain("Sign in to get started");
+  });
+
+  it("falls back to a generic greeting without a name", () => {
+    const text = welcomeEmailText({ ...welcomeSample, recipientName: null });
     expect(text.startsWith("Hi,")).toBe(true);
   });
 });

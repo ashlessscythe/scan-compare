@@ -10,6 +10,7 @@ import {
   isSuperAdminRole,
 } from "@/lib/api-auth";
 import { canAssignRole } from "@/lib/roles";
+import { sendWelcomeEmail } from "@/lib/email";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -66,13 +67,43 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   if (parsed.data.password) data.passwordHash = await bcrypt.hash(parsed.data.password, 12);
   if (parsed.data.siteId !== undefined) data.siteId = parsed.data.siteId;
 
+  const wasPending = existing.role === Role.PENDING;
+  const newRole =
+    parsed.data.role !== undefined ? (parsed.data.role as Role) : existing.role;
+  const isApproval = wasPending && newRole !== Role.PENDING;
+
+  if (isApproval) {
+    data.sessionVersion = { increment: 1 };
+  }
+
   const user = await prisma.user.update({
     where: { id },
     data,
     select: userSelect,
   });
 
-  return Response.json({ user });
+  let welcomeEmailSent = false;
+  if (isApproval && user.enabled) {
+    const site = await prisma.site.findUnique({
+      where: { id: user.siteId },
+      select: { name: true },
+    });
+    if (site) {
+      try {
+        await sendWelcomeEmail({
+          toEmail: user.email,
+          siteId: user.siteId,
+          siteName: site.name,
+          recipientName: user.name,
+        });
+        welcomeEmailSent = true;
+      } catch (error) {
+        console.error("Failed to send welcome email", error);
+      }
+    }
+  }
+
+  return Response.json({ user, welcomeEmailSent });
 }
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {

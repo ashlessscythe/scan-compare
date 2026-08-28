@@ -25,6 +25,7 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const approvedReason = searchParams.get("reason") === "approved";
 
   async function handleLogin() {
     const result = await signIn("credentials", {
@@ -122,6 +123,13 @@ export function RegisterForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {approvedReason && mode === "login" && (
+            <Alert className="mb-4">
+              <AlertDescription>
+                Your account has been approved. Sign in to get started.
+              </AlertDescription>
+            </Alert>
+          )}
           <div className="mb-4 grid grid-cols-2 gap-2">
             <Button
               type="button"

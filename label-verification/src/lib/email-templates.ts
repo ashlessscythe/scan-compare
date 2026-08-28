@@ -97,6 +97,94 @@ export function passwordResetEmailHtml(input: PasswordResetEmailInput): string {
 </html>`;
 }
 
+export type WelcomeEmailInput = {
+  appName: string;
+  siteName: string;
+  loginUrl: string;
+  recipientName?: string | null;
+};
+
+export function welcomeEmailSubject(appName: string): string {
+  return `Your ${appName} account has been approved`;
+}
+
+export function welcomeEmailText(input: WelcomeEmailInput): string {
+  const greeting = input.recipientName?.trim()
+    ? `Hi ${input.recipientName.trim()},`
+    : "Hi,";
+
+  return [
+    greeting,
+    "",
+    `Your ${input.appName} account has been approved for ${input.siteName}.`,
+    "",
+    "Sign in to get started:",
+    input.loginUrl,
+    "",
+    `— ${input.appName}`,
+  ].join("\n");
+}
+
+export function welcomeEmailHtml(input: WelcomeEmailInput): string {
+  const greeting = input.recipientName?.trim()
+    ? `Hi ${escapeHtml(input.recipientName.trim())},`
+    : "Hi,";
+  const appName = escapeHtml(input.appName);
+  const siteName = escapeHtml(input.siteName);
+  const loginUrl = escapeHtml(input.loginUrl);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account approved</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#18181b;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f4f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e7;">
+          <tr>
+            <td style="padding:28px 28px 8px;font-size:20px;font-weight:600;letter-spacing:-0.02em;">
+              ${appName}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 28px 0;font-size:16px;line-height:1.5;">
+              ${greeting}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:12px 28px 0;font-size:15px;line-height:1.6;color:#3f3f46;">
+              Your account has been approved for <strong>${siteName}</strong>. Sign in to get started.
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:28px;">
+              <a href="${loginUrl}" style="display:inline-block;background:#18181b;color:#fafafa;text-decoration:none;font-size:15px;font-weight:600;padding:12px 24px;border-radius:8px;">
+                Sign in to get started
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 28px 8px;font-size:13px;line-height:1.5;color:#71717a;">
+              Or copy and paste this link into your browser:
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 28px 28px;font-size:12px;line-height:1.5;word-break:break-all;color:#52525b;">
+              <a href="${loginUrl}" style="color:#2563eb;">${loginUrl}</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")

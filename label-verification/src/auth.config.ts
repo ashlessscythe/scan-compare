@@ -1,6 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 import type { Role } from "@prisma/client";
 import { applyActiveSiteUpdate, resolveAuthRedirect } from "@/lib/roles";
+import {
+  SESSION_INVALIDATED_ERROR,
+  isSessionInvalidated,
+  validateSessionVersion,
+} from "@/lib/session-version";
 
 export const authConfig = {
   pages: {
@@ -11,8 +16,21 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request }) {
       const pathname = request.nextUrl.pathname;
-      const isLoggedIn = !!auth?.user;
+      const sessionInvalidated = isSessionInvalidated(auth?.error);
+      const isLoggedIn = !!auth?.user && !sessionInvalidated;
       const role = auth?.user?.role as Role | undefined;
+
+      if (sessionInvalidated) {
+        if (
+          pathname.startsWith("/pending") ||
+          pathname.startsWith("/api/auth/account-status") ||
+          pathname.startsWith("/register")
+        ) {
+          return true;
+        }
+        const url = new URL("/register?mode=login&reason=approved", request.nextUrl);
+        return Response.redirect(url);
+      }
 
       const redirectTo = resolveAuthRedirect({ pathname, isLoggedIn, role });
       // Let NextAuth send guests to pages.signIn (preserves callbackUrl).
@@ -22,12 +40,14 @@ export const authConfig = {
       }
       return true;
     },
-    jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id!;
         token.role = user.role;
         token.siteId = user.siteId;
         token.activeSiteId = user.siteId;
+        token.sessionVersion = user.sessionVersion ?? 0;
+        delete token.error;
       }
 
       if (trigger === "update") {
@@ -38,7 +58,14 @@ export const authConfig = {
         });
       }
 
-      return token;
+      return validateSessionVersion({
+        id: token.id as string | undefined,
+        sessionVersion: token.sessionVersion as number | undefined,
+        error: token.error as string | undefined,
+      }).then((validated) => ({
+        ...token,
+        ...validated,
+      }));
     },
     session({ session, token }) {
       if (session.user) {
@@ -47,7 +74,12 @@ export const authConfig = {
         session.user.siteId = token.siteId as string;
         session.user.activeSiteId = (token.activeSiteId as string) ?? (token.siteId as string);
       }
+      if (token.error) {
+        session.error = token.error as string;
+      }
       return session;
     },
   },
 } satisfies NextAuthConfig;
+
+export { SESSION_INVALIDATED_ERROR };

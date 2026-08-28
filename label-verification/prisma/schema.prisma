@@ -41,6 +41,7 @@ model User {
   lastLogin              DateTime?
   passwordResetTokenHash String?
   passwordResetExpires   DateTime?
+  sessionVersion         Int       @default(0)
   siteId                 String
   site                   Site      @relation(fields: [siteId], references: [id])
   scans                  Scan[]

@@ -192,11 +192,28 @@ export default function AdminPage() {
       body: JSON.stringify({ role: "OPERATOR" }),
     });
     if (res.ok) {
-      toast.success("User approved as operator");
+      const data = await res.json();
+      if (data.welcomeEmailSent) {
+        toast.success("User approved — welcome email sent");
+      } else {
+        toast.success("User approved, but welcome email could not be sent");
+      }
       loadAll();
     } else {
       const data = await res.json();
       toast.error(data.error ?? "Could not approve user");
+    }
+  }
+
+  async function resendWelcomeEmail(id: string) {
+    const res = await fetch(`/api/admin/users/${id}/welcome-email`, {
+      method: "POST",
+    });
+    if (res.ok) {
+      toast.success("Welcome email sent");
+    } else {
+      const data = await res.json();
+      toast.error(data.error ?? "Could not send welcome email");
     }
   }
 
@@ -207,7 +224,14 @@ export default function AdminPage() {
       body: JSON.stringify({ role }),
     });
     if (res.ok) {
-      toast.success("Role updated");
+      const data = await res.json();
+      if (data.welcomeEmailSent === true) {
+        toast.success("User approved — welcome email sent");
+      } else if (data.welcomeEmailSent === false) {
+        toast.success("User approved, but welcome email could not be sent");
+      } else {
+        toast.success("Role updated");
+      }
       loadAll();
     } else {
       const data = await res.json();
@@ -541,6 +565,15 @@ export default function AdminPage() {
                               <Button size="sm" variant="outline" onClick={() => toggleUser(u.id, u.enabled)}>
                                 {u.enabled ? "Disable" : "Enable"}
                               </Button>
+                              {isSuperAdmin && u.role !== "PENDING" && u.enabled && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => resendWelcomeEmail(u.id)}
+                                >
+                                  Resend welcome email
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
