@@ -90,8 +90,14 @@ Open [http://localhost:3000](http://localhost:3000)
 |------|-------|----------|
 | Admin | `admin@example.com` | `Admin123!` |
 | Operator | `operator@example.com` | `Operator123!` |
+| Operator 1–4 | `operator1@example.com` … `operator4@example.com` | `Operator123!` |
+| WB Operators | `wb-operator1@example.com` … `wb-operator3@example.com` | `Operator123!` |
 
 Default admin override PIN: **3333** (configurable in Admin → Settings)
+
+### Demo data
+
+Re-running `npx prisma db seed` refreshes demo shipments **12345670–12345679** (10 shipments, 2–25 pallets each) with realistic scan records. User-created shipments outside that range are left intact.
 
 ## Scripts
 

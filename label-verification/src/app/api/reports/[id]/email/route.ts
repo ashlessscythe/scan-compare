@@ -35,6 +35,8 @@ export async function POST(_request: Request, { params }: RouteParams) {
       palletIndex: s.palletIndex,
       pnOrig: s.pnOrig,
       pnNew: s.pnNew,
+      qrOrig: s.qrOrig,
+      qrNew: s.qrNew,
       result: s.result,
       createdAt: s.createdAt.toISOString(),
       userEmail: s.user.email,
