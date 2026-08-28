@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,9 +17,7 @@ type Mode = "signup" | "login";
 export function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mode, setMode] = useState<Mode>(
-    searchParams.get("mode") === "login" ? "login" : "signup",
-  );
+  const mode: Mode = searchParams.get("mode") === "login" ? "login" : "signup";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,11 +25,15 @@ export function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const approvedReason = searchParams.get("reason") === "approved";
 
-  useEffect(() => {
-    const urlMode = searchParams.get("mode");
-    if (urlMode === "login") setMode("login");
-    else if (urlMode === "signup") setMode("signup");
-  }, [searchParams]);
+  const switchMode = useCallback(
+    (nextMode: Mode) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("mode", nextMode);
+      router.replace(`/register?${params.toString()}`);
+      setError("");
+    },
+    [router, searchParams],
+  );
 
   async function handleLogin() {
     const result = await signIn("credentials", {
@@ -84,7 +86,7 @@ export function RegisterForm() {
 
     if (result?.error) {
       setError("Account created, but sign-in failed. Please log in.");
-      setMode("login");
+      router.replace("/register?mode=login");
       return;
     }
 
@@ -141,10 +143,7 @@ export function RegisterForm() {
               type="button"
               variant={mode === "signup" ? "default" : "outline"}
               className="h-10"
-              onClick={() => {
-                setMode("signup");
-                setError("");
-              }}
+              onClick={() => switchMode("signup")}
             >
               Sign up
             </Button>
@@ -152,10 +151,7 @@ export function RegisterForm() {
               type="button"
               variant={mode === "login" ? "default" : "outline"}
               className="h-10"
-              onClick={() => {
-                setMode("login");
-                setError("");
-              }}
+              onClick={() => switchMode("login")}
             >
               Log in
             </Button>
@@ -232,7 +228,7 @@ export function RegisterForm() {
                 <button
                   type="button"
                   className="underline underline-offset-2"
-                  onClick={() => setMode("login")}
+                  onClick={() => switchMode("login")}
                 >
                   Log in
                 </button>
@@ -243,7 +239,7 @@ export function RegisterForm() {
                 <button
                   type="button"
                   className="underline underline-offset-2"
-                  onClick={() => setMode("signup")}
+                  onClick={() => switchMode("signup")}
                 >
                   Sign up
                 </button>

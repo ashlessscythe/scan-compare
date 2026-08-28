@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -19,6 +20,7 @@ type AccountStatus = {
 const POLL_INTERVAL_MS = 5000;
 
 export function PendingStatus() {
+  const router = useRouter();
   const [status, setStatus] = useState<AccountStatus | null>(null);
   const [loadingSignIn, setLoadingSignIn] = useState(false);
 
@@ -54,7 +56,7 @@ export function PendingStatus() {
     try {
       await signOut({ callbackUrl: "/register?mode=login&reason=approved" });
     } catch {
-      window.location.href = "/register?mode=login&reason=approved";
+      router.push("/register?mode=login&reason=approved");
     } finally {
       setLoadingSignIn(false);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -113,7 +113,7 @@ export default function AdminPage() {
   const [emailCcList, setEmailCcList] = useState("");
   const [lockTimeout, setLockTimeout] = useState("30");
 
-  async function loadAll() {
+  const loadAll = useCallback(async () => {
     const [dashRes, usersRes, settingsRes, sitesRes] = await Promise.all([
       fetch("/api/admin/dashboard"),
       fetch("/api/admin/users"),
@@ -139,7 +139,7 @@ export default function AdminPage() {
       setEmailCcList(s.emailCcList.join(", "));
       setLockTimeout(String(s.lockTimeoutMinutes));
     }
-  }
+  }, [isSuperAdmin]);
 
   const defaultNewSiteId = session?.user?.activeSiteId ?? "";
 
@@ -148,7 +148,7 @@ export default function AdminPage() {
       void loadAll();
     }, 0);
     return () => clearTimeout(timer);
-  }, [session?.user?.activeSiteId, isSuperAdmin]);
+  }, [session?.user?.activeSiteId, isSuperAdmin, loadAll]);
 
   async function createUser() {
     const res = await fetch("/api/admin/users", {
