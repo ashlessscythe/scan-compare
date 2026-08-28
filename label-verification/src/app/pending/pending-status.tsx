@@ -51,7 +51,13 @@ export function PendingStatus() {
 
   async function handleSignIn() {
     setLoadingSignIn(true);
-    await signOut({ callbackUrl: "/register?mode=login&reason=approved" });
+    try {
+      await signOut({ callbackUrl: "/register?mode=login&reason=approved" });
+    } catch {
+      window.location.href = "/register?mode=login&reason=approved";
+    } finally {
+      setLoadingSignIn(false);
+    }
   }
 
   const isApproved = status?.isApproved ?? false;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -26,6 +26,12 @@ export function RegisterForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const approvedReason = searchParams.get("reason") === "approved";
+
+  useEffect(() => {
+    const urlMode = searchParams.get("mode");
+    if (urlMode === "login") setMode("login");
+    else if (urlMode === "signup") setMode("signup");
+  }, [searchParams]);
 
   async function handleLogin() {
     const result = await signIn("credentials", {

@@ -23,7 +23,7 @@ export const authConfig = {
       if (sessionInvalidated) {
         if (
           pathname.startsWith("/pending") ||
-          pathname.startsWith("/api/auth/account-status") ||
+          pathname.startsWith("/api/auth/") ||
           pathname.startsWith("/register")
         ) {
           return true;
