@@ -1,13 +1,24 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { proxyMatcher } from "@/proxy.config";
 
 const PROXY_MATCHER = proxyMatcher[0];
+const proxySource = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), "proxy.ts"),
+  "utf8",
+);
 
 function matchesProxy(pathname: string): boolean {
   return new RegExp(`^${PROXY_MATCHER}$`).test(pathname);
 }
 
 describe("proxy matcher", () => {
+  it("stays in sync with the inline matcher in proxy.ts", () => {
+    expect(proxySource).toContain(PROXY_MATCHER);
+  });
+
   it("skips auth API routes so NextAuth handlers return JSON", () => {
     for (const path of [
       "/api/auth/session",
